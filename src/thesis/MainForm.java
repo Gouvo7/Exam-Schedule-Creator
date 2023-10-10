@@ -7,22 +7,16 @@ package thesis;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import thesis.Professor;
 
 /**
  *
@@ -173,53 +167,140 @@ public class MainForm extends javax.swing.JFrame {
 
     private void doThings() throws FileNotFoundException, IOException {
         
-        FileInputStream file = new FileInputStream(new File(jTextField1.getText()));
-        XSSFWorkbook workbook = new XSSFWorkbook(file);
-        //Iterate through each rows one by one
-        XSSFSheet sheet = workbook.getSheet("PROFESSORS_LIST");
-        Iterator<Row> rowIterator = sheet.iterator();
-        int i = 0;
-        // ArayList of Professors
+        
+        String filename = jTextField1.getText();
         List<Professor> profs = new ArrayList<>();
-        while (rowIterator.hasNext()) {
-            i = i + 1;
-            Row row = rowIterator.next();
-            System.out.println("Line is :"+ i);
-            String cellA="";
-            String cellB="";
-            String cellC="";
-            
-            //For each row, iterate through all the columns
-            Iterator<Cell> cellIterator = row.cellIterator();
-            while (cellIterator.hasNext()) {
-                Cell cell = cellIterator.next();
-                int col = cell.getColumnIndex();
-                switch (col) {
-                    case 0:
-                        cellA = cell.getStringCellValue();
-                        break;
-                    case 1:
-                        cellB = cell.getStringCellValue();
-                        break;
-                    case 2:
-                        cellC = cell.getStringCellValue();
-                        break;
-                    default:
-                        break;
-                }
-            }
-            if(check(cellA, cellB, cellC)){
-                profs.add(new Professor(cellA, cellB, cellC));
-            }
-        }
-        workbook.close();
-        file.close();
-        System.out.println("Done reading...");
+        profs.addAll(getProfs(filename));
+        System.out.println("Done reading teachers...");
+        /*
         int c = 0;
         for (Professor currentProfessor : profs) {
             System.out.print("C is: " + c + " ");
             c++;
             currentProfessor.printText();
+        }
+        */
+        List<String> timeslots = new ArrayList<>();
+        timeslots.addAll(getTimeslots(filename));
+        for (String currentProfessor : timeslots) {
+            System.out.println(currentProfessor);
+        }
+        
+        List<String> dates = new ArrayList<>();
+        dates.addAll(getDates(filename));
+        for (String date : dates) {
+            System.out.println(date);
+        }
+    }
+    
+    public List<String> getDates(String f){
+        try {
+            FileInputStream file = new FileInputStream(new File(f));
+            XSSFWorkbook workbook = new XSSFWorkbook(f);
+            //Iterate through each rows one by one
+            XSSFSheet sheet = workbook.getSheet("DATES");
+            int columnIndex = 0;
+            List<String> dates = new ArrayList<>();
+            for (Row row : sheet) {
+                Cell cell = row.getCell(columnIndex);
+                CellType = cell.getCellTypeEnum();
+                if (cell != null && !cell.equals("ΗΜΕΡΟΜΗΝΙΑ")) {
+                    if (cell.getCellType() == CellType.STRING) {
+                    dates.add(cell.getStringCellValue());
+                } else if (cell.getCellType() == CellType.NUMERIC) {
+                    // Handle numeric cell
+                    dates.add(String.valueOf(cell.getNumericCellValue()));
+                }
+                }
+            }
+            return dates;
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        } catch (IOException ex1){
+            return null;
+        }
+    }
+    
+    public List<String> getTimeslots(String f){
+        try {
+            FileInputStream file = new FileInputStream(new File(f));
+            XSSFWorkbook workbook = new XSSFWorkbook(f);
+            //Iterate through each rows one by one
+            XSSFSheet sheet = workbook.getSheet("TIMESLOTS");
+            int columnIndex = 0;
+            List<String> timeslots = new ArrayList<>();
+            for (Row row : sheet) {
+                Cell cell = row.getCell(columnIndex);
+                if (cell != null && !(cell.equals("TIMESLOTS"))) {
+                    timeslots.add(cell.getStringCellValue());
+                }
+            }
+            return timeslots;
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        } catch (IOException ex1){
+            return null;
+        }
+    }
+    
+    public List<Professor> getProfs(String f){
+        try{
+            
+            FileInputStream file = new FileInputStream(new File(f));
+            XSSFWorkbook workbook = new XSSFWorkbook(f);
+            //Iterate through each rows one by one
+            XSSFSheet sheet = workbook.getSheet("PROFESSORS_LIST");
+            Iterator<Row> rowIterator = sheet.iterator();
+            // ArayList of Professors
+            List<Professor> profs = new ArrayList<>();
+            while (rowIterator.hasNext()) {
+                Row row = rowIterator.next();
+                String cellA="";
+                String cellB="";
+                String cellC="";
+
+                //For each row, iterate through all the columns
+                Iterator<Cell> cellIterator = row.cellIterator();
+                while (cellIterator.hasNext()) {
+                    Cell cell = cellIterator.next();
+                    int col = cell.getColumnIndex();
+                    switch (col) {
+                        case 0:
+                            String tmp1 = cell.getStringCellValue();
+                            if (tmp1.equals("ΕΠΩΝΥΜΟ")){
+                                break;
+                            }
+                            cellA = cell.getStringCellValue();
+                            break;
+                        case 1:
+                            String tmp2 = cell.getStringCellValue();
+                            if (tmp2.equals("ΕΠΩΝΥΜΟ")){
+                                break;
+                            }
+                            cellB = cell.getStringCellValue();
+                            break;
+                        case 2:
+                            String tmp3 = cell.getStringCellValue();
+                            if (tmp3.equals("ΕΠΩΝΥΜΟ")){
+                                break;
+                            }
+                            cellC = cell.getStringCellValue();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if(check(cellA, cellB, cellC)){
+                    profs.add(new Professor(cellA, cellB, cellC));
+                }
+            }
+            file.close();
+            return profs;
+        }catch (IOException e){
+            System.out.println("Could not read file");
+            return null;
         }
     }
     
