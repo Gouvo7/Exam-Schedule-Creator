@@ -1,25 +1,36 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+/**
+ * Η κλάση MainForm είναι η κλάση που χρησιμοποιείται για το γραφικό περιβάλλον (user interface - UI) της εφαρμογής.
+ * @author gouvo
  */
+
 package thesis;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.gmele.general.exceptions.GmException;
+import org.gmele.general.sheets.XlsxSheet;
+import org.gmele.general.sheets.exception.SheetExc;
+import static org.junit.Assert.assertThat;
 
 /**
- *
+ * Η κλάση MainForm είναι η κλάση που χρησιμοποιείται για το γραφικό περιβάλλον (user interface - UI) της εφαρμογής.
  * @author gouvo
  */
 public class MainForm extends javax.swing.JFrame {
@@ -27,7 +38,8 @@ public class MainForm extends javax.swing.JFrame {
     /**
      * Creates new form MainForm
      */
-    public MainForm() {
+    public MainForm(){
+        //GmException g = new GmException("Τα γάμησες",1,"ντάτα");
         initComponents();
         this.setLocationRelativeTo(null);
         this.show(true);
@@ -186,129 +198,150 @@ public class MainForm extends javax.swing.JFrame {
             System.out.println(currentProfessor);
         }
         
-        List<String> dates = new ArrayList<>();
-        dates.addAll(getDates(filename));
-        for (String date : dates) {
-            System.out.println(date);
+        
+        HashMap<String, String> dates = 
+                new HashMap<String,String>(getDates(filename));
+        
+        for (Map.Entry<String, String> entry : dates.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            System.out.println("Key=" + key + ", Value=" + value);
         }
+        
+        createTemplate(profs,timeslots,dates, filename);
     }
     
-    public List<String> getDates(String f){
+    public HashMap<String, String> getDates(String f){
         try {
             FileInputStream file = new FileInputStream(new File(f));
-            XSSFWorkbook workbook = new XSSFWorkbook(f);
-            //Iterate through each rows one by one
-            XSSFSheet sheet = workbook.getSheet("DATES");
-            int columnIndex = 0;
-            List<String> dates = new ArrayList<>();
-            for (Row row : sheet) {
-                Cell cell = row.getCell(columnIndex);
-                CellType = cell.getCellTypeEnum();
-                if (cell != null && !cell.equals("ΗΜΕΡΟΜΗΝΙΑ")) {
-                    if (cell.getCellType() == CellType.STRING) {
-                    dates.add(cell.getStringCellValue());
-                } else if (cell.getCellType() == CellType.NUMERIC) {
-                    // Handle numeric cell
-                    dates.add(String.valueOf(cell.getNumericCellValue()));
+            XlsxSheet s = new XlsxSheet(f);
+            s.SelectSheet("DATES");
+            HashMap<String, String> dates = new HashMap<String, String>();
+            SimpleDateFormat inputDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+            SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            
+            int rowIndex = 0;
+            int lastRow = s.GetLastRow();
+            System.out.println(lastRow);
+            
+            while (rowIndex <= lastRow){
+                if (rowIndex != 0){
+                    Date date;
+                    try {
+                        date = inputDateFormat.parse(s.GetCellDate(rowIndex, 0).toString());
+                    } catch (ParseException ex) {
+                        Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                        file.close();
+                        return dates;
+                    }
+                    String cellA = outputDateFormat.format(date);
+                    String cellB = s.GetCellString(rowIndex, 1);
+                    if (check(cellA) && check(cellB)){
+                        dates.put(cellA, cellB);
+                    }else{
+                        file.close();
+                        return dates;
+                    }
                 }
-                }
+                rowIndex++;
             }
+            file.close();
             return dates;
         } catch (FileNotFoundException ex) {
             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        } catch (IOException ex1){
-            return null;
+        } catch (IOException ex){
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SheetExc ex) {
+            
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return null;
     }
     
     public List<String> getTimeslots(String f){
         try {
             FileInputStream file = new FileInputStream(new File(f));
-            XSSFWorkbook workbook = new XSSFWorkbook(f);
+            XlsxSheet s = new XlsxSheet(f);
+            s.SelectSheet("TIMESLOTS");
             //Iterate through each rows one by one
-            XSSFSheet sheet = workbook.getSheet("TIMESLOTS");
-            int columnIndex = 0;
             List<String> timeslots = new ArrayList<>();
-            for (Row row : sheet) {
-                Cell cell = row.getCell(columnIndex);
-                if (cell != null && !(cell.equals("TIMESLOTS"))) {
-                    timeslots.add(cell.getStringCellValue());
+            int rowIndex = 0;
+            int lastRow = s.GetLastRow();
+            
+            while (rowIndex <= lastRow){
+                if (rowIndex != 0){
+                    String cellA = s.GetCellString(rowIndex, 0);
+                    timeslots.add(cellA);
                 }
+                rowIndex++;
             }
+            file.close();
             return timeslots;
         } catch (FileNotFoundException ex) {
             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        } catch (IOException ex1){
-            return null;
+        } catch (IOException ex){
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SheetExc ex) {
+            
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return null;
     }
     
     public List<Professor> getProfs(String f){
         try{
             
             FileInputStream file = new FileInputStream(new File(f));
-            XSSFWorkbook workbook = new XSSFWorkbook(f);
-            //Iterate through each rows one by one
-            XSSFSheet sheet = workbook.getSheet("PROFESSORS_LIST");
-            Iterator<Row> rowIterator = sheet.iterator();
-            // ArayList of Professors
+            //XSSFWorkbook workbook = new XSSFWorkbook(f);
+            XlsxSheet s = new XlsxSheet(f);
+            s.SelectSheet("PROFESSORS_LIST");
+            System.out.println(s.GetLastRow());
+            int rowIndex = 0;
+            int lastRow = s.GetLastRow();
             List<Professor> profs = new ArrayList<>();
-            while (rowIterator.hasNext()) {
-                Row row = rowIterator.next();
-                String cellA="";
-                String cellB="";
-                String cellC="";
-
-                //For each row, iterate through all the columns
-                Iterator<Cell> cellIterator = row.cellIterator();
-                while (cellIterator.hasNext()) {
-                    Cell cell = cellIterator.next();
-                    int col = cell.getColumnIndex();
-                    switch (col) {
-                        case 0:
-                            String tmp1 = cell.getStringCellValue();
-                            if (tmp1.equals("ΕΠΩΝΥΜΟ")){
-                                break;
-                            }
-                            cellA = cell.getStringCellValue();
-                            break;
-                        case 1:
-                            String tmp2 = cell.getStringCellValue();
-                            if (tmp2.equals("ΕΠΩΝΥΜΟ")){
-                                break;
-                            }
-                            cellB = cell.getStringCellValue();
-                            break;
-                        case 2:
-                            String tmp3 = cell.getStringCellValue();
-                            if (tmp3.equals("ΕΠΩΝΥΜΟ")){
-                                break;
-                            }
-                            cellC = cell.getStringCellValue();
-                            break;
-                        default:
-                            break;
+            
+            while (rowIndex <= lastRow){
+                if (rowIndex != 0){
+                    String cellA = s.GetCellString(rowIndex, 0);
+                    String cellB = s.GetCellString(rowIndex, 1);
+                    String cellC = s.GetCellString(rowIndex, 2);
+                    System.out.println(cellA+ " " + cellB + " " + cellC);
+                    Professor tmp = new Professor(cellA, cellB, cellC);
+                    if (check(cellA) && check(cellB) &&  check(cellC)){
+                        profs.add(tmp);
+                    }
+                    else{
+                        file.close();
+                        return profs;
                     }
                 }
-                if(check(cellA, cellB, cellC)){
-                    profs.add(new Professor(cellA, cellB, cellC));
-                }
+                rowIndex++;
             }
+            for (Professor tmp : profs){
+                tmp.printText();
+            }
+
             file.close();
             return profs;
         }catch (IOException e){
             System.out.println("Could not read file");
             return null;
+        }catch (SheetExc e){
+            return null;
         }
     }
     
-    public boolean check(String a, String b, String c){
-        if(a!=null && a!="" && b!=null && b!="" && c!=null && c!=""){
+    public boolean check(String s){
+        if(s!=null && !s.equals("")&& !s.equals(" ")){
             return true;
         }else{
             return false;
         }
     }
+    
+    public void createTemplate(List<Professor> p, List<String> t, HashMap<String,String> d, String f){
+
+    }
 }
+
+
