@@ -1,45 +1,39 @@
-/**
- * Η κλάση MainForm είναι η κλάση που χρησιμοποιείται για το γραφικό περιβάλλον (user interface - UI) της εφαρμογής.
- * @author gouvo
- */
-
 package thesis;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.gmele.general.exceptions.GmException;
 import org.gmele.general.sheets.XlsxSheet;
 import org.gmele.general.sheets.exception.SheetExc;
-import static org.junit.Assert.assertThat;
 
 /**
- * Η κλάση MainForm είναι η κλάση που χρησιμοποιείται για το γραφικό περιβάλλον (user interface - UI) της εφαρμογής.
+ * Η κλάση MainForm είναι η κλάση που χρησιμοποιείται για το γραφικό περιβάλλον 
+ * (user interface - UI) της εφαρμογής.
  * @author gouvo
  */
 public class MainForm extends javax.swing.JFrame {
 
     /**
-     * Creates new form MainForm
+     * Ο κατασκευαστής της κεντρικής φόρμας MainForm.
      */
     public MainForm(){
-        //GmException g = new GmException("Τα γάμησες",1,"ντάτα");
         initComponents();
         this.setLocationRelativeTo(null);
         this.show(true);
@@ -131,24 +125,10 @@ public class MainForm extends javax.swing.JFrame {
         }// </editor-fold>//GEN-END:initComponents
 
     private void goActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goActionPerformed
-        try {
-            doThings();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        doThings();
     }//GEN-LAST:event_goActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+    public static void main() {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -160,7 +140,9 @@ public class MainForm extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
 
-        /* Create and display the form */
+        /**
+         * Εμφάνιση και εκτέλεση του κώδικα της φόρμας.
+         */
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -177,27 +159,27 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
 
-    private void doThings() throws FileNotFoundException, IOException {
-        
-        
+    /**
+     * Η κλάση doThings() προς το παρόν:
+     * 1) Διαβάζει το αρχείο 1) General.xlsx από το μονοπάτι που καθορίζει ο 
+     * χρήστης από την εφαρμογή
+     * 2) Αποθηκεύει τα δεδομένα σε αντικείμενα κατάλληλου τύπου
+     * 3) Παράγει ένα νέο αρχείο όπου πρέπει να συμπληρώσουν οι καθηγητές και 
+     * αφορά τις ημερομηνίες και τις ώρες διαθεσιμότητάς τους. Για κάθε καθηγητή
+     * παράγεται ένα φύλλο, με γραμμές για τις ημερομηνίες και τα χρονικά διαστήματα 
+     * μεταξύ των ωρών λειτουργείας του Πανεπιστημίου.
+     */
+    private void doThings(){
         String filename = jTextField1.getText();
         List<Professor> profs = new ArrayList<>();
         profs.addAll(getProfs(filename));
         System.out.println("Done reading teachers...");
-        /*
-        int c = 0;
-        for (Professor currentProfessor : profs) {
-            System.out.print("C is: " + c + " ");
-            c++;
-            currentProfessor.printText();
-        }
-        */
+
         List<String> timeslots = new ArrayList<>();
         timeslots.addAll(getTimeslots(filename));
         for (String currentProfessor : timeslots) {
             System.out.println(currentProfessor);
         }
-        
         
         HashMap<String, String> dates = 
                 new HashMap<String,String>(getDates(filename));
@@ -207,10 +189,17 @@ public class MainForm extends javax.swing.JFrame {
             String value = entry.getValue();
             System.out.println("Key=" + key + ", Value=" + value);
         }
-        
-        createTemplate(profs,timeslots,dates, filename);
+        try {
+            createTemplate(profs,timeslots,dates, filename);
+        } catch (IOException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
+    /**
+     * @param f είναι το όνομα του αρχείου που θα αναγνωστεί
+     * @return HashMap<String,String> dates είναι ένα HashMap με την μεταβλητή 
+     * κλειδί να είναι η ημερομηνία και την δευτερεόυσα να είναι η μέρα της εβδομάδας.
+     */
     public HashMap<String, String> getDates(String f){
         try {
             FileInputStream file = new FileInputStream(new File(f));
@@ -248,12 +237,14 @@ public class MainForm extends javax.swing.JFrame {
             file.close();
             return dates;
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Το αρχείο δεν βρέθηκε.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex){
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Σφάλμα κατά το άνοιγμα."
+                    + "του αρχείου","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (SheetExc ex) {
-            
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Σφάλμα κατά την ανάγνωση"
+                    + "του αρχείου .xlsx.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
@@ -339,8 +330,43 @@ public class MainForm extends javax.swing.JFrame {
         }
     }
     
-    public void createTemplate(List<Professor> p, List<String> t, HashMap<String,String> d, String f){
+    public void createTemplate(List<Professor> profs, List<String> timeslots, HashMap<String, String> dates, String filename) throws IOException {
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            for (Professor professor : profs) {
+                // Create a sheet for each professor
+                String sheetName = professor.getProfSurname()+ " " + professor.getProfFirstname();
+                XSSFSheet sheet = workbook.createSheet(sheetName);
 
+                // Add timeslots to the first row
+                Row timeslotRow = sheet.createRow(0);
+                for (int i = 0; i < timeslots.size(); i++) {
+                    Cell cell = timeslotRow.createCell(i+1);
+                    cell.setCellValue(timeslots.get(i));
+                }
+
+                // Add dates and time slots to the sheet
+                int rowIndex = 1;
+                for (Map.Entry<String, String> entry : dates.entrySet()) {
+                    String date = entry.getKey();
+                    String day = entry.getValue();
+
+                    Row row = sheet.createRow(rowIndex++);
+                    Cell dateCell = row.createCell(0);
+                    dateCell.setCellValue(day + " " + date);
+
+                    // Add time slots for each date
+                    for (int i = 0; i < timeslots.size(); i++) {
+                        Cell timeSlotCell = row.createCell(i + 1);
+                        // Set the time slot value as needed
+                    }
+                }
+            }
+
+            // Write the workbook to the output file
+            try (FileOutputStream outputStream = new FileOutputStream("kostas.xlsx")) {
+                workbook.write(outputStream);
+            }
+        }
     }
 }
 
