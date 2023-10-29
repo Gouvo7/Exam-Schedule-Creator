@@ -7,9 +7,9 @@ package thesis;
 public class Thesis {
 
     /**
-     * @param args the command line arguments
+     * Αυτή είναι η main η οποία απλά καλεί αρχικοποιεί ένα αντικείμενο της κλάσης MainForm.
      */
-    public static void main(String[] args) {
+    public static void main() {
         MainForm a = new MainForm();
     }
 }
