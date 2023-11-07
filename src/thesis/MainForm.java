@@ -1,31 +1,8 @@
 package thesis;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.gmele.general.sheets.XlsxSheet;
-import org.gmele.general.sheets.exception.SheetExc;
-
 /**
  * Η κλάση MainForm είναι η κλάση που χρησιμοποιείται για το γραφικό περιβάλλον 
- * (user interface - UI) της εφαρμογής.
+ * (user interface - UI) της εφαρμογής. (Προς το παρόν διαχειρίζεται και όλο το πρόγραμμα).
  * @author gouvo
  */
 public class MainForm extends javax.swing.JFrame {
@@ -52,7 +29,8 @@ public class MainForm extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jTextField2 = new javax.swing.JTextField();
-        go = new javax.swing.JButton();
+        loadBtn = new javax.swing.JButton();
+        produceBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -71,11 +49,19 @@ public class MainForm extends javax.swing.JFrame {
         jTextField2.setText("C:\\\\Users\\\\gouvo\\\\OneDrive\\\\Documents\\\\ΠΤΥΧΙΑΚΗ\\\\");
             jTextField2.setEnabled(false);
 
-            go.setFont(new java.awt.Font("Consolas", 0, 18)); // NOI18N
-            go.setLabel("Produce Excel");
-            go.addActionListener(new java.awt.event.ActionListener() {
+            loadBtn.setFont(new java.awt.Font("Consolas", 0, 18)); // NOI18N
+            loadBtn.setLabel("Load Excels");
+            loadBtn.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    goActionPerformed(evt);
+                    loadBtnActionPerformed(evt);
+                }
+            });
+
+            produceBtn.setFont(new java.awt.Font("Consolas", 0, 18)); // NOI18N
+            produceBtn.setLabel("Produce Excel");
+            produceBtn.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    produceBtnActionPerformed(evt);
                 }
             });
 
@@ -84,51 +70,64 @@ public class MainForm extends javax.swing.JFrame {
             layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 378, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap())
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(224, 224, 224)
-                    .addComponent(go)
-                    .addGap(0, 0, Short.MAX_VALUE))
-                .addGroup(layout.createSequentialGroup()
                     .addGap(103, 103, 103)
-                    .addComponent(jLabel1)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(113, 113, 113)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(jLabel4)
-                        .addContainerGap(399, Short.MAX_VALUE)))
+                        .addComponent(jLabel1))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(loadBtn)
+                            .addGap(0, 0, Short.MAX_VALUE))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(0, 3, Short.MAX_VALUE)
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 378, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap(233, Short.MAX_VALUE)
+                        .addComponent(produceBtn)
+                        .addGap(215, 215, 215)))
             );
             layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
-                    .addGap(93, 93, 93)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(59, 59, 59)
+                    .addGap(25, 25, 25)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel4)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGap(18, 18, 18)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel1)
                         .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 157, Short.MAX_VALUE)
-                    .addComponent(go)
-                    .addGap(38, 38, 38))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 247, Short.MAX_VALUE)
+                    .addComponent(loadBtn)
+                    .addGap(52, 52, 52))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(96, 96, 96)
-                        .addComponent(jLabel4)
-                        .addContainerGap(300, Short.MAX_VALUE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap(257, Short.MAX_VALUE)
+                        .addComponent(produceBtn)
+                        .addGap(129, 129, 129)))
             );
 
             pack();
         }// </editor-fold>//GEN-END:initComponents
 
-    private void goActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goActionPerformed
-        doThings();
-    }//GEN-LAST:event_goActionPerformed
+    private void loadBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadBtnActionPerformed
+        ExcelManager a = new ExcelManager();
+        System.out.println("clicked");
+        a.setVisible(true);
+    }//GEN-LAST:event_loadBtnActionPerformed
 
-    public static void main() {
+    private void produceBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_produceBtnActionPerformed
+        String path = jTextField1.getText();
+        System.out.println(path);
+        Generator a = new Generator(this,path);
+        //ExcelManager b = new ExcelManager();
+        //b.readTemplate();
+    }//GEN-LAST:event_produceBtnActionPerformed
+
+    public static void main(String[] args) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -139,7 +138,6 @@ public class MainForm extends javax.swing.JFrame {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-
         /**
          * Εμφάνιση και εκτέλεση του κώδικα της φόρμας.
          */
@@ -152,222 +150,14 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton go;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
+    private javax.swing.JButton loadBtn;
+    private javax.swing.JButton produceBtn;
     // End of variables declaration//GEN-END:variables
-
-    /**
-     * Η κλάση doThings() προς το παρόν:
-     * 1) Διαβάζει το αρχείο 1) General.xlsx από το μονοπάτι που καθορίζει ο 
-     * χρήστης από την εφαρμογή
-     * 2) Αποθηκεύει τα δεδομένα σε αντικείμενα κατάλληλου τύπου
-     * 3) Παράγει ένα νέο αρχείο όπου πρέπει να συμπληρώσουν οι καθηγητές και 
-     * αφορά τις ημερομηνίες και τις ώρες διαθεσιμότητάς τους. Για κάθε καθηγητή
-     * παράγεται ένα φύλλο, με γραμμές για τις ημερομηνίες και τα χρονικά διαστήματα 
-     * μεταξύ των ωρών λειτουργείας του Πανεπιστημίου.
-     */
-    private void doThings(){
-        String filename = jTextField1.getText();
-        List<Professor> profs = new ArrayList<>();
-        profs.addAll(getProfs(filename));
-        System.out.println("Done reading teachers...");
-
-        List<String> timeslots = new ArrayList<>();
-        timeslots.addAll(getTimeslots(filename));
-        for (String currentProfessor : timeslots) {
-            System.out.println(currentProfessor);
-        }
-        
-        HashMap<String, String> dates = 
-                new HashMap<String,String>(getDates(filename));
-        
-        for (Map.Entry<String, String> entry : dates.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            System.out.println("Key=" + key + ", Value=" + value);
-        }
-        try {
-            createTemplate(profs,timeslots,dates, filename);
-        } catch (IOException ex) {
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    /**
-     * @param f είναι το όνομα του αρχείου που θα αναγνωστεί
-     * @return HashMap<String,String> dates είναι ένα HashMap με την μεταβλητή 
-     * κλειδί να είναι η ημερομηνία και την δευτερεόυσα να είναι η μέρα της εβδομάδας.
-     */
-    public HashMap<String, String> getDates(String f){
-        try {
-            FileInputStream file = new FileInputStream(new File(f));
-            XlsxSheet s = new XlsxSheet(f);
-            s.SelectSheet("DATES");
-            HashMap<String, String> dates = new HashMap<String, String>();
-            SimpleDateFormat inputDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
-            SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            
-            int rowIndex = 0;
-            int lastRow = s.GetLastRow();
-            System.out.println(lastRow);
-            
-            while (rowIndex <= lastRow){
-                if (rowIndex != 0){
-                    Date date;
-                    try {
-                        date = inputDateFormat.parse(s.GetCellDate(rowIndex, 0).toString());
-                    } catch (ParseException ex) {
-                        Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-                        file.close();
-                        return dates;
-                    }
-                    String cellA = outputDateFormat.format(date);
-                    String cellB = s.GetCellString(rowIndex, 1);
-                    if (check(cellA) && check(cellB)){
-                        dates.put(cellA, cellB);
-                    }else{
-                        file.close();
-                        return dates;
-                    }
-                }
-                rowIndex++;
-            }
-            file.close();
-            return dates;
-        } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(this, "Το αρχείο δεν βρέθηκε.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-        } catch (IOException ex){
-            JOptionPane.showMessageDialog(this, "Σφάλμα κατά το άνοιγμα."
-                    + "του αρχείου","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-        } catch (SheetExc ex) {
-            JOptionPane.showMessageDialog(this, "Σφάλμα κατά την ανάγνωση"
-                    + "του αρχείου .xlsx.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-        }
-        return null;
-    }
     
-    public List<String> getTimeslots(String f){
-        try {
-            FileInputStream file = new FileInputStream(new File(f));
-            XlsxSheet s = new XlsxSheet(f);
-            s.SelectSheet("TIMESLOTS");
-            //Iterate through each rows one by one
-            List<String> timeslots = new ArrayList<>();
-            int rowIndex = 0;
-            int lastRow = s.GetLastRow();
-            
-            while (rowIndex <= lastRow){
-                if (rowIndex != 0){
-                    String cellA = s.GetCellString(rowIndex, 0);
-                    timeslots.add(cellA);
-                }
-                rowIndex++;
-            }
-            file.close();
-            return timeslots;
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex){
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SheetExc ex) {
-            
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
-    
-    public List<Professor> getProfs(String f){
-        try{
-            
-            FileInputStream file = new FileInputStream(new File(f));
-            //XSSFWorkbook workbook = new XSSFWorkbook(f);
-            XlsxSheet s = new XlsxSheet(f);
-            s.SelectSheet("PROFESSORS_LIST");
-            System.out.println(s.GetLastRow());
-            int rowIndex = 0;
-            int lastRow = s.GetLastRow();
-            List<Professor> profs = new ArrayList<>();
-            
-            while (rowIndex <= lastRow){
-                if (rowIndex != 0){
-                    String cellA = s.GetCellString(rowIndex, 0);
-                    String cellB = s.GetCellString(rowIndex, 1);
-                    String cellC = s.GetCellString(rowIndex, 2);
-                    System.out.println(cellA+ " " + cellB + " " + cellC);
-                    Professor tmp = new Professor(cellA, cellB, cellC);
-                    if (check(cellA) && check(cellB) &&  check(cellC)){
-                        profs.add(tmp);
-                    }
-                    else{
-                        file.close();
-                        return profs;
-                    }
-                }
-                rowIndex++;
-            }
-            for (Professor tmp : profs){
-                tmp.printText();
-            }
-
-            file.close();
-            return profs;
-        }catch (IOException e){
-            System.out.println("Could not read file");
-            return null;
-        }catch (SheetExc e){
-            return null;
-        }
-    }
-    
-    public boolean check(String s){
-        if(s!=null && !s.equals("")&& !s.equals(" ")){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    
-    public void createTemplate(List<Professor> profs, List<String> timeslots, HashMap<String, String> dates, String filename) throws IOException {
-        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-            for (Professor professor : profs) {
-                // Create a sheet for each professor
-                String sheetName = professor.getProfSurname()+ " " + professor.getProfFirstname();
-                XSSFSheet sheet = workbook.createSheet(sheetName);
-
-                // Add timeslots to the first row
-                Row timeslotRow = sheet.createRow(0);
-                for (int i = 0; i < timeslots.size(); i++) {
-                    Cell cell = timeslotRow.createCell(i+1);
-                    cell.setCellValue(timeslots.get(i));
-                }
-
-                // Add dates and time slots to the sheet
-                int rowIndex = 1;
-                for (Map.Entry<String, String> entry : dates.entrySet()) {
-                    String date = entry.getKey();
-                    String day = entry.getValue();
-
-                    Row row = sheet.createRow(rowIndex++);
-                    Cell dateCell = row.createCell(0);
-                    dateCell.setCellValue(day + " " + date);
-
-                    // Add time slots for each date
-                    for (int i = 0; i < timeslots.size(); i++) {
-                        Cell timeSlotCell = row.createCell(i + 1);
-                        // Set the time slot value as needed
-                    }
-                }
-            }
-
-            // Write the workbook to the output file
-            try (FileOutputStream outputStream = new FileOutputStream("kostas.xlsx")) {
-                workbook.write(outputStream);
-            }
-        }
-    }
 }
 
 
