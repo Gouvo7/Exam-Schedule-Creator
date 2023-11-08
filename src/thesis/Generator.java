@@ -43,6 +43,7 @@ public class Generator {
     private static String fileName;
     private static JFrame myJFrame;
     private Logs logger;
+    private SavedPaths paths;
     
     // Δήλωση των στατικών ονομασιών των φύλλων του excel προς επεξεργασία.
     static final String sheet1 = "PROFESSORS_LIST";
@@ -55,6 +56,7 @@ public class Generator {
         myJFrame = x;
         fileName = y;
         logger = new Logs();
+        paths = new SavedPaths();
         doThings();
     }
 
@@ -73,10 +75,10 @@ public class Generator {
     public void doThings(){
 
         boolean excel1,excel2,excel3, excel4, excel5 = false;
-
+        System.out.println("Test1");
         List<Professor> profs = new ArrayList<>();
         try{
-            profs.addAll(getProfs(fileName));
+            profs.addAll(getProfs(paths.getImportFilePath()));
             excel1 = true;
         }catch (Exception e){
             JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
@@ -87,7 +89,7 @@ public class Generator {
         
         List<String> timeslots = new ArrayList<>();
         try{
-            timeslots.addAll(getTimeslots(fileName));
+            timeslots.addAll(getTimeslots(paths.getImportFilePath()));
             excel2 = true;
         }catch (Exception e){
             JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
@@ -102,7 +104,7 @@ public class Generator {
         HashMap<String, String> dates = new HashMap<>();
         try{
             HashMap<String, String> tmp = 
-                new HashMap<String,String>(getDates(fileName));
+                new HashMap<String,String>(getDates(paths.getImportFilePath()));
             for (Map.Entry<String, String> entry : tmp.entrySet()) {
                 dates.put(entry.getKey(), entry.getValue());
             }
@@ -115,7 +117,7 @@ public class Generator {
         }
         List<Classroom> classrooms = new ArrayList<>();
         try{
-            classrooms.addAll(getClassrooms(fileName));
+            classrooms.addAll(getClassrooms(paths.getImportFilePath()));
             excel4 = true;
         }catch (Exception e){
             JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
@@ -125,7 +127,7 @@ public class Generator {
         }
         List<String> distinctProfessors = new ArrayList<>();
         try{
-            distinctProfessors.addAll(findProfessors(fileName));
+            distinctProfessors.addAll(findProfessors(paths.getImportFilePath()));
             excel5 = true;
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
@@ -135,7 +137,7 @@ public class Generator {
         if (excel1 && excel2 && excel3 && excel4 && excel5){
         
             try {
-                createTemplate(profs,timeslots,dates,classrooms, distinctProfessors, fileName);
+                createTemplate(profs,timeslots,dates,classrooms, distinctProfessors, paths.getImportFilePath());
                 logger.appendLogger("Η δημιουργία template ολοκληρώθηκε επιτυχώς.");
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(myJFrame, "Το αρχείο προς συμπλήρωση δεν μπορεί να"
@@ -147,7 +149,7 @@ public class Generator {
         JOptionPane.showMessageDialog(myJFrame, logger.getLoggerTxt(),
                    "Μηνύματα εφαρμογής", JOptionPane.INFORMATION_MESSAGE);
                 
-        readTemplate(profs,timeslots,dates,classrooms, distinctProfessors, fileName);
+        readTemplate(profs,timeslots,dates,classrooms, distinctProfessors, paths.getImportFilePath());
     }
     
     /**
@@ -157,7 +159,7 @@ public class Generator {
      * @return HashMap<String,String> dates είναι ένα HashMap με την μεταβλητή 
      * κλειδί να είναι η ημερομηνία και την δευτερεόυσα να είναι η μέρα της εβδομάδας.
      */
-    public List<String> findProfessors(String f){
+    public List<String> findUniqueProfessors(String f){
         try{
             FileInputStream file = new FileInputStream(new File(f));
             //XSSFWorkbook workbook = new XSSFWorkbook(f);
@@ -178,13 +180,13 @@ public class Generator {
                             String[] nameParts = professorName.split(" ");
                             if (nameParts.length >= 1) {
                                 String lastName = nameParts[nameParts.length - 1];
-                                    if (!distinctLastNames.contains(lastName)) {
-                                        distinctLastNames.add(lastName);
-                                    }
+                                if (!distinctLastNames.contains(lastName)) {
+                                    distinctLastNames.add(lastName);
                                 }
                             }
                         }
                     }
+                }
             }
             for (String lastName : distinctLastNames) {
                 System.out.println(lastName);
@@ -384,10 +386,10 @@ public class Generator {
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex){
             JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
-                    + " του αρχείου '"+f+"'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+                    + " του αρχείου '" + f + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (SheetExc ex) {
             JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά την ανάγνωση"
-                    + " του αρχείου '"+f+"'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+                    + " του αρχείου '" + f + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
@@ -511,7 +513,7 @@ public class Generator {
         List<String> distinctProfessorsNew = new ArrayList<>();
         // READ PROFS_COURSES
         try{
-            distinctProfessorsNew.addAll(findProfessors(fileName));
+            distinctProfessorsNew.addAll(findUniqueProfessors(fileName));
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
                     + " του φύλλου: '"+sheet5+"'.",
@@ -531,7 +533,7 @@ public class Generator {
         } catch (FileNotFoundException ex) {
             logger.appendLogger("T");
         }
-        XlsxSheet s = new XlsxSheet(f);
+        //XlsxSheet s = new XlsxSheet(f);
         for (String x : distinctProfessorsNew){
             
         }

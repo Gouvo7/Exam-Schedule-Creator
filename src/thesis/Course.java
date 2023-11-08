@@ -1,5 +1,8 @@
 package thesis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author gouvo
@@ -10,12 +13,14 @@ public class Course {
     private String courseShort;
     private String courseSem;
     private boolean isExamined;
+    private List<Professor> examiners;
     
     Course(String a, String b, String c, boolean d){
         courseName = a;
         courseShort = b;
         courseSem = c;
         isExamined = d;
+        examiners = new ArrayList<>();
     }
 
     /**
@@ -73,6 +78,4 @@ public class Course {
     public void setIsExamined(boolean isExamined) {
         this.isExamined = isExamined;
     }
-    
-    
 }

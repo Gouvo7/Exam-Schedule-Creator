@@ -1,5 +1,8 @@
 package thesis;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Η κλάση Professors χρησιμοποιείται για την αποθήκευση στοιχείων των καθηγητών.
  * @param profSurname -> Επώνυμο καθηγητή
@@ -45,6 +48,4 @@ public class Professor {
     public void printText(){
         System.out.println(profSurname + " " + profFirstname + " " + profField);
     }
-    
-    
 }
