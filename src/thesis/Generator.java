@@ -57,7 +57,6 @@ public class Generator {
         fileName = y;
         logger = new Logs();
         paths = new SavedPaths();
-        doThings();
     }
 
     /**
@@ -72,10 +71,8 @@ public class Generator {
      * αφορά την διαθεσιμότητα των αιθουσών για τις ημερομηνίες της εξεταστικής.
      */
     
-    public void doThings(){
-
+    public void readTemplates(){
         boolean excel1,excel2,excel3, excel4, excel5 = false;
-        System.out.println("Test1");
         List<Professor> profs = new ArrayList<>();
         try{
             profs.addAll(getProfs(paths.getImportFilePath()));
@@ -83,6 +80,183 @@ public class Generator {
         }catch (Exception e){
             JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
                     + " του φύλλου: '"+sheet1+"'.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return ;
+        }
+        
+        List<String> timeslots = new ArrayList<>();
+        try{
+            timeslots.addAll(getTimeslots(paths.getImportFilePath()));
+            excel2 = true;
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
+                    + " του φύλλου: '"+sheet2+"'.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        HashMap<String, String> dates = new HashMap<>();
+        try{
+            HashMap<String, String> tmp = 
+                new HashMap<String,String>(getDates(paths.getImportFilePath()));
+            for (Map.Entry<String, String> entry : tmp.entrySet()) {
+                dates.put(entry.getKey(), entry.getValue());
+            }
+            excel3 = true;
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
+                    + " του φύλλου: '"+sheet3+"'.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        List<Classroom> classrooms = new ArrayList<>();
+        try{
+            classrooms.addAll(getClassrooms(paths.getImportFilePath()));
+            excel4 = true;
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
+                    + " του φύλλου: '"+sheet4+"'.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return ;
+        }
+        List<String> distinctProfessors = new ArrayList<>();
+        try{
+            distinctProfessors.addAll(findUniqueProfessors(paths.getImportFilePath()));
+            excel5 = true;
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
+                    + " του φύλλου: '"+sheet5+"'.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        }
+        
+        if (excel1 && excel2 && excel3 && excel4 && excel5){
+            //addAvailability(profs, timeslots, paths.getImportFilePath());
+            addProfessorsAvailability(profs, timeslots.size(), "C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\TEST2.xlsx");
+            addClassroomsAvailability(classrooms, timeslots.size(), "C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\TEST3.xlsx");
+        }
+    }
+    
+    /**
+     *
+     * @param professors
+     * @param lastColumn
+     * @param filename
+     * @return
+     */
+    public List<Professor> addProfessorsAvailability(List<Professor> professors,int lastColumn, String filename){
+        try{
+            FileInputStream file = new FileInputStream(new File(filename));
+            //XSSFWorkbook workbook = new XSSFWorkbook(f);
+            XlsxSheet s = new XlsxSheet(filename);
+            for (Professor professor : professors){
+                String sheetName = professor.getProfSurname() + " " + professor.getProfFirstname();
+                s.SelectSheet(sheetName);
+                System.out.println("Καθητητής: " + sheetName);
+                int lastRow = s.GetLastRow();
+                List<Availability> availabilityList = new ArrayList<>();
+                for (int rowIndex = 1; rowIndex <= lastRow; rowIndex++) {
+                    System.out.println("FIX");
+                    String cellDate = s.GetCellString(rowIndex, 0);
+                    for (int colIndex = 1; colIndex < lastColumn; colIndex++){
+                        String timeslot = s.GetCellString(0,colIndex);
+                        String curCell = s.GetCellString(rowIndex, colIndex).trim();
+                        if (curCell.equals("+")){
+                            Availability tmp = new Availability(cellDate, timeslot, 1);
+                            availabilityList.add(tmp);
+                        }else if (curCell.equals("-")){
+                            Availability tmp = new Availability(cellDate, timeslot, 0);
+                            availabilityList.add(tmp);
+                        }else{
+                            return null;
+                        }
+                        
+                    }
+                }
+                if (!availabilityList.isEmpty()){
+                    professor.setAvailability(availabilityList);
+                }
+            }
+            file.close();
+            return null;
+            
+        } catch (SheetExc exName) {
+            JOptionPane.showMessageDialog(myJFrame, "Αδερφέ δεν βρήκα το sheet που μου έδωσες.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return null;
+        } catch (FileNotFoundException ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return null;
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        }
+        return null;
+        
+    }
+    
+    public List<Professor> addClassroomsAvailability(List<Classroom> classrooms,int lastColumn, String filename){
+        try{
+            FileInputStream file = new FileInputStream(new File(filename));
+            //XSSFWorkbook workbook = new XSSFWorkbook(f);
+            XlsxSheet s = new XlsxSheet(filename);
+            for (Classroom classroom : classrooms){
+                String sheetName = classroom.getClassroomName();
+                s.SelectSheet(sheetName);
+                System.out.println("Αίθουσα: " + sheetName);
+                int lastRow = s.GetLastRow();
+                List<Availability> availabilityList = new ArrayList<>();
+                for (int rowIndex = 1; rowIndex <= lastRow; rowIndex++) {
+                    String cellDate = s.GetCellString(rowIndex, 0);
+                    for (int colIndex = 1; colIndex < lastColumn; colIndex++){
+                        String timeslot = s.GetCellString(0,colIndex);
+                        String curCell = s.GetCellString(rowIndex, colIndex).trim();
+                        if (curCell.equals("+")){
+                            Availability tmp = new Availability(cellDate, timeslot, 1);
+                            availabilityList.add(tmp);
+                        }else if (curCell.equals("-")){
+                            Availability tmp = new Availability(cellDate, timeslot, 0);
+                            availabilityList.add(tmp);
+                        }else{
+                            System.out.println("Γαμήθηκες");
+                            return null;
+                        }
+                    }
+                }
+                if (!availabilityList.isEmpty()){
+                    classroom.setAvailability(availabilityList);
+                }
+                classroom.prinAvailable();
+            }
+            file.close();
+            return null;
+            
+        } catch (SheetExc ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Αδερφέ δεν βρήκα το sheet που μου έδωσες.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return null;
+        } catch (FileNotFoundException ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return null;
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        }
+        return null;
+        
+    }
+    
+    public void doThings(){
+
+        boolean excel1,excel2,excel3, excel4, excel5 = false;
+        List<Professor> profs = new ArrayList<>();
+        try{
+            profs.addAll(getProfs(paths.getImportFilePath()));
+            excel1 = true;
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
+                    + " του φύλλου: '" + sheet1 + "'.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
             return ;
         }
@@ -127,7 +301,7 @@ public class Generator {
         }
         List<String> distinctProfessors = new ArrayList<>();
         try{
-            distinctProfessors.addAll(findProfessors(paths.getImportFilePath()));
+            distinctProfessors.addAll(findUniqueProfessors(paths.getImportFilePath()));
             excel5 = true;
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
@@ -146,10 +320,8 @@ public class Generator {
                 logger.appendLogger("Η δημιουργία template απέτυχε.");
             }
         }
-        JOptionPane.showMessageDialog(myJFrame, logger.getLoggerTxt(),
-                   "Μηνύματα εφαρμογής", JOptionPane.INFORMATION_MESSAGE);
                 
-        readTemplate(profs,timeslots,dates,classrooms, distinctProfessors, paths.getImportFilePath());
+       // readTemplate(profs,timeslots,dates,classrooms, distinctProfessors, paths.getImportFilePath());
     }
     
     /**
@@ -159,11 +331,11 @@ public class Generator {
      * @return HashMap<String,String> dates είναι ένα HashMap με την μεταβλητή 
      * κλειδί να είναι η ημερομηνία και την δευτερεόυσα να είναι η μέρα της εβδομάδας.
      */
-    public List<String> findUniqueProfessors(String f){
+    public List<String> findUniqueProfessors(String filename){
         try{
-            FileInputStream file = new FileInputStream(new File(f));
+            FileInputStream file = new FileInputStream(new File(filename));
             //XSSFWorkbook workbook = new XSSFWorkbook(f);
-            XlsxSheet s = new XlsxSheet(f);
+            XlsxSheet s = new XlsxSheet(filename);
             s.SelectSheet(sheet5);
             int rowIndex = 0;
             int lastRow = s.GetLastRow();
@@ -188,20 +360,18 @@ public class Generator {
                     }
                 }
             }
-            for (String lastName : distinctLastNames) {
-                System.out.println(lastName);
-            }
+
             file.close();
             return distinctLastNames;
         } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '"+f+"' δεν βρέθηκε.",
+            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex){
             JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
-                    + " του αρχείου '"+f+"'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+                    + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (SheetExc ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά την ανάγνωση"
-                    + " του αρχείου '"+f+"'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα εντοπισμού του φύλλου '" + sheet5 + "'."
+                    ,"Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
@@ -213,11 +383,11 @@ public class Generator {
      * @return List<Classroom> - είναι μία λίστα από αντικείμενα Classroom τα οποία
      * εμπεριέχουν πληροφορίες για κάθε αίθουσα.
      */
-    public List<Classroom> getClassrooms(String f){
+    public List<Classroom> getClassrooms(String filename){
         try{
-            FileInputStream file = new FileInputStream(new File(f));
+            FileInputStream file = new FileInputStream(new File(filename));
             //XSSFWorkbook workbook = new XSSFWorkbook(f);
-            XlsxSheet s = new XlsxSheet(f);
+            XlsxSheet s = new XlsxSheet(filename);
             s.SelectSheet(sheet4);
             int rowIndex = 0;
             int lastRow = s.GetLastRow();
@@ -246,14 +416,14 @@ public class Generator {
             file.close();
             return classrooms;
         } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '"+f+"' δεν βρέθηκε.",
+            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex){
             JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
-                    + " του αρχείου '"+f+"'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+                    + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (SheetExc ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά την ανάγνωση"
-                    + " του αρχείου '"+f+"'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα εντοπισμού του φύλλου '" + sheet4 + "'."
+                    ,"Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
@@ -263,10 +433,10 @@ public class Generator {
      * @return List<Classroom> - είναι μία λίστα από αντικείμενα Classroom τα οποία
      * εμπεριέχουν πληροφορίες για κάθε αίθουσα.
      */
-    public HashMap<String, String> getDates(String f){
+    public HashMap<String, String> getDates(String filename){
         try {
-            FileInputStream file = new FileInputStream(new File(f));
-            XlsxSheet s = new XlsxSheet(f);
+            FileInputStream file = new FileInputStream(new File(filename));
+            XlsxSheet s = new XlsxSheet(filename);
             s.SelectSheet(sheet3);
             HashMap<String, String> dates = new HashMap<String, String>();
             SimpleDateFormat inputDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
@@ -280,7 +450,8 @@ public class Generator {
                     try {
                         date = inputDateFormat.parse(s.GetCellDate(rowIndex, 0).toString());
                     } catch (ParseException ex) {
-                        Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                        JOptionPane.showMessageDialog(myJFrame, "Λάθος τύπος "
+                                + "δεδομένων στο φύλλο '" + sheet3 + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
                         file.close();
                         return dates;
                     }
@@ -300,22 +471,22 @@ public class Generator {
             file.close();
             return dates;
         } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '"+f+"' δεν βρέθηκε.",
+            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex){
             JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
-                    + " του αρχείου '"+f+"'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+                    + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (SheetExc ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά την ανάγνωση"
-                    + " του αρχείου '"+f+"'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα εντοπισμού του φύλλου '" + sheet3 + "'."
+                    ,"Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
     
-    public List<String> getTimeslots(String f){
+    public List<String> getTimeslots(String filename){
         try {
-            FileInputStream file = new FileInputStream(new File(f));
-            XlsxSheet s = new XlsxSheet(f);
+            FileInputStream file = new FileInputStream(new File(filename));
+            XlsxSheet s = new XlsxSheet(filename);
             s.SelectSheet(sheet2);
             //Iterate through each rows one by one
             List<String> timeslots = new ArrayList<>();
@@ -335,23 +506,23 @@ public class Generator {
             file.close();
             return timeslots;
         } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '"+f+"' δεν βρέθηκε.",
+            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" +filename + "' δεν βρέθηκε.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex){
             JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
-                    + " του αρχείου '"+f+"'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+                    + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (SheetExc ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά την ανάγνωση"
-                    + " του αρχείου '"+f+"'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα εντοπισμού του φύλλου '" + sheet2 + "'."
+                    ,"Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
     
-    public List<Professor> getProfs(String f){
+    public List<Professor> getProfs(String filename){
         try{
-            FileInputStream file = new FileInputStream(new File(f));
+            FileInputStream file = new FileInputStream(new File(filename));
             //XSSFWorkbook workbook = new XSSFWorkbook(f);
-            XlsxSheet s = new XlsxSheet(f);
+            XlsxSheet s = new XlsxSheet(filename);
             s.SelectSheet(sheet1);
             int rowIndex = 0;
             int lastRow = s.GetLastRow();
@@ -376,20 +547,17 @@ public class Generator {
                 }
                 rowIndex++;
             }
-            for (Professor tmp : profs){
-                tmp.printText();
-            }
             file.close();
             return profs;
         } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '"+f+"' δεν βρέθηκε.",
+            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex){
             JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
-                    + " του αρχείου '" + f + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+                    + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (SheetExc ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά την ανάγνωση"
-                    + " του αρχείου '" + f + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα εντοπισμού του φύλλου '" + sheet1 + "'."
+                    ,"Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
@@ -451,6 +619,9 @@ public class Generator {
             try (FileOutputStream outputStream = new FileOutputStream("C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\prof.xlsx")) {
                 workbook.write(outputStream);
             }
+            logger.appendLogger("Η δημιουργία του template για τους καθηγητές ολοκληρώθηκε επιτυχώς.");
+        }catch (Exception e){
+            logger.appendLogger("Η δημιουργία του template για τους καθηγητές απέτυχε.");
         }
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             CellStyle style = getStyle(workbook);
@@ -493,7 +664,14 @@ public class Generator {
             try (FileOutputStream outputStream = new FileOutputStream("C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\class.xlsx")) {
                 workbook.write(outputStream);
             }
+            logger.appendLogger("Η δημιουργία του template για τις αίθουσες ολοκληρώθηκε επιτυχώς.");
+        }catch (Exception e){
+            logger.appendLogger("Η δημιουργία του template για τις αίθουσες απέτυχε.");
         }
+        System.out.println(logger.getLoggerTxt());
+        JOptionPane.showMessageDialog(myJFrame,logger.getLoggerTxt(),
+               "Μήνυμα Εφαρμογής", JOptionPane.INFORMATION_MESSAGE);
+
     }
 
     private CellStyle getStyle(XSSFWorkbook workbook) {

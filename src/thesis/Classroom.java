@@ -1,5 +1,8 @@
 package thesis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author gouvo
@@ -10,6 +13,7 @@ public class Classroom {
     private String classroomName;
     private int classroomSeats;
     private boolean isLabClassroom;
+    private List<Availability> availability;
     
     Classroom(String a, String b, int c, String d){
         classroomCode = a;
@@ -20,6 +24,7 @@ public class Classroom {
         }else{
             isLabClassroom = false;
         }
+        availability = new ArrayList<>();
     }
     
     public String getClassroomCode(){
@@ -52,5 +57,15 @@ public class Classroom {
     
     public void setClassroomType(boolean x){
         this.isLabClassroom = x;
+    }
+    
+    public void setAvailability(List<Availability> availability) {
+        this.availability = availability;
+    }
+    
+    public void prinAvailable(){
+        for (Availability x : availability){
+            System.out.println(x.getDate() +  x.getTimeSlot() + x.getIsAvailable());
+        }
     }
 }

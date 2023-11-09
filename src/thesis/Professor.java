@@ -1,7 +1,7 @@
 package thesis;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Η κλάση Professors χρησιμοποιείται για την αποθήκευση στοιχείων των καθηγητών.
@@ -15,11 +15,13 @@ public class Professor {
     private String profSurname;
     private String profFirstname;
     private String profField;
+    private List<Availability> availability;
     
     Professor(String a, String b, String c){
         profSurname = a;
         profFirstname = b;
         profField = c;
+        availability = new ArrayList<>();
     }
     
     public void setProfSurname(String x){
@@ -42,10 +44,20 @@ public class Professor {
         return this.profField;
     }
     
+    public void setAvailability(List<Availability> availability) {
+        this.availability = availability;
+    }
+    
     /**
      * Η μέθοδος εκτυπώνει όλα τα στοιχεία ενός καθηγητή.
      */
     public void printText(){
         System.out.println(profSurname + " " + profFirstname + " " + profField);
+    }
+    
+    public void prinAvailable(){
+        for (Availability x : availability){
+            System.out.println(x.getDate() +  x.getTimeSlot() + x.getIsAvailable());
+        }
     }
 }

@@ -114,15 +114,18 @@ public class MainForm extends javax.swing.JFrame {
         }// </editor-fold>//GEN-END:initComponents
 
     private void loadBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadBtnActionPerformed
-        ExcelManager a = new ExcelManager();
-        System.out.println("clicked");
-        a.setVisible(true);
+        String path = jTextField1.getText();
+        System.out.println(path);
+        Generator a = new Generator(this,path);
+        a.readTemplates();
     }//GEN-LAST:event_loadBtnActionPerformed
 
     private void produceBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_produceBtnActionPerformed
         String path = jTextField1.getText();
         System.out.println(path);
         Generator a = new Generator(this,path);
+        a.doThings();
+        System.out.println("Done with excels. Fill them in and continue");
         //ExcelManager b = new ExcelManager();
         //b.readTemplate();
     }//GEN-LAST:event_produceBtnActionPerformed

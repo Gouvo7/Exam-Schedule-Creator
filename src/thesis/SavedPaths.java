@@ -10,10 +10,10 @@ package thesis;
  * @author gouvo
  */
 public class SavedPaths {
-    //static final String importFolderPath = "C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ";
-    //static final String importFilePath = "C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\1) General.xlsx";
-    static String importFolderPath = "C:\\Users\\dbuser1\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ";
-    static String importFilePath = "C:\\Users\\dbuser1\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\1) General.xlsx";
+    static String importFolderPath = "C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ";
+    static String importFilePath = "C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\1) General.xlsx";
+    //static String importFolderPath = "C:\\Users\\dbuser1\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ";
+    //static String importFilePath = "C:\\Users\\dbuser1\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\1) General.xlsx";
     public void SavedPaths(){
         
     }
