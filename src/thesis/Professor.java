@@ -2,6 +2,8 @@ package thesis;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 
 /**
  * Η κλάση Professors χρησιμοποιείται για την αποθήκευση στοιχείων των καθηγητών.
@@ -59,5 +61,24 @@ public class Professor {
         for (Availability x : availability){
             System.out.println(x.getDate() +  x.getTimeSlot() + x.getIsAvailable());
         }
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Professor professor = (Professor) obj;
+        return Objects.equals(profSurname, professor.profSurname) &&
+               Objects.equals(profFirstname, professor.profFirstname) &&
+               Objects.equals(profField, professor.profField);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(profSurname, profFirstname, profField);
     }
 }

@@ -13,8 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.apache.poi.ss.usermodel.Cell;
@@ -32,8 +30,8 @@ import org.gmele.general.sheets.exception.SheetExc;
  *
  * @author gouvo
  * 
- * Η κλάση είναι υπεύθυνη για την δημιουργία των κατάλληλων αρχείων προς συμπλήρωση
- * από τους καθηγητες αλλά και τον υπεύθυνο για την σύνταξη του προγράμματος εξεταστικής.
+ * Η κλάση είναι υπεύθυνη για την δημιουργία και διαχείριση αντικειμένων αλλά και την
+ * ανάγνωση/δημιουργία αρχείων .xlsx
  * @param - myJFrame - Το παράθυρο που το καλεί.
  * @param - fileName - Το όνομα του αρχείου προς ανάγνωση.
  */
@@ -58,19 +56,13 @@ public class Generator {
         logger = new Logs();
         paths = new SavedPaths();
     }
-
-    /**
-     * Η κλάση doThings():
-     * 1) Διαβάζει το αρχείο από το μονοπάτι που καθορίζει ο χρήστης από την εφαρμογή.
-     * 2) Αποθηκεύει τα δεδομένα σε αντικείμενα κατάλληλου τύπου
-     * 3) Παράγει δύο νέα αρχεία όπου το 1ο συμπληρώνεται από τους καθηγητές και 
-     * αφορά την διαθεσιμότητά τους για τις ημερομηνίες της εξεταστικής. Για κάθε 
-     * καθηγητή παράγεται ένα φύλλο, με γραμμές για τις ημερομηνίες και τα χρονικά 
-     * διαστήματα μεταξύ των ωρών λειτουργίας του Πανεπιστημίου. Το 2ο αρχείο
-     * συμπληρώνεται από τον υπεύθυνο σύνταξης του προγράμματος εξεταστικής και
-     * αφορά την διαθεσιμότητα των αιθουσών για τις ημερομηνίες της εξεταστικής.
-     */
     
+    /**
+     * Η μέθοδος διαβάζει το κύριο excel που εμπεριέχει πληροφορίες για τους καθηγητές,
+     * τα μαθήματα, τις σχέσεις τους κ.α. Έπειτα, καλεί 2 μεθόδους που συμπληρώνουν
+     * στα αντικείμενα καθηγητών και αιθουσών την διαθεσιμότητά τους με βάση τα συμπληρωμένα
+     * template.
+     */
     public void readTemplates(){
         boolean excel1,excel2,excel3, excel4, excel5 = false;
         List<Professor> profs = new ArrayList<>();
@@ -119,9 +111,9 @@ public class Generator {
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
             return ;
         }
-        List<String> distinctProfessors = new ArrayList<>();
+        List<Professor> distinctProfessors = new ArrayList<>();
         try{
-            distinctProfessors.addAll(findUniqueProfessors(paths.getImportFilePath()));
+            distinctProfessors.addAll(findUniqueProfessors(paths.getImportFilePath(),profs));
             excel5 = true;
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
@@ -131,8 +123,9 @@ public class Generator {
         
         if (excel1 && excel2 && excel3 && excel4 && excel5){
             //addAvailability(profs, timeslots, paths.getImportFilePath());
-            addProfessorsAvailability(profs, timeslots.size(), "C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\TEST2.xlsx");
-            addClassroomsAvailability(classrooms, timeslots.size(), "C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\TEST3.xlsx");
+            System.out.println(paths.getImportFilePath1());
+            addProfessorsAvailability(profs, timeslots.size(), paths.getImportFilePath1());
+            addClassroomsAvailability(classrooms, timeslots.size(), paths.getImportFilePath2());
         }
     }
     
@@ -149,13 +142,15 @@ public class Generator {
             //XSSFWorkbook workbook = new XSSFWorkbook(f);
             XlsxSheet s = new XlsxSheet(filename);
             for (Professor professor : professors){
+                System.out.println(professor.getProfSurname() + " " + professor.getProfFirstname());
+            }
+            for (Professor professor : professors){
                 String sheetName = professor.getProfSurname() + " " + professor.getProfFirstname();
                 s.SelectSheet(sheetName);
                 System.out.println("Καθητητής: " + sheetName);
                 int lastRow = s.GetLastRow();
                 List<Availability> availabilityList = new ArrayList<>();
                 for (int rowIndex = 1; rowIndex <= lastRow; rowIndex++) {
-                    System.out.println("FIX");
                     String cellDate = s.GetCellString(rowIndex, 0);
                     for (int colIndex = 1; colIndex < lastColumn; colIndex++){
                         String timeslot = s.GetCellString(0,colIndex);
@@ -169,7 +164,6 @@ public class Generator {
                         }else{
                             return null;
                         }
-                        
                     }
                 }
                 if (!availabilityList.isEmpty()){
@@ -192,7 +186,6 @@ public class Generator {
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return null;
-        
     }
     
     public List<Professor> addClassroomsAvailability(List<Classroom> classrooms,int lastColumn, String filename){
@@ -232,7 +225,7 @@ public class Generator {
             return null;
             
         } catch (SheetExc ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Αδερφέ δεν βρήκα το sheet που μου έδωσες.",
+            JOptionPane.showMessageDialog(myJFrame, "Χάσαμε.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
             return null;
         } catch (FileNotFoundException ex) {
@@ -244,9 +237,19 @@ public class Generator {
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return null;
-        
     }
     
+    /**
+     * Η κλάση doThings():
+     * 1) Διαβάζει το αρχείο από το μονοπάτι που καθορίζει ο χρήστης από την εφαρμογή.
+     * 2) Αποθηκεύει τα δεδομένα σε αντικείμενα κατάλληλου τύπου
+     * 3) Παράγει δύο νέα αρχεία όπου το 1ο συμπληρώνεται από τους καθηγητές και 
+     * αφορά την διαθεσιμότητά τους για τις ημερομηνίες της εξεταστικής. Για κάθε 
+     * καθηγητή παράγεται ένα φύλλο, με γραμμές για τις ημερομηνίες και τα χρονικά 
+     * διαστήματα μεταξύ των ωρών λειτουργίας του Πανεπιστημίου. Το 2ο αρχείο
+     * συμπληρώνεται από τον υπεύθυνο σύνταξης του προγράμματος εξεταστικής και
+     * αφορά την διαθεσιμότητα των αιθουσών για τις ημερομηνίες της εξεταστικής.
+     */
     public void doThings(){
 
         boolean excel1,excel2,excel3, excel4, excel5 = false;
@@ -299,19 +302,19 @@ public class Generator {
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
             return ;
         }
-        List<String> distinctProfessors = new ArrayList<>();
+        List<Professor> distinctProfessors = new ArrayList<>();
         try{
-            distinctProfessors.addAll(findUniqueProfessors(paths.getImportFilePath()));
+            distinctProfessors.addAll(findUniqueProfessors(paths.getImportFilePath(), profs));
             excel5 = true;
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
-                    + " του φύλλου: '"+sheet5+"'.",
+                    + " του φύλλου: '" + sheet5 + "'.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         if (excel1 && excel2 && excel3 && excel4 && excel5){
         
             try {
-                createTemplate(profs,timeslots,dates,classrooms, distinctProfessors, paths.getImportFilePath());
+                createTemplate(distinctProfessors,timeslots,dates,classrooms, paths.getImportFilePath());
                 logger.appendLogger("Η δημιουργία template ολοκληρώθηκε επιτυχώς.");
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(myJFrame, "Το αρχείο προς συμπλήρωση δεν μπορεί να"
@@ -331,15 +334,23 @@ public class Generator {
      * @return HashMap<String,String> dates είναι ένα HashMap με την μεταβλητή 
      * κλειδί να είναι η ημερομηνία και την δευτερεόυσα να είναι η μέρα της εβδομάδας.
      */
-    public List<String> findUniqueProfessors(String filename){
+    public List<Professor> findUniqueProfessors(String filename, List<Professor> profs){
         try{
             FileInputStream file = new FileInputStream(new File(filename));
             //XSSFWorkbook workbook = new XSSFWorkbook(f);
             XlsxSheet s = new XlsxSheet(filename);
             s.SelectSheet(sheet5);
+            List<Professor> unique = new ArrayList<>();
+            for (Professor x : profs){
+                if (!unique.contains(x)){
+                    unique.add(x);
+                }else{
+                    
+                }
+            }
             int rowIndex = 0;
             int lastRow = s.GetLastRow();
-            List<String> distinctLastNames = new ArrayList<>();
+            List<Professor> distinctProfs = new ArrayList<>();
             for (int rowNum = 1; rowNum <= lastRow; rowNum++) {
 
                 // Get professor names from columns B, C, D, and E
@@ -348,21 +359,24 @@ public class Generator {
                     if (cell != null) {
                         String professorName = cell.trim();
                         if (!professorName.isEmpty() && !professorName.equals("0") && !professorName.equals("-")) {
-
                             String[] nameParts = professorName.split(" ");
                             if (nameParts.length >= 1) {
                                 String lastName = nameParts[nameParts.length - 1];
-                                if (!distinctLastNames.contains(lastName)) {
-                                    distinctLastNames.add(lastName);
+                                String firstName = nameParts[0];
+                                if (!distinctProfs.contains(lastName)) {
+                                    f
                                 }
                             }
+                        }else{
+                            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα στα δεδομένα του φύλλου '" + sheet5 + "'."
+                    ,"Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
                         }
                     }
                 }
             }
 
             file.close();
-            return distinctLastNames;
+            return distinctProfs;
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
@@ -570,11 +584,11 @@ public class Generator {
         }
     }
     
-    public void createTemplate(List<Professor> profs, List<String> timeslots, HashMap<String, String> dates,List<Classroom> classrooms,List<String> uniqueProfs, String filename) throws IOException {
+    public void createTemplate(List<Professor> uniqueProfs, List<String> timeslots, HashMap<String, String> dates,List<Classroom> classrooms, String filename) throws IOException {
         
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             CellStyle style = getStyle(workbook);
-            for (Professor professor : profs) {
+            for (Professor professor : uniqueProfs) {
                 // Create a sheet for each professor
                 String sheetName = professor.getProfSurname()+ " " + professor.getProfFirstname();
                 if (uniqueProfs.contains(professor.getProfSurname())){
@@ -685,7 +699,7 @@ public class Generator {
         style.setVerticalAlignment(VerticalAlignment.CENTER);
         return style;
     }
-    
+    /*
     public void readTemplate(List<Professor> profs, List<String> timeslots, HashMap<String, String> dates,List<Classroom> classrooms,List<String> uniqueProfs, String filename){
         
         List<String> distinctProfessorsNew = new ArrayList<>();
@@ -707,7 +721,7 @@ public class Generator {
                 return;
         }
         try {
-            FileInputStream file = new FileInputStream(new File("C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\TEST2.xlsx"));
+            FileInputStream file = new FileInputStream(new File(paths.getImportFilePath1()));
         } catch (FileNotFoundException ex) {
             logger.appendLogger("T");
         }
@@ -715,7 +729,7 @@ public class Generator {
         for (String x : distinctProfessorsNew){
             
         }
-        
+        */
         /*
         public List<Professor> getProfs(String f){
         try{
@@ -764,33 +778,5 @@ public class Generator {
         return null;
     }
      */   
-    }
-    class Logs{
-        private String log;
-        private int index;
-        Logs(){
-            log = "";
-            index = 0;
-        }
-        
-        public String getLoggerTxt(){
-            return log;
-        }
-        public void appendLogger(String x){
-            log = log + x + "\n";
-        }
-        
-        public int getIndex(){
-            index = index + 1;
-            return index;
-        }
-        public String getIndexString(){
-            index = index + 1;
-            return index+") ";
-        }
-        
-        public void loggerClear(){
-            log = "";
-        }
-    }
+    //}
 }
