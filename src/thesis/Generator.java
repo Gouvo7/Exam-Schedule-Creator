@@ -48,13 +48,116 @@ public class Generator {
     static final String sheet2 = "TIMESLOTS";
     static final String sheet3 = "DATES";
     static final String sheet4 = "CLASSROOMS";
-    static final String sheet5 = "COURSES_PROFESSORS";
+    static final String sheet5 = "COURSES_LIST";
+    static final String sheet6 = "COURSES_PROFESSORS";
     
     Generator(JFrame x, String y){
         myJFrame = x;
         fileName = y;
         logger = new Logs();
         paths = new SavedPaths();
+    }
+    
+    /**
+     * Η κλάση doThings():
+     * 1) Διαβάζει το αρχείο από το μονοπάτι που καθορίζει ο χρήστης από την εφαρμογή.
+     * 2) Αποθηκεύει τα δεδομένα σε αντικείμενα κατάλληλου τύπου
+     * 3) Παράγει δύο νέα αρχεία όπου το 1ο συμπληρώνεται από τους καθηγητές και 
+     * αφορά την διαθεσιμότητά τους για τις ημερομηνίες της εξεταστικής. Για κάθε 
+     * καθηγητή παράγεται ένα φύλλο, με γραμμές για τις ημερομηνίες και τα χρονικά 
+     * διαστήματα μεταξύ των ωρών λειτουργίας του Πανεπιστημίου. Το 2ο αρχείο
+     * συμπληρώνεται από τον υπεύθυνο σύνταξης του προγράμματος εξεταστικής και
+     * αφορά την διαθεσιμότητα των αιθουσών για τις ημερομηνίες της εξεταστικής.
+     */
+    public void doThings(){
+
+        boolean excel1,excel2,excel3, excel4, excel5 = false;
+        List<Professor> profs = new ArrayList<>();
+        try{
+            profs.addAll(getProfs(paths.getImportFilePath()));
+            excel1 = true;
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
+                    + " του φύλλου: '" + sheet1 + "'.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return ;
+        }
+        
+        List<String> timeslots = new ArrayList<>();
+        try{
+            timeslots.addAll(getTimeslots(paths.getImportFilePath()));
+            excel2 = true;
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
+                    + " του φύλλου: '" + sheet2 + "'.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        for (String timeSlots : timeslots) {
+            System.out.println(timeSlots);
+        }
+        
+        HashMap<String, String> dates = new HashMap<>();
+        try{
+            HashMap<String, String> tmp = 
+                new HashMap<String,String>(getDates(paths.getImportFilePath()));
+            for (Map.Entry<String, String> entry : tmp.entrySet()) {
+                dates.put(entry.getKey(), entry.getValue());
+            }
+            excel3 = true;
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
+                    + " του φύλλου: '" + sheet3 + "'.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        List<Classroom> classrooms = new ArrayList<>();
+        try{
+            classrooms.addAll(getClassrooms(paths.getImportFilePath()));
+            excel4 = true;
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
+                    + " του φύλλου: '" + sheet4 + "'.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return ;
+        }
+        
+        try{
+            classrooms.addAll(getClassrooms(paths.getImportFilePath()));
+            excel4 = true;
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
+                    + " του φύλλου: '" + sheet4 + "'.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return ;
+        }
+
+        List<Course> courses = new ArrayList<>();
+        try{
+            courses.addAll(getCourses(paths.getImportFilePath(), profs));
+            excel5 = true;
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
+                    + " του φύλλου: '" + sheet5 + "'.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return ;
+        }
+        
+        if (excel1 && excel2 && excel3 && excel4 && excel5){
+        
+            try {
+                createTemplate(profs,timeslots,dates,classrooms, paths.getImportFilePath());
+                logger.appendLogger("Η δημιουργία template ολοκληρώθηκε επιτυχώς.");
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(myJFrame, "Το αρχείο προς συμπλήρωση δεν μπορεί να"
+                        + " δημιουργηθεί. Παρακαλώ ελέγξτε τα μηνύματα λάθους.",
+                   "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+                logger.appendLogger("Η δημιουργία template απέτυχε.");
+            }
+        }
+                
+       // readTemplate(profs,timeslots,dates,classrooms, distinctProfessors, paths.getImportFilePath());
     }
     
     /**
@@ -230,94 +333,50 @@ public class Generator {
         return null;
     }
     
-    /**
-     * Η κλάση doThings():
-     * 1) Διαβάζει το αρχείο από το μονοπάτι που καθορίζει ο χρήστης από την εφαρμογή.
-     * 2) Αποθηκεύει τα δεδομένα σε αντικείμενα κατάλληλου τύπου
-     * 3) Παράγει δύο νέα αρχεία όπου το 1ο συμπληρώνεται από τους καθηγητές και 
-     * αφορά την διαθεσιμότητά τους για τις ημερομηνίες της εξεταστικής. Για κάθε 
-     * καθηγητή παράγεται ένα φύλλο, με γραμμές για τις ημερομηνίες και τα χρονικά 
-     * διαστήματα μεταξύ των ωρών λειτουργίας του Πανεπιστημίου. Το 2ο αρχείο
-     * συμπληρώνεται από τον υπεύθυνο σύνταξης του προγράμματος εξεταστικής και
-     * αφορά την διαθεσιμότητα των αιθουσών για τις ημερομηνίες της εξεταστικής.
-     */
-    public void doThings(){
-
-        boolean excel1,excel2,excel3, excel4, excel5 = false;
-        List<Professor> profs = new ArrayList<>();
+    public List<Classroom> getCourses(String filename, List<Professor> profs){
         try{
-            profs.addAll(getProfs(paths.getImportFilePath()));
-            excel1 = true;
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
-                    + " του φύλλου: '" + sheet1 + "'.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return ;
-        }
-        
-        List<String> timeslots = new ArrayList<>();
-        try{
-            timeslots.addAll(getTimeslots(paths.getImportFilePath()));
-            excel2 = true;
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
-                    + " του φύλλου: '"+sheet2+"'.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        for (String timeSlots : timeslots) {
-            System.out.println(timeSlots);
-        }
-        
-        HashMap<String, String> dates = new HashMap<>();
-        try{
-            HashMap<String, String> tmp = 
-                new HashMap<String,String>(getDates(paths.getImportFilePath()));
-            for (Map.Entry<String, String> entry : tmp.entrySet()) {
-                dates.put(entry.getKey(), entry.getValue());
+            FileInputStream file = new FileInputStream(new File(filename));
+            //XSSFWorkbook workbook = new XSSFWorkbook(f);
+            XlsxSheet s = new XlsxSheet(filename);
+            s.SelectSheet(sheet5);
+            int rowIndex = 0;
+            int lastRow = s.GetLastRow();
+            List<Classroom> classrooms = new ArrayList<>();
+            
+            while (rowIndex <= lastRow){
+                if (rowIndex != 0){
+                    String cellA = s.GetCellString(rowIndex, 0);
+                    String cellB = s.GetCellString(rowIndex, 1);
+                    int cellC = (int) s.GetCellNumeric(rowIndex, 2);
+                    String cellD = s.GetCellString(rowIndex, 3);
+                    cellA = cellA.trim();
+                    cellB = cellB.trim();
+                    cellD = cellD.trim();
+                    if (cellA != null && cellB != null && cellC != 0 && cellD != null){
+                        Classroom tmp = new Classroom(cellA, cellB, cellC, cellD);
+                        classrooms.add(tmp);
+                    }
+                    else{
+                        file.close();
+                        break;
+                    }
+                }
+                rowIndex++;
             }
-            excel3 = true;
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
-                    + " του φύλλου: '"+sheet3+"'.",
+            file.close();
+            return classrooms;
+        } catch (FileNotFoundException ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return;
+        } catch (IOException ex){
+            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
+                    + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (SheetExc ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα εντοπισμού του φύλλου '" + sheet4 + "'."
+                    ,"Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
-        List<Classroom> classrooms = new ArrayList<>();
-        try{
-            classrooms.addAll(getClassrooms(paths.getImportFilePath()));
-            excel4 = true;
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
-                    + " του φύλλου: '"+sheet4+"'.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return ;
-        }
-
-        if (excel1 && excel2 && excel3 && excel4){
-        
-            try {
-                createTemplate(profs,timeslots,dates,classrooms, paths.getImportFilePath());
-                logger.appendLogger("Η δημιουργία template ολοκληρώθηκε επιτυχώς.");
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(myJFrame, "Το αρχείο προς συμπλήρωση δεν μπορεί να"
-                        + " δημιουργηθεί. Παρακαλώ ελέγξτε τα μηνύματα λάθους.",
-                   "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-                logger.appendLogger("Η δημιουργία template απέτυχε.");
-            }
-        }
-                
-       // readTemplate(profs,timeslots,dates,classrooms, distinctProfessors, paths.getImportFilePath());
+        return null;
     }
-    
-    /**
-     * Εντοπισμός όλων των καθηγητών από το φύλλο που είναι σημειωμένες οι σχέσεις
-     * μάθημα-καθηγητής/ες εξέτασης.
-     * @param f είναι το όνομα του αρχείου που θα αναγνωστεί
-     * @return HashMap<String,String> dates είναι ένα HashMap με την μεταβλητή 
-     * κλειδί να είναι η ημερομηνία και την δευτερεόυσα να είναι η μέρα της εβδομάδας.
-     */
-
     
     /**
      * Εντοπισμός όλων των αιθουσών που είναι καταχωρημένες.
@@ -369,6 +428,7 @@ public class Generator {
         }
         return null;
     }
+    
     /**
      * 
      * @param f - Η ονομασία του αρχείου προς ανάγνωση.
@@ -401,7 +461,7 @@ public class Generator {
                     String cellB = s.GetCellString(rowIndex, 1);
                     cellA = cellA.trim();
                     cellB =cellB.trim();
-                    if (check(cellA) && check(cellB)){
+                    if (checkIfEmpty(cellA) && checkIfEmpty(cellB)){
                         dates.put(cellA, cellB);
                     }else{
                         file.close();
@@ -460,14 +520,6 @@ public class Generator {
         return null;
     }
     
-    public boolean checkDuplicateProfessor(Professor tmp, String A, String B, String C){
-        if(tmp.getProfSurname().equals(A) && tmp.getProfFirstname().equals(B) && tmp.getProfField().equals(C) ){
-            System.out.println("Βρήκα διπλό!");
-            return true;
-        }
-        return false;
-    }
-    
     public List<Professor> getProfs(String filename){
         try{
             FileInputStream file = new FileInputStream(new File(filename));
@@ -524,7 +576,15 @@ public class Generator {
         return null;
     }
     
-    public boolean check(String s){
+    public boolean checkDuplicateProfessor(Professor tmp, String A, String B, String C){
+        if(tmp.getProfSurname().equals(A) && tmp.getProfFirstname().equals(B) && tmp.getProfField().equals(C) ){
+            System.out.println("Βρήκα διπλό!");
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean checkIfEmpty(String s){
         if(s!=null && !s.equals("") && !s.equals(" ")){
             return true;
         }else{
@@ -606,7 +666,7 @@ public class Generator {
                     dateCell.setCellValue(day + " " + date);
 
                     for (int i = 0; i < timeslots.size(); i++) {
-                        Cell timeSlotCell = row.createCell(i + 1);
+                        row.createCell(i + 1);
                     }
                 }
                 for (Row row : sheet) {
