@@ -386,8 +386,7 @@ public class Generator {
                         JOptionPane.showMessageDialog(myJFrame, "Βλάκα έχεις βάλει μάθημα "
                                 + "που δεν υπάρχει","Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
                     }
-                    
-                    if (checkIfValid(profA) && checkIfValidCoursesProfs(profA, profB, profC, profD)){
+                    if(checkIfValid(course) && checkIfValid(profA) && checkIfValid[profB) && checkIfValid(profC) && checkIfValid(profD)){
                         for (Professor tmpProf : profs){
                             if (tmpProf.getProfSurname().equals(profC))
                         }
@@ -409,7 +408,7 @@ public class Generator {
     }
     
     public boolean checkIfValidCoursesProfs(String A, String B, String C, String D){
-        
+        if (A.equals(B)  )
     }
     
     public List<Course> getCourses(String filename, List<Professor> profs) throws SheetExc{
