@@ -78,4 +78,12 @@ public class Course {
     public void setIsExamined(boolean isExamined) {
         this.isExamined = isExamined;
     }
+    
+    public List<Professor> getExaminers() {
+        return examiners;
+    }
+
+    public void setExaminers(List<Professor> examiners) {
+        this.examiners = examiners;
+    }
 }

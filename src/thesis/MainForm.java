@@ -1,5 +1,9 @@
 package thesis;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.gmele.general.sheets.exception.SheetExc;
+
 /**
  * Η κλάση MainForm είναι η κλάση που χρησιμοποιείται για το γραφικό περιβάλλον 
  * (user interface - UI) της εφαρμογής. (Προς το παρόν διαχειρίζεται και όλο το πρόγραμμα).
@@ -117,7 +121,10 @@ public class MainForm extends javax.swing.JFrame {
         String path = jTextField1.getText();
         System.out.println(path);
         Generator a = new Generator(this,path);
-        a.readTemplates();
+        try {
+            a.readTemplates();
+        } catch (SheetExc ex) {
+        }
     }//GEN-LAST:event_loadBtnActionPerformed
 
     private void produceBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_produceBtnActionPerformed
