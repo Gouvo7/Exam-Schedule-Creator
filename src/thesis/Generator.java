@@ -124,7 +124,18 @@ public class Generator {
 
             if (excel1 && excel2 && excel3 && excel4 && excel5) {
                 createTemplate(profs, timeslots, dates, classrooms);
+                FileOutputStream f = new FileOutputStream(new File("myObjects.dat"));
+                ObjectOutputStream o = new ObjectOutputStream(f);
+                // Write objects to file
+                o.writeObject(profs);
+                o.writeObject(courses);
+                o.writeObject(classrooms);
+                o.writeObject(timeslots);
+                o.writeObject(dates);
+                o.close();
+                f.close();
             }
+            
         } catch (Exception e) {
             return;
         }
@@ -140,78 +151,33 @@ public class Generator {
      */
     public void readTemplates() throws SheetExc{
         try {
-            boolean excel1, excel2, excel3, excel4, excel5 = false;
             
-            List<Professor> profs = new ArrayList<>();
-            profs = getProfs(fileName);
-            excel1 = true;
-            if (profs == null) {
-                throw new Exception();
+            FileInputStream fi = new FileInputStream(new File("myObjects.dat"));
+            ObjectInputStream oi = new ObjectInputStream(fi);
+            List<Professor> profs = (List<Professor>) oi.readObject();
+            List<Classroom> classrooms = (List<Classroom>) oi.readObject();
+            List<Course> courses = (List<Course>) oi.readObject();
+            List<String> timeslots = (List<String>) oi.readObject();
+            HashMap<String, String> dates = (HashMap<String, String>) oi.readObject();
+            oi.close();
+            fi.close();
+            System.out.println("\n\n\n\n\n\n\n\n");
+            for (Professor tmp : profs){
+                //System.out.println(tmp.getProfSurname());
             }
-
-            List<String> timeslots = new ArrayList<>();
-            timeslots = getTimeslots(fileName);
-            if (timeslots == null) {
-                throw new Exception();
-            }
-            excel2 = true;
-
-            HashMap<String, String> dates = new HashMap<>();
-            HashMap<String, String> tmp
-                    = new HashMap<String, String>(getDates(fileName));
-            if (tmp == null) {
-                throw new Exception();
-            }
-            for (Map.Entry<String, String> entry : tmp.entrySet()) {
-                dates.put(entry.getKey(), entry.getValue());
-            }
-            excel3 = true;
-
-            List<Classroom> classrooms = new ArrayList<>();
-            classrooms = getClassrooms(fileName);
-            if (classrooms == null) {
-                throw new Exception();
-            }
-            excel4 = true;
-
-            for (Classroom cls : classrooms) {
-                System.out.println(cls.getClassroomName());
-            }
-            List<Course> courses = new ArrayList<>();
-            courses = getCourses(fileName, profs);
-            if (courses == null) {
-                throw new Exception();
-            }
-            excel5 = true;
-
-            addProfsToCourses(profs, courses, fileName);
-            if (profs.isEmpty() || courses.isEmpty())
-            {
-                return;
-            }
-
-            if (excel1 && excel2 && excel3 && excel4 && excel5){
-                addProfessorsAvailability(profs, timeslots.size(), paths.getImportFilePath1());
-                for (Professor prof : profs){
-                    prof.prinAvailable();
-                }
-                addClassroomsAvailability(classrooms, timeslots.size(), paths.getImportFilePath2());
-                for (Classroom cls : classrooms){
-                    cls.prinAvailable();
-                }
+            for (int i=0; i<timeslots.size();i++){
+                System.out.println(timeslots.get(i));
             }
             
-            FileOutputStream f = new FileOutputStream(new File("myObjects.dat"));
-            ObjectOutputStream o = new ObjectOutputStream(f);
-            // Write objects to file
-            o.writeObject(profs);
-            o.writeObject(courses);
-            o.writeObject(classrooms);
-            o.writeObject(timeslots);
-            o.writeObject(dates);
-            o.close();
-            f.close();
             
+            addProfessorsAvailability(profs, timeslots.size(), paths.getImportFilePath1());
+            for (Professor prof : profs){
+                prof.prinAvailable();
+            }
+            addClassroomsAvailability(classrooms, timeslots.size(), paths.getImportFilePath2());
+            for (Classroom cls : classrooms){
+                cls.prinAvailable();
+            }
         }catch (Exception e){
             return;
         }
@@ -306,7 +272,6 @@ public class Generator {
                         }else{
                             throw new Exception();
                         }
-                        
                     }
                 }
                 if (!availabilityList.isEmpty()){
@@ -474,7 +439,6 @@ public class Generator {
         return null;
     }
     
-        
     /**
      * Εντοπισμός όλων των αιθουσών που έχουν καταχωρηθεί στο βασικό αρχείο.
      * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
@@ -860,6 +824,5 @@ public class Generator {
         }
 	oi.close();
 	fi.close();
-
     }
 }
