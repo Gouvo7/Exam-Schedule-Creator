@@ -118,9 +118,13 @@ public class MainForm extends javax.swing.JFrame {
         System.out.println(path);
         Generator a = new Generator(this,path);
         try {
-            a.readTemplates();
+            boolean hasRead = a.readTemplates();
+            if (hasRead){
+                SceduleManager b = new SceduleManager(a);
+            }else { //throw new SheetExc(); 
+                System.out.println("Ta gamhsame");
+            }
             System.out.println("Edw mpainw?");
-            System.out.println("Telos magka fix");
         } catch (SheetExc ex) {
             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
         }

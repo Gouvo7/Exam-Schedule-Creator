@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.apache.poi.ss.usermodel.Cell;
@@ -45,6 +47,54 @@ public class Generator {
     private static JFrame myJFrame;
     private static Logs logger;
     private SavedPaths paths;
+
+    private List<Professor> profs;
+    private List<Course> courses;
+    private List<Classroom> classrooms;
+    private List<String> timeslots;
+    private HashMap<String, String> dates;
+    
+    public List<Professor> getProfs() {
+        return profs;
+    }
+
+    public void setProfs(List<Professor> profs) {
+        this.profs = profs;
+    }
+
+    public List<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(List<Course> courses) {
+        this.courses = courses;
+    }
+
+    public List<Classroom> getClassrooms() {
+        return classrooms;
+    }
+
+    public void setClassrooms(List<Classroom> classrooms) {
+        this.classrooms = classrooms;
+    }
+
+    public List<String> getTimeslots() {
+        return timeslots;
+    }
+
+    public void setTimeslots(List<String> timeslots) {
+        this.timeslots = timeslots;
+    }
+
+    public HashMap<String, String> getDates() {
+        return dates;
+    }
+
+    public void setDates(HashMap<String, String> dates) {
+        this.dates = dates;
+    }
+    
+    
     
     // Δήλωση των στατικών ονομασιών των φύλλων του excel προς επεξεργασία.
     
@@ -80,23 +130,23 @@ public class Generator {
         try {
             boolean excel1, excel2, excel3, excel4, excel5 = false;
             
-            List<Professor> profs = new ArrayList<>();
-            profs = getProfs(fileName);
+            profs = new ArrayList<>();
+            profs = readProfs(fileName);
             excel1 = true;
             if (profs == null) {
                 throw new Exception();
             }
 
-            List<String> timeslots = new ArrayList<>();
-            timeslots = getTimeslots(fileName);
+            timeslots = new ArrayList<>();
+            timeslots = readTimeslots(fileName);
             if (timeslots == null) {
                 throw new Exception();
             }
             excel2 = true;
 
-            HashMap<String, String> dates = new HashMap<>();
+            dates = new HashMap<>();
             HashMap<String, String> tmp
-                    = new HashMap<String, String>(getDates(fileName));
+                    = new HashMap<String, String>(readDates(fileName));
             if (tmp == null) {
                 throw new Exception();
             }
@@ -105,37 +155,23 @@ public class Generator {
             }
             excel3 = true;
 
-            List<Classroom> classrooms = new ArrayList<>();
-            classrooms = getClassrooms(fileName);
+            classrooms = new ArrayList<>();
+            classrooms = readClassrooms(fileName);
             if (classrooms == null) {
                 throw new Exception();
             }
             excel4 = true;
 
-            for (Classroom cls : classrooms) {
-                System.out.println(cls.getClassroomName());
-            }
-            List<Course> courses = new ArrayList<>();
-            courses = getCourses(fileName, profs);
+            courses = new ArrayList<>();
+            courses = readCourses(fileName, profs);
             if (courses == null) {
                 throw new Exception();
             }
             excel5 = true;
-
+            
             if (excel1 && excel2 && excel3 && excel4 && excel5) {
                 createTemplate(profs, timeslots, dates, classrooms);
-                FileOutputStream f = new FileOutputStream(new File("myObjects.dat"));
-                ObjectOutputStream o = new ObjectOutputStream(f);
-                // Write objects to file
-                o.writeObject(profs);
-                o.writeObject(courses);
-                o.writeObject(classrooms);
-                o.writeObject(timeslots);
-                o.writeObject(dates);
-                o.close();
-                f.close();
             }
-            
         } catch (Exception e) {
             return;
         }
@@ -149,38 +185,18 @@ public class Generator {
      * 
      * @throws org.gmele.general.sheets.exception.SheetExc
      */
-    public void readTemplates() throws SheetExc{
+    public boolean readTemplates() throws SheetExc{
         try {
-            
-            FileInputStream fi = new FileInputStream(new File("myObjects.dat"));
-            ObjectInputStream oi = new ObjectInputStream(fi);
-            List<Professor> profs = (List<Professor>) oi.readObject();
-            List<Classroom> classrooms = (List<Classroom>) oi.readObject();
-            List<Course> courses = (List<Course>) oi.readObject();
-            List<String> timeslots = (List<String>) oi.readObject();
-            HashMap<String, String> dates = (HashMap<String, String>) oi.readObject();
-            oi.close();
-            fi.close();
-            System.out.println("\n\n\n\n\n\n\n\n");
-            for (Professor tmp : profs){
-                //System.out.println(tmp.getProfSurname());
-            }
-            for (int i=0; i<timeslots.size();i++){
-                System.out.println(timeslots.get(i));
-            }
-            
-            
+            boolean outcome = readObjects();
             addProfessorsAvailability(profs, timeslots.size(), paths.getImportFilePath1());
-            for (Professor prof : profs){
-                prof.prinAvailable();
-            }
             addClassroomsAvailability(classrooms, timeslots.size(), paths.getImportFilePath2());
-            for (Classroom cls : classrooms){
-                cls.prinAvailable();
-            }
+            return true;
         }catch (Exception e){
-            return;
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά την ανάγνωση των δεδομένων. ",
+            " Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
         }
+        return false;
     }
     
     /**
@@ -378,7 +394,7 @@ public class Generator {
      * @return Μία λίστα με αντικείμενα τύπου Course.
      * @throws SheetExc 
      */
-    public List<Course> getCourses(String filename, List<Professor> profs) throws SheetExc{
+    public List<Course> readCourses(String filename, List<Professor> profs) throws SheetExc{
         try{
             FileInputStream file = new FileInputStream(new File(filename));
             //XSSFWorkbook workbook = new XSSFWorkbook(f);
@@ -445,7 +461,7 @@ public class Generator {
      * @return Μία λίστα με αντικείμενα τύπου Classroom.
      * @throws SheetExc 
      */
-    public List<Classroom> getClassrooms(String filename) throws SheetExc{
+    public List<Classroom> readClassrooms(String filename) throws SheetExc{
         try{
             FileInputStream file = new FileInputStream(new File(filename));
             //XSSFWorkbook workbook = new XSSFWorkbook(f);
@@ -496,7 +512,7 @@ public class Generator {
      * @return Ένα HashMap με ζευγάρια ημέρας - ημερομηνίας.
      * @throws SheetExc 
      */
-    public HashMap<String, String> getDates(String filename) throws SheetExc{
+    public HashMap<String, String> readDates(String filename) throws SheetExc{
         try {
             FileInputStream file = new FileInputStream(new File(filename));
             XlsxSheet s = new XlsxSheet(filename);
@@ -552,7 +568,7 @@ public class Generator {
      * @return Μία λίστα με Strings.
      * @throws SheetExc 
      */
-    public List<String> getTimeslots(String filename) throws SheetExc{
+    public List<String> readTimeslots(String filename) throws SheetExc{
         try {
             FileInputStream file = new FileInputStream(new File(filename));
             XlsxSheet s = new XlsxSheet(filename);
@@ -594,7 +610,7 @@ public class Generator {
      * @return Μία λίστα με αντικείμενα τύπου Professor.
      * @throws SheetExc 
      */
-    public List<Professor> getProfs(String filename) throws SheetExc{
+    public List<Professor> readProfs(String filename) throws SheetExc{
         try{
             FileInputStream file = new FileInputStream(new File(filename));
             //XSSFWorkbook workbook = new XSSFWorkbook(f);
@@ -811,18 +827,51 @@ public class Generator {
         return style;
     }
     
-    public void readObjects() throws FileNotFoundException, IOException, ClassNotFoundException{
-        FileInputStream fi = new FileInputStream(new File("myObjects.dat"));
-	ObjectInputStream oi = new ObjectInputStream(fi);
-        List<Professor> pr1 = (List<Professor>) oi.readObject();
-        List<Classroom> pr2 = (List<Classroom>) oi.readObject();
-        List<Course> pr3 = (List<Course>) oi.readObject();
-        
-        System.out.println("\n\n\n\n\n\n\n\n");
-        for (Professor tmp : pr1){
-            System.out.println(tmp.getProfSurname());
+    public boolean readObjects(){
+        try {
+            FileInputStream fi = new FileInputStream(new File("myObjects.dat"));
+            ObjectInputStream oi = new ObjectInputStream(fi);
+            profs = (List<Professor>) oi.readObject();
+            courses = (List<Course>) oi.readObject();
+            classrooms = (List<Classroom>) oi.readObject();
+            timeslots = (List<String>) oi.readObject();
+            dates = (HashMap<String, String>) oi.readObject();
+            oi.close();
+            fi.close();
+            return true;
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά την ανάγνωση των αποθηκευμένων αρχείων."
+            + "Τα δεδομένα των συμπληρωμένων αρχείων δεν είναι σωστά." + 
+            " Παρακαλώ ελέγξτε τα δεδομένα σας και δοκιμάστε ξανά.", "Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (ClassNotFoundException ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα εφαρμογής", "Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
         }
-	oi.close();
-	fi.close();
+        return false;
+    }
+    
+    public void saveObjects(){
+        FileOutputStream f = null;
+        try {
+            f = new FileOutputStream(new File("myObjects.dat"));
+            ObjectOutputStream o = new ObjectOutputStream(f);
+            if (profs == null || courses == null || classrooms == null || timeslots == null || dates == null ){
+                JOptionPane.showMessageDialog(myJFrame, "Τα δεδομένα των συμπληρωμένων αρχείων δεν είναι σωστά." + 
+                    " Παρακαλώ ελέγξτε τα δεδομένα σας και δοκιμάστε ξανά.", "Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            o.writeObject(profs);
+            o.writeObject(courses);
+            o.writeObject(classrooms);
+            o.writeObject(timeslots);
+            o.writeObject(dates);
+            o.close();
+            f.close();
+        } catch (FileNotFoundException ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα εντοπισμού " + 
+                    "των αποθηκευμένων αρχείων του προγράμματος.", "Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα αποθηκευμένα " + 
+                    "δεδομένα. Παρακαλώ ελέγξτε τα δεδομένα σας και δοκιμάστε ξανά.", "Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
