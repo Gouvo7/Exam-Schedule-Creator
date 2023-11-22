@@ -1,14 +1,14 @@
 package thesis;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author gouvo
+/** @author gouvo
+ * Η κλάση Classroom χρησιμοποιείται για την αποθήκευση στοιχείων αιθουσών
  */
 
-public class Classroom {
+public class Classroom implements Serializable{
     private String classroomCode;
     private String classroomName;
     private int classroomSeats;
@@ -65,7 +65,7 @@ public class Classroom {
     
     public void prinAvailable(){
         for (Availability x : availability){
-            System.out.println(x.getDate() +  x.getTimeSlot() + x.getIsAvailable());
+            System.out.println(this.getClassroomName() + " " + x.getDate() + " " + x.getTimeSlot() + " " + x.getIsAvailable());
         }
     }
 }

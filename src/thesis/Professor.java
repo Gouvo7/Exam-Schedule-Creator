@@ -1,18 +1,19 @@
 package thesis;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 
-/**
+/** @author gouvo
  * Η κλάση Professors χρησιμοποιείται για την αποθήκευση στοιχείων των καθηγητών.
- * @param profSurname -> Επώνυμο καθηγητή
- * @param profFirstname -> Όνομα καθηγητή
- * @param profField -> Ειδικότητα καθηγητή
- * @author gouvo
+ * @param profSurname Επώνυμο καθηγητή.
+ * @param profFirstname Όνομα καθηγητή.
+ * @param profField Ειδικότητα καθηγητή.
+ * 
  */
-public class Professor {
+public class Professor implements Serializable{
     
     private String profSurname;
     private String profFirstname;
@@ -59,7 +60,7 @@ public class Professor {
     
     public void prinAvailable(){
         for (Availability x : availability){
-            System.out.println(x.getDate() +  x.getTimeSlot() + x.getIsAvailable());
+            System.out.println(this.getProfSurname() + " " + x.getDate() +  " " + x.getTimeSlot() + " " + x.getIsAvailable());
         }
     }
     

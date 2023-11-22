@@ -1,5 +1,6 @@
 package thesis;
 
+import java.io.Serializable;
 import thesis.Professor;
 
 /**
@@ -13,7 +14,7 @@ isAvailable == 0 -> Η/Ο αίθουσα/καθηγητής δεν είναι δ
 isAvailable == 1 -> Ο καθηγητής έχει δηλώσει πως μπορεί.
 isAvailable == 2 -> Ο καθηγητής έχει δηλώσει πως μπορεί αλλά έχει δεσμευθεί από άλλο μάθημα.
  */
-public class Availability {
+public class Availability implements Serializable{
 
     private String date;
     private String timeSlot;

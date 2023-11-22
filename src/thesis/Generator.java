@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,8 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.apache.poi.ss.usermodel.Cell;
@@ -41,27 +41,29 @@ public class Generator {
     
     
     private static String fileName;
+    private static String sheet1, sheet2,sheet3, sheet4, sheet5, sheet6;
     private static JFrame myJFrame;
-    private Logs logger;
+    private static Logs logger;
     private SavedPaths paths;
     
     // Δήλωση των στατικών ονομασιών των φύλλων του excel προς επεξεργασία.
-    static final String sheet1 = "PROFESSORS_LIST";
-    static final String sheet2 = "TIMESLOTS";
-    static final String sheet3 = "DATES";
-    static final String sheet4 = "CLASSROOMS";
-    static final String sheet5 = "COURSES_LIST";
-    static final String sheet6 = "COURSES_PROFESSORS";
+    
     
     Generator(JFrame x, String y){
         myJFrame = x;
         fileName = y;
         logger = new Logs();
         paths = new SavedPaths();
+        fileName = paths.getImportFilePath();
+        sheet1 = paths.getSheet1();
+        sheet2 = paths.getSheet2();
+        sheet3 = paths.getSheet3();
+        sheet4 = paths.getSheet4();
+        sheet5 = paths.getSheet5();
+        sheet6 = paths.getSheet6();
     }
     
     /**
-     * Η κλάση doThings():
      * 1) Διαβάζει το αρχείο από το μονοπάτι που καθορίζει ο χρήστης από την εφαρμογή.
      * 2) Αποθηκεύει τα δεδομένα σε αντικείμενα κατάλληλου τύπου
      * 3) Παράγει δύο νέα αρχεία όπου το 1ο συμπληρώνεται από τους καθηγητές και 
@@ -70,174 +72,159 @@ public class Generator {
      * διαστήματα μεταξύ των ωρών λειτουργίας του Πανεπιστημίου. Το 2ο αρχείο
      * συμπληρώνεται από τον υπεύθυνο σύνταξης του προγράμματος εξεταστικής και
      * αφορά την διαθεσιμότητα των αιθουσών για τις ημερομηνίες της εξεταστικής.
+     * 
+     * Σε περίπτωση που κάποιο από τα φύλλα δεν είναι συμπληρωμένο με έγκυρες πληροφορίες
+     * ή κενά, θα προκληθεί ένα Exception και η διαδικασία θα διακοπεί.
      */
-    public void doThings(){
-
-        boolean excel1,excel2,excel3, excel4, excel5 = false;
-        List<Professor> profs = new ArrayList<>();
-        try{
-            profs.addAll(getProfs(paths.getImportFilePath()));
+    public void createExcels(){
+        try {
+            boolean excel1, excel2, excel3, excel4, excel5 = false;
+            
+            List<Professor> profs = new ArrayList<>();
+            profs = getProfs(fileName);
             excel1 = true;
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
-                    + " του φύλλου: '" + sheet1 + "'.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return ;
-        }
-        
-        List<String> timeslots = new ArrayList<>();
-        try{
-            timeslots.addAll(getTimeslots(paths.getImportFilePath()));
+            if (profs == null) {
+                throw new Exception();
+            }
+
+            List<String> timeslots = new ArrayList<>();
+            timeslots = getTimeslots(fileName);
+            if (timeslots == null) {
+                throw new Exception();
+            }
             excel2 = true;
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
-                    + " του φύλλου: '" + sheet2 + "'.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        HashMap<String, String> dates = new HashMap<>();
-        try{
-            HashMap<String, String> tmp = 
-                new HashMap<String,String>(getDates(paths.getImportFilePath()));
+
+            HashMap<String, String> dates = new HashMap<>();
+            HashMap<String, String> tmp
+                    = new HashMap<String, String>(getDates(fileName));
+            if (tmp == null) {
+                throw new Exception();
+            }
             for (Map.Entry<String, String> entry : tmp.entrySet()) {
                 dates.put(entry.getKey(), entry.getValue());
             }
             excel3 = true;
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
-                    + " του φύλλου: '" + sheet3 + "'.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+
+            List<Classroom> classrooms = new ArrayList<>();
+            classrooms = getClassrooms(fileName);
+            if (classrooms == null) {
+                throw new Exception();
+            }
+            excel4 = true;
+
+            for (Classroom cls : classrooms) {
+                System.out.println(cls.getClassroomName());
+            }
+            List<Course> courses = new ArrayList<>();
+            courses = getCourses(fileName, profs);
+            if (courses == null) {
+                throw new Exception();
+            }
+            excel5 = true;
+
+            if (excel1 && excel2 && excel3 && excel4 && excel5) {
+                createTemplate(profs, timeslots, dates, classrooms);
+            }
+        } catch (Exception e) {
             return;
         }
-        
-        List<Classroom> classrooms = new ArrayList<>();
-        
-        try{
-            classrooms.addAll(getClassrooms(paths.getImportFilePath()));
-            excel4 = true;
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
-                    + " του φύλλου: '" + sheet4 + "'.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return ;
-        }
-        for (Classroom cls : classrooms){
-            System.out.println(cls.getClassroomName());
-        }
-        List<Course> courses = new ArrayList<>();
-        try{
-            courses.addAll(getCourses(paths.getImportFilePath(), profs));
-            excel5 = true;
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
-                    + " του φύλλου: '" + sheet5 + "'.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return ;
-        }
-        if (excel1 && excel2 && excel3 && excel4 && excel5){
-//            try {
-                createTemplate(profs,timeslots,dates,classrooms, paths.getImportFilePath());
-  //          } catch (IOException ex) {
-    //            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο προς συμπλήρωση δεν μπορεί να"
-//                        + " δημιουργηθεί. Παρακαλώ ελέγξτε τα μηνύματα λάθους.",
-//                   "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-  //          }
-        }
     }
-    
+
     /**
      * Η μέθοδος διαβάζει το κύριο excel που εμπεριέχει πληροφορίες για τους καθηγητές,
-     * τα μαθήματα, τις σχέσεις τους κ.α.Έπειτα, καλεί 2 μεθόδους που συμπληρώνουν
- στα αντικείμενα καθηγητών και αιθουσών την διαθεσιμότητά τους με βάση τα συμπληρωμένα
- template.
+     * τα μαθήματα, τις σχέσεις τους κ.α. Έπειτα, καλεί 2 μεθόδους που συμπληρώνουν
+     * στα αντικείμενα καθηγητών και αιθουσών την διαθεσιμότητά τους με βάση τα συμπληρωμένα
+     * template.
+     * 
      * @throws org.gmele.general.sheets.exception.SheetExc
      */
     public void readTemplates() throws SheetExc{
-        boolean excel1,excel2,excel3, excel4, excel5 = false;
-        List<Professor> profs = new ArrayList<>();
-        try{
-            profs.addAll(getProfs(paths.getImportFilePath()));
+        try {
+            boolean excel1, excel2, excel3, excel4, excel5 = false;
+            
+            List<Professor> profs = new ArrayList<>();
+            profs = getProfs(fileName);
             excel1 = true;
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
-                    + " του φύλλου: '"+sheet1+"'.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return ;
-        }
-        
-        List<String> timeslots = new ArrayList<>();
-        try{
-            timeslots.addAll(getTimeslots(paths.getImportFilePath()));
+            if (profs == null) {
+                throw new Exception();
+            }
+
+            List<String> timeslots = new ArrayList<>();
+            timeslots = getTimeslots(fileName);
+            if (timeslots == null) {
+                throw new Exception();
+            }
             excel2 = true;
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
-                    + " του φύλλου: '"+sheet2+"'.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        HashMap<String, String> dates = new HashMap<>();
-        try{
-            HashMap<String, String> tmp = 
-                new HashMap<String,String>(getDates(paths.getImportFilePath()));
+
+            HashMap<String, String> dates = new HashMap<>();
+            HashMap<String, String> tmp
+                    = new HashMap<String, String>(getDates(fileName));
+            if (tmp == null) {
+                throw new Exception();
+            }
             for (Map.Entry<String, String> entry : tmp.entrySet()) {
                 dates.put(entry.getKey(), entry.getValue());
             }
             excel3 = true;
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
-                    + " του φύλλου: '"+sheet3+"'.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        List<Classroom> classrooms = new ArrayList<>();
-        try{
-            classrooms.addAll(getClassrooms(paths.getImportFilePath()));
-            excel4 = true;
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
-                    + " του φύλλου: '"+sheet4+"'.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return ;
-        }
-        
-        List<Course> courses = new ArrayList<>();
-        try{
-            courses.addAll(getCourses(paths.getImportFilePath(), profs));
-            excel5 = true;
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα ανάγνωσης των δεδομένων"
-                    + " του φύλλου: '" + sheet5 + "'.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return ;
-        }
-        
-        addProfsToCourses(profs, courses, paths.getImportFilePath());
-        if (profs.isEmpty() || courses.isEmpty())
-        {
-            return;
-        }
-        
-        if (excel1 && excel2 && excel3 && excel4 && excel5){
-            addProfessorsAvailability(profs, timeslots.size(), paths.getImportFilePath1());
-            for (Professor prof : profs){
-                prof.prinAvailable();
+
+            List<Classroom> classrooms = new ArrayList<>();
+            classrooms = getClassrooms(fileName);
+            if (classrooms == null) {
+                throw new Exception();
             }
-            System.out.println("Kolpa");
-            addClassroomsAvailability(classrooms, timeslots.size(), paths.getImportFilePath2());
-            System.out.println("Telos!");
+            excel4 = true;
+
+            for (Classroom cls : classrooms) {
+                System.out.println(cls.getClassroomName());
+            }
+            List<Course> courses = new ArrayList<>();
+            courses = getCourses(fileName, profs);
+            if (courses == null) {
+                throw new Exception();
+            }
+            excel5 = true;
+
+            addProfsToCourses(profs, courses, fileName);
+            if (profs.isEmpty() || courses.isEmpty())
+            {
+                return;
+            }
+
+            if (excel1 && excel2 && excel3 && excel4 && excel5){
+                addProfessorsAvailability(profs, timeslots.size(), paths.getImportFilePath1());
+                for (Professor prof : profs){
+                    prof.prinAvailable();
+                }
+                addClassroomsAvailability(classrooms, timeslots.size(), paths.getImportFilePath2());
+                for (Classroom cls : classrooms){
+                    cls.prinAvailable();
+                }
+            }
+            
+            FileOutputStream f = new FileOutputStream(new File("myObjects.dat"));
+            ObjectOutputStream o = new ObjectOutputStream(f);
+            // Write objects to file
+            o.writeObject(profs);
+            o.writeObject(courses);
+            o.writeObject(classrooms);
+            o.writeObject(timeslots);
+            o.writeObject(dates);
+            o.close();
+            f.close();
+            
+        }catch (Exception e){
+            return;
         }
     }
     
     /**
-     *
-     * @param professors
-     * @param lastColumn
-     * @param filename
-     * @return
-     */
+     * Συμπληρώνει για όλη την λίστα των καθηγητών, την διαθεσιμότητά τους από το
+     * συμπληρωμένο φύλλο που παράχθηκε από το πρόγραμμα σε προηγούμενο βήμα. 
+     * @param professors Η λίστα με τους καθηγητές που θα προστεθεί η διαθεσιμότητά τους.
+     * @param lastColumn Το μέγεθος της λίστας timeslots ή το πλήθος των διαφορετικών
+     * χρονικών πλαισίων.
+     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
+     */    
     public void addProfessorsAvailability(List<Professor> professors,int lastColumn, String filename) throws SheetExc{
         try{
             FileInputStream file = new FileInputStream(new File(filename));
@@ -261,7 +248,7 @@ public class Generator {
                             Availability tmp = new Availability(cellDate, timeslot, 0);
                             availabilityList.add(tmp);
                         }else{
-                            return;
+                            throw new Exception();
                         }
                     }
                 }
@@ -271,7 +258,6 @@ public class Generator {
                 }
             }
             file.close();
-            System.out.println("Fixopoulos");
             return ;
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
@@ -280,10 +266,22 @@ public class Generator {
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα σημπληρωμένα αρχεία διαθεσιμότητας καθηγητών.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
+        
         return ;
     }
     
+    /**
+     * Συμπληρώνει για όλη την λίστα των αιθουσών, την διαθεσιμότητά τους από το
+     * συμπληρωμένο φύλλο που παράχθηκε από το πρόγραμμα σε προηγούμενο βήμα. 
+     * @param classrooms Η λίστα με τις αίθουσες που θα προστεθεί η διαθεσιμότητά τους.
+     * @param lastColumn Το μέγεθος της λίστας timeslots ή το πλήθος των διαφορετικών
+     * χρονικών πλαισίων.
+     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
+     */
     public void addClassroomsAvailability(List<Classroom> classrooms,int lastColumn, String filename){
         try{
             FileInputStream file = new FileInputStream(new File(filename));
@@ -299,8 +297,6 @@ public class Generator {
                     for (int colIndex = 1; colIndex < lastColumn; colIndex++){
                         String timeslot = s.GetCellString(0,colIndex);
                         String curCell = s.GetCellString(rowIndex, colIndex).trim();
-                                                    System.out.println("Γαμήθηκες");
-
                         if (curCell.equals("+")){
                             Availability tmp = new Availability(cellDate, timeslot, 1);
                             availabilityList.add(tmp);
@@ -308,13 +304,11 @@ public class Generator {
                             Availability tmp = new Availability(cellDate, timeslot, 0);
                             availabilityList.add(tmp);
                         }else{
-                            System.out.println("Γαμήθηκες");
-                            return ;
+                            throw new Exception();
                         }
                         
                     }
                 }
-                System.out.println("Finished loops: ");
                 if (!availabilityList.isEmpty()){
                     classroom.setAvailability(availabilityList);
                 }
@@ -331,22 +325,29 @@ public class Generator {
             JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (SheetExc ex) {
-            ex.getStackTrace();
-            Logger.getLogger(Generator.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα σημπληρωμένα αρχεία διαθεσιμότητας αιθουσών.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return ;
     }
     
+    /**
+     * Ενημέρωση της λίστας των καθηγητών που εξετάζουν το μάθημα σε ολόκληρη την λίστα
+     * αντικειμένων Course.
+     * @param profs Η λίστα με τους καθηγητές.
+     * @param courses Η λίστα με τα μαθήματα.
+     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
+     * @throws SheetExc 
+     */
     public void addProfsToCourses(List<Professor> profs, List<Course> courses, String filename) throws SheetExc{
         try{
             FileInputStream file = new FileInputStream(new File(filename));
-            //XSSFWorkbook workbook = new XSSFWorkbook(f);
             XlsxSheet s = new XlsxSheet(filename);
             s.SelectSheet(sheet6);
             int rowIndex = 0;
             int lastRow = s.GetLastRow();
             List<String> uniqueCourses = new ArrayList<>();
-            //remove duplicate courses
             while (rowIndex <= lastRow){
                 if (rowIndex != 0){
                     String course = s.GetCellString(rowIndex, 0).trim();
@@ -354,7 +355,6 @@ public class Generator {
                         JOptionPane.showMessageDialog(myJFrame, "Βρέθηκε το ίδιο μάθημα"
                                 + " παραπάνω από μια φορά στο φύλλο " + sheet6 + ". Παρακαλώ ελέγξτε τα στοιχεία"
                                 + "  και δοκιμάστε ξανά.","Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
-                        profs.clear();
                         return ;
                     }else{
                         uniqueCourses.add(course);
@@ -387,10 +387,7 @@ public class Generator {
                         }
                     }
                     if (!exists){
-                        JOptionPane.showMessageDialog(myJFrame, "Βρέθηκε μάθημα που δεν υπάρχει"
-                                + " στο φύλλο των μαθημάτων.","Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
-                        courses.clear();
-                        return ;
+                        throw new Exception();
                     }
                 }
                 rowIndex++;
@@ -402,10 +399,20 @@ public class Generator {
         } catch (IOException ex){
             JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
                     + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex){
+            JOptionPane.showMessageDialog(myJFrame, "Βρέθηκε μάθημα στο φύλλο '" + sheet6 + "' που δεν υπάρχει"
+                                + " στο φύλλο των μαθημάτων.","Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return ;
     }
     
+    /**
+     * Εντοπισμός όλων των μαθημάτων που έχουν καταχωρηθεί στο βασικό αρχείο.
+     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
+     * @param profs Η λίστα με τους καθηγητές.
+     * @return Μία λίστα με αντικείμενα τύπου Course.
+     * @throws SheetExc 
+     */
     public List<Course> getCourses(String filename, List<Professor> profs) throws SheetExc{
         try{
             FileInputStream file = new FileInputStream(new File(filename));
@@ -446,10 +453,7 @@ public class Generator {
                         }
                     }
                     else{
-                        JOptionPane.showMessageDialog(myJFrame, "Εντοπίστικαν κενές γραμμές στο φύλλο "
-                                + sheet5 + ". Παρακαλώ ελέγξτε τα δεδομένα.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-                        courses.clear();
-                        return courses;
+                        throw new Exception();
                     }
                 }
                 rowIndex++;
@@ -462,16 +466,20 @@ public class Generator {
         } catch (IOException ex){
             JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
                     + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα δεδομένα του φύλλου: '"
+            + sheet5 + "'. Βεβαιωθείτε ότι δεν υπάρχουν κενά κελιά ή διπλότυπες εγγραφές.",
+            "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
     
         
     /**
-     * Εντοπισμός όλων των αιθουσών που είναι καταχωρημένες.
-     * @param f - Η ονομασία του αρχείου προς ανάγνωση.
-     * @return List<Classroom> - είναι μία λίστα από αντικείμενα Classroom τα οποία
-     * εμπεριέχουν πληροφορίες για κάθε αίθουσα.
+     * Εντοπισμός όλων των αιθουσών που έχουν καταχωρηθεί στο βασικό αρχείο.
+     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
+     * @return Μία λίστα με αντικείμενα τύπου Classroom.
+     * @throws SheetExc 
      */
     public List<Classroom> getClassrooms(String filename) throws SheetExc{
         try{
@@ -496,10 +504,8 @@ public class Generator {
                         Classroom tmp = new Classroom(cellA, cellB, cellC, cellD);
                         classrooms.add(tmp);
                     }
-                    
                     else{
-                        file.close();
-                        return null;
+                        throw new Exception();
                     }
                 }
                 rowIndex++;
@@ -512,15 +518,19 @@ public class Generator {
         } catch (IOException ex){
             JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
                     + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα δεδομένα του φύλλου: '"
+            + sheet4 + "'. Βεβαιωθείτε ότι δεν υπάρχουν κενά κελιά ή διπλότυπες εγγραφές.",
+            "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
     
     /**
-     * 
-     * @param f - Η ονομασία του αρχείου προς ανάγνωση.
-     * @return List<Classroom> - είναι μία λίστα από αντικείμενα Classroom τα οποία
-     * εμπεριέχουν πληροφορίες για κάθε αίθουσα.
+     * Εντοπισμός όλων των ημερομηνιών της εξεταστικής που έχουν καταχωρηθεί στο βασικό αρχείο.
+     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
+     * @return Ένα HashMap με ζευγάρια ημέρας - ημερομηνίας.
+     * @throws SheetExc 
      */
     public HashMap<String, String> getDates(String filename) throws SheetExc{
         try {
@@ -542,7 +552,7 @@ public class Generator {
                         JOptionPane.showMessageDialog(myJFrame, "Λάθος τύπος "
                                 + "δεδομένων στο φύλλο '" + sheet3 + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
                         file.close();
-                        return dates;
+                        return null;
                     }
                     String cellA = outputDateFormat.format(date);
                     String cellB = s.GetCellString(rowIndex, 1);
@@ -551,8 +561,7 @@ public class Generator {
                     if (checkIfValid(cellA) && checkIfValid(cellB)){
                         dates.put(cellA, cellB);
                     }else{
-                        file.close();
-                        return dates;
+                        throw new Exception();
                     }
                 }
                 rowIndex++;
@@ -565,10 +574,20 @@ public class Generator {
         } catch (IOException ex){
             JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
                     + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα δεδομένα του φύλλου: '"
+            + sheet3 + "'. Βεβαιωθείτε ότι δεν υπάρχουν κενά κελιά ή διπλότυπες εγγραφές.",
+            "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
     
+    /**
+     * Εντοπισμός όλων των διαστημάτων εξέτασης που έχουν καταχωρηθεί στο βασικό αρχείο.
+     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
+     * @return Μία λίστα με Strings.
+     * @throws SheetExc 
+     */
     public List<String> getTimeslots(String filename) throws SheetExc{
         try {
             FileInputStream file = new FileInputStream(new File(filename));
@@ -581,10 +600,10 @@ public class Generator {
             while (rowIndex < lastRow){
                 if (rowIndex != 0){
                     String cellA = s.GetCellString(rowIndex, 0);
-                    if(cellA != null){
+                    if(checkIfValid(cellA)){
                         timeslots.add(cellA);
                     }else{
-                        break;
+                        throw new Exception();
                     }
                 }
                 rowIndex++;
@@ -597,10 +616,20 @@ public class Generator {
         } catch (IOException ex){
             JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
                     + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα δεδομένα του φύλλου: '"
+            + sheet3 + "'. Βεβαιωθείτε ότι δεν υπάρχουν κενά κελιά ή διπλότυπες εγγραφές.",
+            "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
     
+    /**
+     * Εντοπισμός όλων των καθηγητών που έχουν καταχωρηθεί στο βασικό αρχείο.
+     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
+     * @return Μία λίστα με αντικείμενα τύπου Professor.
+     * @throws SheetExc 
+     */
     public List<Professor> getProfs(String filename) throws SheetExc{
         try{
             FileInputStream file = new FileInputStream(new File(filename));
@@ -616,32 +645,33 @@ public class Generator {
                     String cellA = s.GetCellString(rowIndex, 0).trim();
                     String cellB = s.GetCellString(rowIndex, 1).trim();
                     String cellC = s.GetCellString(rowIndex, 2).trim();
-                    
                     if (cellA != null && cellB != null && cellC != null){
-                        boolean dupliicate = false;
+                        boolean duplicate = false;
                         if (profs.isEmpty()){
-                            dupliicate = false;
+                            duplicate = false;
                         }else{
                             for (Professor tmp : profs){
                                 if (checkDuplicateProfessor(tmp,cellA,cellB,cellC)){
-                                    dupliicate = true;
+                                    duplicate = true;
                                     break;
                                 }
                             }
                         }
-                        if (!dupliicate){
+                        if (!duplicate){
                             Professor prof = new Professor(cellA, cellB, cellC);
                             profs.add(prof);
+                        }else{
+                            throw new Exception();
                         }
                     }
                     else{
-                        JOptionPane.showMessageDialog(myJFrame, "Εντοπίστικαν κενές γραμμές στο φύλλο"
-                                + sheet1 + ". Παρακαλώ ελέγξτε τα δεδομένα.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+                        throw new Exception();
                     }
                 }
                 rowIndex++;
             }
             file.close();
+            
             return profs;
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
@@ -649,26 +679,47 @@ public class Generator {
         } catch (IOException ex){
             JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
                     + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα δεδομένα του φύλλου: '"
+            + sheet1 + "'. Βεβαιωθείτε ότι δεν υπάρχουν κενά κελιά ή διπλότυπες εγγραφές.",
+            "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
     
-    public boolean checkDuplicateProfessor(Professor tmp, String A, String B, String C){
-        if(tmp.getProfSurname().equals(A) && tmp.getProfFirstname().equals(B) && tmp.getProfField().equals(C) ){
-            System.out.println("Βρήκα διπλό καθηγητή!");
+    /**
+     * Έλεγχος για διπλοεγγραφή καθηγητή.
+     * @param prof Αντικείμενο καθηγητή.
+     * @param cellA Πληροφορία από 1η στήλη.
+     * @param cellB Πληροφορία από 2η στήλη.
+     * @param cellC Πληροφορία από 3η στήλη.
+     * @return εάν υπάρχει ήδη ή όχι.
+     */
+    public boolean checkDuplicateProfessor(Professor prof, String cellA, String cellB, String cellC){
+        if(prof.getProfSurname().equals(cellA) && prof.getProfFirstname().equals(cellB) && prof.getProfField().equals(cellC) ){
             return true;
         }
         return false;
     }
     
-    public boolean checkDuplicateCourse(Course tmp, String A){
-        if(tmp.getCourseName().equals(A)){
-            System.out.println("Βρήκα διπλό μάθημα!");
+    /**
+     * Έλεγχος για διπλοεγγραφή μαθήματος.
+     * @param course Αντικείμενο καθηγητή.
+     * @param cellA Πληροφορία από 1η στήλη.
+     * @return εάν υπάρχει ήδη ή όχι.
+     */
+    public boolean checkDuplicateCourse(Course course, String cellA){
+        if(course.getCourseName().equals(cellA)){
             return true;
         }
         return false;
     }
     
+    /**
+     * Έλεγχος για έγκυρη πληροφορία.
+     * @param s Το string προς έλεγχο.
+     * @return εάν είναι έγκυρο ή όχι.
+     */
     public boolean checkIfValid(String s){
         if(s != null && !s.equals("") && !s.equals(" ")){
             return true;
@@ -677,17 +728,28 @@ public class Generator {
         }
     }
     
-    public void createTemplate(List<Professor> uniqueProfs, List<String> timeslots, HashMap<String, String> dates,List<Classroom> classrooms, String filename){
+    /**
+     * Δημιουργία των template αρχείων προς συμπλήρωση. 
+     * 1 αρχείο αφορά τους καθηγητές και την διαθεσιμότητά τους για τις ημερομηνίες 
+     * της εξεταστικής. Κάθε φύλλο θα συμπληρώνεται από τον κάθε καθηγητή ξεχωριστά.
+     * 2 αρχείο αφορά τις αίθουσες και την διαθεσιμότητά τους για τις ημερομηνίες
+     * της εξεταστικής. Τα φύλλα συμπληρώνονται από τον υπεύθυνο για το πρόγραμμα.
+     * @param uniqueProfs Λίστα αντικειμένων καθηγητών (Professor).
+     * @param timeslots Λίστα strings με τα διαστήματα εξέτασης. 
+     * @param dates HashMap με τα ζευγάρια ημέρας - ημερομηνίας.
+     * @param classrooms Λίστα αντικειμένων αιθουσών (Course).
+     */
+    public void createTemplate(List<Professor> uniqueProfs, List<String> timeslots, HashMap<String, String> dates,List<Classroom> classrooms){
         
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             CellStyle style = getStyle(workbook);
             for (Professor professor : uniqueProfs) {
-                // Create a sheet for each professor
+                // Δημιουργία φύλλου (sheet) για κάθε καθηγητή
                 String sheetName = professor.getProfSurname()+ " " + professor.getProfFirstname();
                     XSSFSheet sheet = workbook.createSheet(sheetName);
                 
                 
-                    // Add timeslots to the first row
+                    // Προσθήκη των χρονικών διαστημάτων (timeslots) ως headers στις στήλες
                     Row timeslotRow = sheet.createRow(0);
                     for (int i = 0; i < timeslots.size(); i++) {
                         Cell cell = timeslotRow.createCell(i+1);
@@ -695,7 +757,7 @@ public class Generator {
                         sheet.autoSizeColumn(i+1);
                     }
 
-                    // Add dates and time slots to the sheet
+                    // Προσθήκη των ημερομηνιών στις γραμμές της 1ης στήλης
                     int rowIndex = 1;
                     for (Map.Entry<String, String> entry : dates.entrySet()) {
                         String date = entry.getKey();
@@ -703,10 +765,10 @@ public class Generator {
                         Row row = sheet.createRow(rowIndex++);
                         Cell dateCell = row.createCell(0);
                         dateCell.setCellValue(day + "\n" + date);
-                        // Add time slots for each date
-                        for (int i = 0; i < timeslots.size(); i++) {
-                            row.createCell(i + 1);
-                        }
+                        
+                        //for (int i = 0; i < timeslots.size(); i++) {
+                        //      row.createCell(i + 1);
+                        //      }
                     }
                     for (Row row : sheet) {
                         for (Cell cell : row) {
@@ -716,7 +778,7 @@ public class Generator {
                     sheet.autoSizeColumn(0);
             }
 
-            // Αποθήκευση αρχείου προς συμπλήρωση για τους καθηγητές.
+            // Αποθήκευση αρχείου προς συμπλήρωση για τους καθηγητές
             try (FileOutputStream outputStream = new FileOutputStream("C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\prof.xlsx")) {
                 workbook.write(outputStream);
             }
@@ -728,18 +790,18 @@ public class Generator {
             CellStyle style = getStyle(workbook);
 
             for (Classroom classroom : classrooms) {
-                // Δημιουργία ενός φύλλου (sheet) για κάθε τάξη.
+                // Δημιουργία ενός φύλλου (sheet) για κάθε αίθουσα
                 String sheetName = classroom.getClassroomName();
                 XSSFSheet sheet = workbook.createSheet(sheetName);
 
-                // Προσθήκη των χρονικών διαστημάτων (timeslots) ως headers στις στήλες.
+                // Προσθήκη των χρονικών διαστημάτων (timeslots) ως headers στις στήλες
                 Row timeslotRow = sheet.createRow(0);
                 for (int i = 0; i < timeslots.size(); i++) {
                     Cell cell = timeslotRow.createCell(i + 1);
                     cell.setCellValue(timeslots.get(i));
                     sheet.autoSizeColumn(i+1);
                 }
-                // Προσθήκη των ημερομηνιών στις γραμμές της 1ης στήλης.
+                // Προσθήκη των ημερομηνιών στις γραμμές της 1ης στήλης
                 int rowIndex = 1;
                 for (Map.Entry<String, String> entry : dates.entrySet()) {
                     String date = entry.getKey();
@@ -747,10 +809,6 @@ public class Generator {
                     Row row = sheet.createRow(rowIndex++);
                     Cell dateCell = row.createCell(0);
                     dateCell.setCellValue(day + " " + date);
-
-                    for (int i = 0; i < timeslots.size(); i++) {
-                        row.createCell(i + 1);
-                    }
                 }
                 for (Row row : sheet) {
                     for (Cell cell : row) {
@@ -759,20 +817,24 @@ public class Generator {
                 }
                 sheet.autoSizeColumn(0);
             }
-            // Αποθήκευση αρχείου προς συμπλήρωση για τις τάξεις.
+            // Αποθήκευση αρχείου προς συμπλήρωση για τις αίθουσες
             try (FileOutputStream outputStream1 = new FileOutputStream("C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\class.xlsx")) {
                 workbook.write(outputStream1);
             }
             logger.appendLogger("Η δημιουργία του template για τις αίθουσες ολοκληρώθηκε επιτυχώς.");
         }catch (Exception e){
-            e.printStackTrace();
             logger.appendLogger("Η δημιουργία του template για τις αίθουσες απέτυχε.");
         }
-        System.out.println(logger.getLoggerTxt());
         JOptionPane.showMessageDialog(myJFrame,logger.getLoggerTxt(),
                "Μήνυμα Εφαρμογής", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Μέθοδος που δημιουργεί ένα αντικείμενο CellStyle με κάποια ορισμένα χαρακτηριστικά.
+     * @param workbook Αντικείμενο τύπου XSSFWorkbook που θα λάβει την τροποποίηση.
+     * @return style Το αντικείμενο τύπου CellStyle.
+     */
+    
     private CellStyle getStyle(XSSFWorkbook workbook) {
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();
@@ -783,5 +845,21 @@ public class Generator {
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
         return style;
+    }
+    
+    public void readObjects() throws FileNotFoundException, IOException, ClassNotFoundException{
+        FileInputStream fi = new FileInputStream(new File("myObjects.dat"));
+	ObjectInputStream oi = new ObjectInputStream(fi);
+        List<Professor> pr1 = (List<Professor>) oi.readObject();
+        List<Classroom> pr2 = (List<Classroom>) oi.readObject();
+        List<Course> pr3 = (List<Course>) oi.readObject();
+        
+        System.out.println("\n\n\n\n\n\n\n\n");
+        for (Professor tmp : pr1){
+            System.out.println(tmp.getProfSurname());
+        }
+	oi.close();
+	fi.close();
+
     }
 }

@@ -1,5 +1,6 @@
 package thesis;
 
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.gmele.general.sheets.exception.SheetExc;
@@ -123,18 +124,24 @@ public class MainForm extends javax.swing.JFrame {
         Generator a = new Generator(this,path);
         try {
             a.readTemplates();
+            System.out.println("Edw mpainw?");
+            a.readObjects();
+            System.out.println("Telos magka fix");
         } catch (SheetExc ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
     }//GEN-LAST:event_loadBtnActionPerformed
 
     private void produceBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_produceBtnActionPerformed
         String path = jTextField1.getText();
         System.out.println(path);
         Generator a = new Generator(this,path);
-        a.doThings();
-        System.out.println("Done with excels. Fill them in and continue");
-        //ExcelManager b = new ExcelManager();
-        //b.readTemplate();
+        a.createExcels();
     }//GEN-LAST:event_produceBtnActionPerformed
 
     public static void main(String[] args) {
