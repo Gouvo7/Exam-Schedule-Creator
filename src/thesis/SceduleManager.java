@@ -1,17 +1,17 @@
 package thesis;
 
-import java.awt.Color;
-import java.awt.Component;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.JFrame;
-import javax.swing.TransferHandler;
-import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 
 /**
@@ -19,78 +19,82 @@ import javax.swing.JComponent;
  * @author gouvo
  */
 public class SceduleManager extends JFrame {
+    
+    private JTable table;
+    private ExcelManager excelManager;
 
     public SceduleManager() {
-        
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     }
         
-    public SceduleManager(Generator a) {
+    public SceduleManager(ExcelManager a) {
         initComponents();
-        List<Professor> profs = a.getProfs();
-        VisualElement professorElement = new VisualElement(profs.get(0));
-        VisualElement classroomElement = new VisualElement(profs.get(1));
-        System.out.println(profs.get(0).getProfFirstname());
-
-        // Set layout manager for the frame
-        this.setLayout(new FlowLayout());
-
-        // Add elements to the frame
-        this.add(professorElement);
-        this.add(classroomElement);
-
-        // Set up drag-and-drop for the visual elements
-        this.addDragAndDrop(professorElement);
-        this.addDragAndDrop(classroomElement);
-
-        // Set frame properties
-        setTitle("Object Visualization - Swing");
-        setSize(400, 400);
+        excelManager = a;
+        
+        List<Classroom> classrooms = a.getClassrooms();
+        List<String> timeslots = a.getTimeslots();
+        for (Classroom classs : classrooms){
+            System.out.println(classs.getClassroomName());
+        }
+        modelPanel.setLayout(new BorderLayout());
+        modelPanel.add(new JScrollPane(populateTable()),BorderLayout.CENTER);
+        
+        this.pack();
+        this.setVisible(true);
+        this.setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Center the frame
-        setVisible(true);
     }
 
-    private void addDragAndDrop(Component component) {
-        if (component instanceof JComponent) {
-            JComponent jComponent = (JComponent) component;
-            TransferHandler handler = new TransferHandler("object");
-            jComponent.setTransferHandler(handler);
+    public static void printTableModel(DefaultTableModel model) {
+        int rowCount = model.getRowCount();
+        int colCount = model.getColumnCount();
 
-            component.addMouseMotionListener(new MouseMotionAdapter() {
-                public void mouseDragged(MouseEvent e) {
-                    JComponent c = (JComponent) e.getSource();
-                    TransferHandler handler = c.getTransferHandler();
-                    handler.exportAsDrag(c, e, TransferHandler.COPY);
-                }
-            });
+        // Print column headers
+        for (int col = 0; col < colCount; col++) {
+            System.out.print(model.getColumnName(col) + "\t");
         }
-    }
+        System.out.println();
 
-    // Custom class for the visual representation
-    private class VisualElement extends JComponent {
-        private Object obj;
-
-        public VisualElement(Object obj) {
-            this.obj = obj;
-            setPreferredSize(new Dimension(50, 50));
-
-            // Set up transfer handler for drag-and-drop
-            setTransferHandler(new TransferHandler("object"));
-
-            // Add additional customization based on the type of object
-            if (obj instanceof Professor) {
-                setForeground(Color.RED);
-            } else if (obj instanceof Classroom) {
-                setForeground(Color.BLUE);
+        // Print data
+        for (int row = 0; row < rowCount; row++) {
+            for (int col = 0; col < colCount; col++) {
+                System.out.print(model.getValueAt(row, col) + "\t");
             }
+            System.out.println();
         }
+    }
+    
+    public JTable populateTable(){
+        List<String> timeslots = excelManager.getTimeslots();
+        List<String> dates = new ArrayList<>(excelManager.getDates());
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            g.setColor(getForeground());
-            g.fillOval(0, 0, getWidth(), getHeight());
+        int excelRows = dates.size();
+        int excelCols = timeslots.size();
+        System.out.println(excelCols);
+        System.out.println(excelRows);
+        // Create a DefaultTableModel with custom data
+        DefaultTableModel model = new DefaultTableModel(excelRows + 1, excelCols + 1);
+        
+        for (int z=0; z<timeslots.size(); z++){
+            System.out.println(timeslots.get(z));
         }
+        for (int i = 0; i < excelRows; i++) {
+            LocalDate date = LocalDate.parse(dates.get(i), dateFormatter);
+            String greekDayName = date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("el-GR"));
+            model.setValueAt(dates.get(i) + " " + greekDayName, i + 1, 0);
+        }
+        
+        for (int j = 0; j < excelCols; j++){
+            model.setValueAt(timeslots.get(j), 0, j + 1);
+        }
+        
+        table = new JTable(model);
+                table.getTableHeader().setReorderingAllowed(false);
+
+        table.setPreferredScrollableViewportSize(new Dimension(800, 600));  // Set preferred size
+        //printTableModel(model);
+        return table;
     }
     
     /**
@@ -102,17 +106,36 @@ public class SceduleManager extends JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        modelPanel = new javax.swing.JPanel();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        javax.swing.GroupLayout modelPanelLayout = new javax.swing.GroupLayout(modelPanel);
+        modelPanel.setLayout(modelPanelLayout);
+        modelPanelLayout.setHorizontalGroup(
+            modelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1062, Short.MAX_VALUE)
+        );
+        modelPanelLayout.setVerticalGroup(
+            modelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 456, Short.MAX_VALUE)
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(modelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(modelPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(181, Short.MAX_VALUE))
         );
 
         pack();
@@ -154,5 +177,6 @@ public class SceduleManager extends JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel modelPanel;
     // End of variables declaration//GEN-END:variables
 }

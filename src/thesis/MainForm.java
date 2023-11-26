@@ -1,8 +1,18 @@
 package thesis;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.poi.util.IOUtils;
 import org.gmele.general.sheets.exception.SheetExc;
 
 /**
@@ -116,7 +126,7 @@ public class MainForm extends javax.swing.JFrame {
     private void loadBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadBtnActionPerformed
         String path = jTextField1.getText();
         System.out.println(path);
-        Generator a = new Generator(this,path);
+        ExcelManager a = new ExcelManager(this,path);
         try {
             boolean hasRead = a.readTemplates();
             if (hasRead){
@@ -133,11 +143,11 @@ public class MainForm extends javax.swing.JFrame {
     private void produceBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_produceBtnActionPerformed
         String path = jTextField1.getText();
         System.out.println(path);
-        Generator a = new Generator(this,path);
+        ExcelManager a = new ExcelManager(this,path);
         a.createExcels();
     }//GEN-LAST:event_produceBtnActionPerformed
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException, IOException {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
