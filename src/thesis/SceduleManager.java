@@ -74,6 +74,10 @@ public class SceduleManager extends JFrame {
         System.out.println(excelCols);
         System.out.println(excelRows);
         // Create a DefaultTableModel with custom data
+        
+        timeslots.add(0,"");
+        //Vector<String> stringVector = new Vector<>(stringList);
+
         DefaultTableModel model = new DefaultTableModel(excelRows + 1, excelCols + 1);
         
         for (int z=0; z<timeslots.size(); z++){
