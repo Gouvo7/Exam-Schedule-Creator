@@ -2,6 +2,8 @@ package thesis;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
@@ -24,25 +26,21 @@ public class SceduleManager extends JFrame {
     private ExcelManager excelManager;
 
     public SceduleManager() {
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     }
-        
-    public SceduleManager(ExcelManager a) {
+    
+    public SceduleManager(ExcelManager excelManager) {
         initComponents();
-        excelManager = a;
+        this.excelManager = excelManager;
         
-        List<Classroom> classrooms = a.getClassrooms();
-        List<String> timeslots = a.getTimeslots();
-        for (Classroom classs : classrooms){
-            System.out.println(classs.getClassroomName());
-        }
+        coursesPanel.setLayout(new GridLayout());
         modelPanel.setLayout(new BorderLayout());
-        modelPanel.add(new JScrollPane(populateTable()),BorderLayout.CENTER);
-        
-        this.pack();
+        modelPanel.add(populateTable(), BorderLayout.CENTER);
+
         this.setVisible(true);
         this.setLocationRelativeTo(null);
+        this.setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
     }
 
     public static void printTableModel(DefaultTableModel model) {
@@ -64,19 +62,18 @@ public class SceduleManager extends JFrame {
         }
     }
     
-    public JTable populateTable(){
+    public JScrollPane populateTable(){
         List<String> timeslots = excelManager.getTimeslots();
         List<String> dates = new ArrayList<>(excelManager.getDates());
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         int excelRows = dates.size();
         int excelCols = timeslots.size();
-        System.out.println(excelCols);
-        System.out.println(excelRows);
+        
         // Create a DefaultTableModel with custom data
         DefaultTableModel model = new DefaultTableModel(excelRows + 1, excelCols + 1);
         
-        for (int z=0; z<timeslots.size(); z++){
+        for (int z = 0; z<timeslots.size(); z++){
             System.out.println(timeslots.get(z));
         }
         for (int i = 0; i < excelRows; i++) {
@@ -90,11 +87,30 @@ public class SceduleManager extends JFrame {
         }
         
         table = new JTable(model);
-                table.getTableHeader().setReorderingAllowed(false);
+        printTableModel(model);
 
-        table.setPreferredScrollableViewportSize(new Dimension(800, 600));  // Set preferred size
-        //printTableModel(model);
-        return table;
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+        return scrollPane;
+    }
+    
+    private void drawCourseRectangles() {
+        List<Course> cls = new ArrayList<>(excelManager.getCourses());
+        for (Course course : cls) {
+            String courseName = course.getCourseName();
+
+            // Adjust the coordinates and dimensions based on your preferences
+            int x = 50 ;
+            int y = 50 ;
+            int width = 80; // Example: Width of the rectangle
+            int height = 50; // Example: Height based on time duration
+
+            coursesPanel.getGraphics().drawRect(x, y, width, height);
+            coursesPanel.getGraphics().drawString(courseName, x + 5, y + 15); // Adjust text position
+        }
+        coursesPanel.revalidate();
+        coursesPanel.repaint();
     }
     
     /**
@@ -107,6 +123,7 @@ public class SceduleManager extends JFrame {
     private void initComponents() {
 
         modelPanel = new javax.swing.JPanel();
+        coursesPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -114,28 +131,38 @@ public class SceduleManager extends JFrame {
         modelPanel.setLayout(modelPanelLayout);
         modelPanelLayout.setHorizontalGroup(
             modelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1062, Short.MAX_VALUE)
+            .addGap(0, 800, Short.MAX_VALUE)
         );
         modelPanelLayout.setVerticalGroup(
             modelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 456, Short.MAX_VALUE)
+            .addGap(0, 450, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout coursesPanelLayout = new javax.swing.GroupLayout(coursesPanel);
+        coursesPanel.setLayout(coursesPanelLayout);
+        coursesPanelLayout.setHorizontalGroup(
+            coursesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        coursesPanelLayout.setVerticalGroup(
+            coursesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 126, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(modelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(modelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(coursesPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(modelPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(181, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(coursesPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -177,6 +204,7 @@ public class SceduleManager extends JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel coursesPanel;
     private javax.swing.JPanel modelPanel;
     // End of variables declaration//GEN-END:variables
 }

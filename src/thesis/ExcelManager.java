@@ -14,11 +14,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.apache.poi.ss.usermodel.Cell;
@@ -41,6 +40,7 @@ import org.gmele.general.sheets.exception.SheetExc;
  * @param - myJFrame - Το παράθυρο που το καλεί.
  * @param - fileName - Το όνομα του αρχείου προς ανάγνωση.
  */
+
 public class ExcelManager {
     
     
@@ -96,10 +96,7 @@ public class ExcelManager {
         this.dates = dates;
     }
     
-    
-    
     // Δήλωση των στατικών ονομασιών των φύλλων του excel προς επεξεργασία.
-    
     
     ExcelManager(JFrame x, String y){
         myJFrame = x;
@@ -152,7 +149,7 @@ public class ExcelManager {
                 throw new Exception();
             }
             excel3 = true;
-            Collections.sort(dates);
+            Collections.sort(dates, new DateComparator());
             
             classrooms = new ArrayList<>();
             classrooms = readClassrooms(fileName);
