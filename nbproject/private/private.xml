@@ -4,8 +4,17 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/gouvo/OneDrive/Documents/NetBeansProjects/Thesis/src/thesis/Classroom.java</file>
+<<<<<<< HEAD
             <file>file:/C:/Users/gouvo/OneDrive/Documents/NetBeansProjects/Thesis/src/thesis/ButtonTransferHandler.java</file>
             <file>file:/C:/Users/gouvo/OneDrive/Documents/NetBeansProjects/Thesis/src/thesis/MainForm.java</file>
+=======
+            <file>file:/C:/Users/gouvo/OneDrive/Documents/NetBeansProjects/Thesis/src/thesis/Course.java</file>
+            <file>file:/C:/Users/gouvo/OneDrive/Documents/NetBeansProjects/Thesis/src/thesis/MainForm.java</file>
+            <file>file:/C:/Users/gouvo/OneDrive/Documents/NetBeansProjects/Thesis/src/thesis/SavedPaths.java</file>
+            <file>file:/C:/Users/gouvo/OneDrive/Documents/NetBeansProjects/Thesis/src/thesis/ExcelManager.java</file>
+            <file>file:/C:/Users/gouvo/OneDrive/Documents/NetBeansProjects/Thesis/src/thesis/Professor.java</file>
+            <file>file:/C:/Users/gouvo/OneDrive/Documents/NetBeansProjects/Thesis/src/thesis/Availability.java</file>
+>>>>>>> d0d79f98952665f981b2386c25a2ed2a205c08ad
             <file>file:/C:/Users/gouvo/OneDrive/Documents/NetBeansProjects/Thesis/src/thesis/SceduleManager.java</file>
         </group>
     </open-files>
