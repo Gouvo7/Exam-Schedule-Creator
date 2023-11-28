@@ -1,18 +1,9 @@
 package thesis;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.poi.util.IOUtils;
 import org.gmele.general.sheets.exception.SheetExc;
 
 /**
@@ -131,10 +122,10 @@ public class MainForm extends javax.swing.JFrame {
             boolean hasRead = a.readTemplates();
             if (hasRead){
                 SceduleManager b = new SceduleManager(a);
-            }else { //throw new SheetExc(); 
-                System.out.println("Ta gamhsame");
+            }else {
+                System.out.println("Πρόβλημα με ScheduleManager");
             }
-            System.out.println("Edw mpainw?");
+            System.out.println("Τέλος ScheduleManager");
         } catch (SheetExc ex) {
             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -179,5 +170,3 @@ public class MainForm extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
     
 }
-
-

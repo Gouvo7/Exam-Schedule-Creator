@@ -1,18 +1,25 @@
 package thesis;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-
 
 /**
  *
@@ -24,63 +31,78 @@ public class SceduleManager extends JFrame {
     private ExcelManager excelManager;
 
     public SceduleManager() {
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     }
-        
-    public SceduleManager(ExcelManager a) {
+    
+    public SceduleManager(ExcelManager excelManager) {
         initComponents();
-        excelManager = a;
         
-        List<Classroom> classrooms = a.getClassrooms();
-        List<String> timeslots = a.getTimeslots();
-        for (Classroom classs : classrooms){
-            System.out.println(classs.getClassroomName());
-        }
+        this.excelManager = excelManager;
+        
+            table.setDropTarget(new DropTarget() {
+            @Override
+            public synchronized void drop(DropTargetDropEvent evt) {
+                try {
+                    Transferable transferable = evt.getTransferable();
+                    if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                        evt.acceptDrop(DnDConstants.ACTION_MOVE);
+                        String courseName = (String) transferable.getTransferData(DataFlavor.stringFlavor);
+
+                        // Handle the dropped courseName on the table
+                        // You can get the table coordinates using evt.getLocation()
+
+                        evt.dropComplete(true);
+                    } else {
+                        evt.rejectDrop();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    evt.rejectDrop();
+                }
+            }
+        });
+        
         modelPanel.setLayout(new BorderLayout());
-        modelPanel.add(new JScrollPane(populateTable()),BorderLayout.CENTER);
+        modelPanel.add(populateTable(), BorderLayout.CENTER);
         
-        this.pack();
+        coursesPanel.setLayout(new GridLayout(5,5));
+        populateCourses();
+        
         this.setVisible(true);
         this.setLocationRelativeTo(null);
+        this.setSize(800, 600);
+        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public static void printTableModel(DefaultTableModel model) {
-        int rowCount = model.getRowCount();
-        int colCount = model.getColumnCount();
+    public void populateCourses() {
+        List<Course> courses = new ArrayList<>(excelManager.getCourses()); // Replace this with your actual list of courses
+        for (Course course : courses) {
+            // Create a custom component (e.g., JPanel or JButton) for each course
+            JButton courseButton = new JButton(course.getCourseName());
+            courseButton.setPreferredSize(new Dimension(100, 50)); // Set preferred size as needed
+            courseButton.setText(course.getCourseName());
+            courseButton.setBackground(Color.red);
+            courseButton.setTransferHandler(new ButtonTransferHandler(course.getCourseName()));
 
-        // Print column headers
-        for (int col = 0; col < colCount; col++) {
-            System.out.print(model.getColumnName(col) + "\t");
-        }
-        System.out.println();
-
-        // Print data
-        for (int row = 0; row < rowCount; row++) {
-            for (int col = 0; col < colCount; col++) {
-                System.out.print(model.getValueAt(row, col) + "\t");
-            }
-            System.out.println();
+            coursesPanel.add(courseButton);
         }
     }
     
-    public JTable populateTable(){
+
+
+    
+    public JScrollPane populateTable(){
         List<String> timeslots = excelManager.getTimeslots();
         List<String> dates = new ArrayList<>(excelManager.getDates());
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         int excelRows = dates.size();
         int excelCols = timeslots.size();
-        System.out.println(excelCols);
-        System.out.println(excelRows);
-        // Create a DefaultTableModel with custom data
         
-        timeslots.add(0,"");
-        //Vector<String> stringVector = new Vector<>(stringList);
-
+        // Create a DefaultTableModel with custom data
         DefaultTableModel model = new DefaultTableModel(excelRows + 1, excelCols + 1);
         
-        for (int z=0; z<timeslots.size(); z++){
+        for (int z = 0; z<timeslots.size(); z++){
             System.out.println(timeslots.get(z));
         }
         for (int i = 0; i < excelRows; i++) {
@@ -94,11 +116,10 @@ public class SceduleManager extends JFrame {
         }
         
         table = new JTable(model);
-                table.getTableHeader().setReorderingAllowed(false);
 
-        table.setPreferredScrollableViewportSize(new Dimension(800, 600));  // Set preferred size
-        //printTableModel(model);
-        return table;
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        return scrollPane;
     }
     
     /**
@@ -110,44 +131,50 @@ public class SceduleManager extends JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane1 = new javax.swing.JScrollPane();
         modelPanel = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        coursesPanel = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setPreferredSize(new java.awt.Dimension(960, 800));
+        getContentPane().setLayout(null);
+
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(800, 500));
+
+        modelPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        modelPanel.setPreferredSize(new java.awt.Dimension(900, 500));
 
         javax.swing.GroupLayout modelPanelLayout = new javax.swing.GroupLayout(modelPanel);
         modelPanel.setLayout(modelPanelLayout);
         modelPanelLayout.setHorizontalGroup(
             modelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1062, Short.MAX_VALUE)
+            .addGap(0, 922, Short.MAX_VALUE)
         );
         modelPanelLayout.setVerticalGroup(
             modelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 456, Short.MAX_VALUE)
+            .addGap(0, 494, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(modelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(modelPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(181, Short.MAX_VALUE))
-        );
+        jScrollPane1.setViewportView(modelPanel);
+
+        getContentPane().add(jScrollPane1);
+        jScrollPane1.setBounds(10, 10, 940, 290);
+
+        coursesPanel.setLayout(null);
+        jScrollPane2.setViewportView(coursesPanel);
+
+        getContentPane().add(jScrollPane2);
+        jScrollPane2.setBounds(20, 340, 930, 210);
+
+        jLabel1.setText("Μαθήματα:");
+        getContentPane().add(jLabel1);
+        jLabel1.setBounds(20, 310, 90, 16);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -181,6 +208,10 @@ public class SceduleManager extends JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel coursesPanel;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPanel modelPanel;
     // End of variables declaration//GEN-END:variables
 }
