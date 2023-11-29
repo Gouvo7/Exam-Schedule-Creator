@@ -2,13 +2,17 @@ package thesis;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
@@ -16,9 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.TransferHandler;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -35,42 +41,15 @@ public class SceduleManager extends JFrame {
     
     public SceduleManager(ExcelManager excelManager) {
         initComponents();
-        
         this.excelManager = excelManager;
         
-            table.setDropTarget(new DropTarget() {
-            @Override
-            public synchronized void drop(DropTargetDropEvent evt) {
-                try {
-                    Transferable transferable = evt.getTransferable();
-                    if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                        evt.acceptDrop(DnDConstants.ACTION_MOVE);
-                        String courseName = (String) transferable.getTransferData(DataFlavor.stringFlavor);
-
-                        // Handle the dropped courseName on the table
-                        // You can get the table coordinates using evt.getLocation()
-
-                        evt.dropComplete(true);
-                    } else {
-                        evt.rejectDrop();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    evt.rejectDrop();
-                }
-            }
-        });
-        
         modelPanel.setLayout(new BorderLayout());
-        modelPanel.add(populateTable(), BorderLayout.CENTER);
-        
-        coursesPanel.setLayout(new GridLayout(5,5));
+        modelPanel.add(populateTable());
+        coursesPanel.setLayout(new GridLayout(0,3));
         populateCourses();
         
         this.setVisible(true);
         this.setLocationRelativeTo(null);
-        this.setSize(800, 600);
-        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
@@ -79,17 +58,21 @@ public class SceduleManager extends JFrame {
         for (Course course : courses) {
             // Create a custom component (e.g., JPanel or JButton) for each course
             JButton courseButton = new JButton(course.getCourseName());
-            courseButton.setPreferredSize(new Dimension(100, 50)); // Set preferred size as needed
+            courseButton.setPreferredSize(new Dimension(270, 40)); // Set preferred size as needed
             courseButton.setText(course.getCourseName());
             courseButton.setBackground(Color.red);
             courseButton.setTransferHandler(new ButtonTransferHandler(course.getCourseName()));
 
+            courseButton.addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mousePressed(java.awt.event.MouseEvent evt) {
+                    JComponent comp = (JComponent) evt.getSource();
+                    TransferHandler handler = comp.getTransferHandler();
+                    handler.exportAsDrag(comp, evt, TransferHandler.COPY);
+                }
+            });
             coursesPanel.add(courseButton);
         }
     }
-    
-
-
     
     public JScrollPane populateTable(){
         List<String> timeslots = excelManager.getTimeslots();
@@ -100,8 +83,18 @@ public class SceduleManager extends JFrame {
         int excelCols = timeslots.size();
         
         // Create a DefaultTableModel with custom data
-        DefaultTableModel model = new DefaultTableModel(excelRows + 1, excelCols + 1);
-        
+        DefaultTableModel model = new DefaultTableModel(excelRows + 1, excelCols + 1){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // Make all cells non-editable
+                return false;
+            }
+            public boolean isCellSelected(int row, int column) {
+                // Make all cells non-selectable
+                return false;
+            }
+        };
+
         for (int z = 0; z<timeslots.size(); z++){
             System.out.println(timeslots.get(z));
         }
@@ -114,11 +107,80 @@ public class SceduleManager extends JFrame {
         for (int j = 0; j < excelCols; j++){
             model.setValueAt(timeslots.get(j), 0, j + 1);
         }
-        
         table = new JTable(model);
+        table.setRowHeight(40);
+        table.setCellSelectionEnabled(false);
+        table.setDropTarget(new DropTarget() {
+            public synchronized void drop(DropTargetDropEvent evt) {
+                try {
+                    evt.acceptDrop(DnDConstants.ACTION_COPY);
+                    Transferable transferable = evt.getTransferable();
+                    String buttonText = (String) transferable.getTransferData(DataFlavor.stringFlavor);
+
+                    Point dropLocation = evt.getLocation();
+                    int row = table.rowAtPoint(dropLocation);
+                    int col = table.columnAtPoint(dropLocation);
+
+                    model.setValueAt(buttonText, row, col);
+
+                    // Remove the button from coursesPanel
+                    Component[] components = coursesPanel.getComponents();
+                    for (Component component : components) {
+                        if (component instanceof JButton) {
+                            JButton button = (JButton) component;
+                            if (buttonText.equals(button.getText())) {
+                                coursesPanel.remove(button);
+                                break;
+                            }
+                        }
+                    }
+                    coursesPanel.revalidate();
+                    coursesPanel.repaint();
+
+                    evt.dropComplete(true);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    evt.rejectDrop();
+                }
+            }
+        });
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int selectedRow = table.getSelectedRow();
+                    int selectedColumn = table.getSelectedColumn();
+
+                    Object cellValue = model.getValueAt(selectedRow, selectedColumn);
+                    if (cellValue != null && cellValue instanceof String) {
+                        String buttonText = (String) cellValue;
+
+                        // Add the button back to coursesPanel
+                        JButton button = new JButton(buttonText);
+                        button.setPreferredSize(new Dimension(270, 40));
+                        button.setBackground(Color.red);
+                        button.setTransferHandler(new ButtonTransferHandler(buttonText));
+                        button.addMouseListener(new MouseAdapter() {
+                            public void mousePressed(MouseEvent evt) {
+                                JComponent comp = (JComponent) evt.getSource();
+                                TransferHandler handler = comp.getTransferHandler();
+                                handler.exportAsDrag(comp, evt, TransferHandler.COPY);
+                            }
+                        });
+
+                        coursesPanel.add(button);
+                        coursesPanel.revalidate();
+                        coursesPanel.repaint();
+
+                        // Clear the cell value
+                        model.setValueAt(null, selectedRow, selectedColumn);
+                    }
+                }
+            }
+        });
 
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
         return scrollPane;
     }
     
@@ -131,46 +193,30 @@ public class SceduleManager extends JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
+        modelScrollPane = new javax.swing.JScrollPane();
         modelPanel = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        coursesScrollPane = new javax.swing.JScrollPane();
         coursesPanel = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(960, 800));
-        getContentPane().setLayout(null);
+        setPreferredSize(new java.awt.Dimension(1100, 1000));
+        getContentPane().setLayout(new java.awt.FlowLayout());
 
-        jScrollPane1.setPreferredSize(new java.awt.Dimension(800, 500));
+        modelScrollPane.setPreferredSize(new java.awt.Dimension(1000, 600));
 
         modelPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         modelPanel.setPreferredSize(new java.awt.Dimension(900, 500));
+        modelPanel.setLayout(null);
+        modelScrollPane.setViewportView(modelPanel);
 
-        javax.swing.GroupLayout modelPanelLayout = new javax.swing.GroupLayout(modelPanel);
-        modelPanel.setLayout(modelPanelLayout);
-        modelPanelLayout.setHorizontalGroup(
-            modelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 922, Short.MAX_VALUE)
-        );
-        modelPanelLayout.setVerticalGroup(
-            modelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 494, Short.MAX_VALUE)
-        );
+        getContentPane().add(modelScrollPane);
 
-        jScrollPane1.setViewportView(modelPanel);
-
-        getContentPane().add(jScrollPane1);
-        jScrollPane1.setBounds(10, 10, 940, 290);
+        coursesScrollPane.setPreferredSize(new java.awt.Dimension(1000, 300));
 
         coursesPanel.setLayout(null);
-        jScrollPane2.setViewportView(coursesPanel);
+        coursesScrollPane.setViewportView(coursesPanel);
 
-        getContentPane().add(jScrollPane2);
-        jScrollPane2.setBounds(20, 340, 930, 210);
-
-        jLabel1.setText("Μαθήματα:");
-        getContentPane().add(jLabel1);
-        jLabel1.setBounds(20, 310, 90, 16);
+        getContentPane().add(coursesScrollPane);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -209,9 +255,8 @@ public class SceduleManager extends JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel coursesPanel;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane coursesScrollPane;
     private javax.swing.JPanel modelPanel;
+    private javax.swing.JScrollPane modelScrollPane;
     // End of variables declaration//GEN-END:variables
 }

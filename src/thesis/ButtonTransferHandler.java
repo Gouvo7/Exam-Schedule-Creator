@@ -3,6 +3,7 @@ package thesis;
 import javax.swing.TransferHandler;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.StringSelection;
+import javax.swing.JComponent;
 
 /**
  *
@@ -10,20 +11,19 @@ import java.awt.datatransfer.StringSelection;
  */
 
 public class ButtonTransferHandler extends TransferHandler {
-    private final String courseName;
+    private final String buttonText;
 
-    public ButtonTransferHandler(String courseName) {
-        this.courseName = courseName;
+    public ButtonTransferHandler(String buttonText) {
+        this.buttonText = buttonText;
     }
 
     @Override
-    protected Transferable createTransferable(javax.swing.JComponent c) {
-        // Transfer the course name as a StringSelection
-        return new StringSelection(courseName);
+    protected Transferable createTransferable(JComponent c) {
+        return new StringSelection(buttonText);
     }
 
     @Override
-    public int getSourceActions(javax.swing.JComponent c) {
-        return TransferHandler.MOVE;
+    public int getSourceActions(JComponent c) {
+        return TransferHandler.COPY;
     }
 }
