@@ -25,7 +25,9 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
 /**
  *
@@ -60,7 +62,7 @@ public class SceduleManager extends JFrame {
             JButton courseButton = new JButton(course.getCourseName());
             courseButton.setPreferredSize(new Dimension(270, 40)); // Set preferred size as needed
             courseButton.setText(course.getCourseName());
-            courseButton.setBackground(Color.red);
+            courseButton.setBackground(Color.lightGray);
             courseButton.setTransferHandler(new ButtonTransferHandler(course.getCourseName()));
 
             courseButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -95,21 +97,21 @@ public class SceduleManager extends JFrame {
             }
         };
 
-        for (int z = 0; z<timeslots.size(); z++){
-            System.out.println(timeslots.get(z));
+        for (int j = 0; j < excelCols; j++){
+            model.setValueAt(timeslots.get(j), 0, j + 1);
         }
+
         for (int i = 0; i < excelRows; i++) {
             LocalDate date = LocalDate.parse(dates.get(i), dateFormatter);
             String greekDayName = date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("el-GR"));
             model.setValueAt(dates.get(i) + " " + greekDayName, i + 1, 0);
         }
         
-        for (int j = 0; j < excelCols; j++){
-            model.setValueAt(timeslots.get(j), 0, j + 1);
-        }
         table = new JTable(model);
-        table.setRowHeight(40);
+        //table.setRowHeight(40);
         table.setCellSelectionEnabled(false);
+        table.setTableHeader(new JTableHeader());
+        table.getTableHeader().setReorderingAllowed(false);
         table.setDropTarget(new DropTarget() {
             public synchronized void drop(DropTargetDropEvent evt) {
                 try {
@@ -144,6 +146,8 @@ public class SceduleManager extends JFrame {
                 }
             }
         });
+        
+
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -157,7 +161,7 @@ public class SceduleManager extends JFrame {
                         // Add the button back to coursesPanel
                         JButton button = new JButton(buttonText);
                         button.setPreferredSize(new Dimension(270, 40));
-                        button.setBackground(Color.red);
+                        button.setBackground(Color.lightGray);
                         button.setTransferHandler(new ButtonTransferHandler(buttonText));
                         button.addMouseListener(new MouseAdapter() {
                             public void mousePressed(MouseEvent evt) {
@@ -199,7 +203,7 @@ public class SceduleManager extends JFrame {
         coursesPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1100, 1000));
+        setPreferredSize(new java.awt.Dimension(1000, 1000));
         getContentPane().setLayout(new java.awt.FlowLayout());
 
         modelScrollPane.setPreferredSize(new java.awt.Dimension(1000, 600));
