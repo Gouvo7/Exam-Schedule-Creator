@@ -14,7 +14,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -178,10 +177,11 @@ public class ExcelManager {
 
     /**
      * Η μέθοδος διαβάζει το κύριο excel που εμπεριέχει πληροφορίες για τους καθηγητές,
-     * τα μαθήματα, τις σχέσεις τους κ.α. Έπειτα, καλεί 2 μεθόδους που συμπληρώνουν
-     * στα αντικείμενα καθηγητών και αιθουσών την διαθεσιμότητά τους με βάση τα συμπληρωμένα
-     * template.
+     * τα μαθήματα, τις σχέσεις τους κ.α.Έπειτα, καλεί 2 μεθόδους που συμπληρώνουν
+ στα αντικείμενα καθηγητών και αιθουσών την διαθεσιμότητά τους με βάση τα συμπληρωμένα
+ template.
      * 
+     * @return 
      * @throws org.gmele.general.sheets.exception.SheetExc
      */
     public boolean readTemplates() throws SheetExc{
@@ -359,7 +359,8 @@ public class ExcelManager {
                                     if (prof.getProfSurname().equals(profA) || prof.getProfSurname().equals(profB) ||
                                         prof.getProfSurname().equals(profC) || prof.getProfSurname().equals(profD) ){
                                         if (!tmpCourse.getExaminers().contains(prof)){
-                                            tmpCourse.getExaminers().add(prof);
+                                            //tmpCourse.getExaminers().add(prof);
+                                            tmpCourse.addExaminer(prof);
                                         }
                                     }
                                 }
@@ -828,6 +829,9 @@ public class ExcelManager {
             ObjectInputStream oi = new ObjectInputStream(fi);
             profs = (List<Professor>) oi.readObject();
             courses = (List<Course>) oi.readObject();
+            for (Course c : courses){
+                c.gamaTa();
+            }
             classrooms = (List<Classroom>) oi.readObject();
             timeslots = (List<String>) oi.readObject();
             dates = (List<String>) oi.readObject();

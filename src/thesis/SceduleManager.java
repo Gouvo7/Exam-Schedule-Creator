@@ -37,6 +37,9 @@ public class SceduleManager extends JFrame {
     
     private JTable table;
     private ExcelManager excelManager;
+    private List<Course> courses;
+    private List<Professor> professors;
+    
 
     public SceduleManager() {
     }
@@ -44,7 +47,8 @@ public class SceduleManager extends JFrame {
     public SceduleManager(ExcelManager excelManager) {
         initComponents();
         this.excelManager = excelManager;
-        
+        courses = new ArrayList<>(excelManager.getCourses());
+        professors = new ArrayList<>(excelManager.getProfs());
         modelPanel.setLayout(new BorderLayout());
         modelPanel.add(populateTable());
         coursesPanel.setLayout(new GridLayout(0,3));
@@ -56,7 +60,6 @@ public class SceduleManager extends JFrame {
     }
 
     public void populateCourses() {
-        List<Course> courses = new ArrayList<>(excelManager.getCourses()); // Replace this with your actual list of courses
         for (Course course : courses) {
             // Create a custom component (e.g., JPanel or JButton) for each course
             JButton courseButton = new JButton(course.getCourseName());
@@ -108,7 +111,7 @@ public class SceduleManager extends JFrame {
         }
         
         table = new JTable(model);
-        //table.setRowHeight(40);
+        table.setRowHeight(40);
         table.setCellSelectionEnabled(false);
         table.setTableHeader(new JTableHeader());
         table.getTableHeader().setReorderingAllowed(false);
@@ -118,11 +121,33 @@ public class SceduleManager extends JFrame {
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
                     Transferable transferable = evt.getTransferable();
                     String buttonText = (String) transferable.getTransferData(DataFlavor.stringFlavor);
-
                     Point dropLocation = evt.getLocation();
                     int row = table.rowAtPoint(dropLocation);
                     int col = table.columnAtPoint(dropLocation);
 
+                    for (Course course : courses){
+                        if (course.getCourseName().equals(buttonText)){
+                            
+                            String rowValue = (String) table.getValueAt(row, 0);
+                            String colValue = (String) table.getValueAt(0, col);
+                            List<Professor> examiners = new ArrayList<>();
+                            System.out.println("Fix");
+
+                            for (Professor prf : course.getExaminers()){
+                                System.out.println(prf.getProfSurname());
+                            }
+                            examiners = course.getExaminers();
+                            System.out.println(examiners.size());
+                            for (Professor prof : professors){
+                                if(examiners.contains(prof)){
+                                    System.out.println("I FOUND:" + prof.getProfSurname());
+                                }
+                            }
+                        }
+                        
+                        
+                    }
+                    
                     model.setValueAt(buttonText, row, col);
 
                     // Remove the button from coursesPanel
@@ -203,7 +228,8 @@ public class SceduleManager extends JFrame {
         coursesPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1000, 1000));
+        setTitle("Φόρμα Δημιουργίας Προγράμματος");
+        setPreferredSize(new java.awt.Dimension(1200, 1000));
         getContentPane().setLayout(new java.awt.FlowLayout());
 
         modelScrollPane.setPreferredSize(new java.awt.Dimension(1000, 600));

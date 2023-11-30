@@ -24,6 +24,10 @@ public class Course implements Serializable{
         examiners = new ArrayList<>();
     }
 
+    public Course getCourse(){
+        return this;
+    }
+    
     /**
      * @return the courseName
      */
@@ -86,5 +90,17 @@ public class Course implements Serializable{
 
     public void setExaminers(List<Professor> examiners) {
         this.examiners = examiners;
+    }
+    
+    public void addExaminer(Professor prof){
+        examiners.add(prof);
+    }
+    
+    public void gamaTa(){
+        int i = 0;
+        System.out.println("Course is:" + this.getCourseName());
+        for (Professor prof : examiners){
+            System.out.println("Professor " + i + ": " + prof.getProfFirstname());
+        }
     }
 }
