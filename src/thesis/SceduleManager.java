@@ -26,6 +26,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 import javax.swing.border.Border;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
@@ -111,10 +112,12 @@ public class SceduleManager extends JFrame {
         }
         
         table = new JTable(model);
-        table.setRowHeight(40);
+        table.setRowHeight(60);
         table.setCellSelectionEnabled(false);
         table.setTableHeader(new JTableHeader());
         table.getTableHeader().setReorderingAllowed(false);
+        table.setShowGrid(true);
+        table.setGridColor(Color.BLACK);
         table.setDropTarget(new DropTarget() {
             public synchronized void drop(DropTargetDropEvent evt) {
                 try {
@@ -124,32 +127,14 @@ public class SceduleManager extends JFrame {
                     Point dropLocation = evt.getLocation();
                     int row = table.rowAtPoint(dropLocation);
                     int col = table.columnAtPoint(dropLocation);
-
-                    for (Course course : courses){
-                        if (course.getCourseName().equals(buttonText)){
-                            
-                            String rowValue = (String) table.getValueAt(row, 0);
-                            String colValue = (String) table.getValueAt(0, col);
-                            List<Professor> examiners = new ArrayList<>();
-                            System.out.println("Fix");
-
-                            for (Professor prf : course.getExaminers()){
-                                System.out.println(prf.getProfSurname());
-                            }
-                            examiners = course.getExaminers();
-                            System.out.println(examiners.size());
-                            for (Professor prof : professors){
-                                if(examiners.contains(prof)){
-                                    System.out.println("I FOUND:" + prof.getProfSurname());
-                                }
-                            }
-                        }
-                        
-                        
-                    }
-                    
+                    Course tmpCourse = new Course(findCourse(buttonText));
+                    //tmpCourse.printStatistics();
+                    String rowValue = (String) table.getValueAt(row, 0);
+                    String colValue = (String) table.getValueAt(0, col);
+                    boolean isValid = checkAvailabilityForProfessors(tmpCourse, rowValue, colValue);
+                    Color cellColor = isValid ? Color.GREEN : Color.RED;
+                    table.getColumnModel().getColumn(col).setCellRenderer(new CustomCellRenderer(cellColor));
                     model.setValueAt(buttonText, row, col);
-
                     // Remove the button from coursesPanel
                     Component[] components = coursesPanel.getComponents();
                     for (Component component : components) {
@@ -211,6 +196,40 @@ public class SceduleManager extends JFrame {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         return scrollPane;
+    }
+    
+    public String getDateWithGreekFormat(String dateStr){
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy EEEE", new Locale("el"));
+        LocalDate date = LocalDate.parse(dateStr, inputFormatter);
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        // Format the LocalDate to the desired output pattern
+        String formattedDate = date.format(outputFormatter);
+        return formattedDate;
+    }
+    
+    public boolean checkAvailabilityForProfessors(Course course, String dateStr, String timeslotStr){
+        List<Professor> profs = new ArrayList<>(course.getExaminers());
+        List<Integer> results = new ArrayList<Integer>();
+        String date = getDateWithGreekFormat(dateStr);
+        for (Professor prof : profs){
+            int tmp = prof.isAvailable(date, timeslotStr);
+            results.add(tmp);
+        }
+        for (Integer i : results){
+            if (i == 0 || i == 2){
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public Course findCourse(String tmp){
+        for (Course course : this.courses){
+            if (course.getCourseName().equals(tmp)){
+                return course;
+            }
+        }
+        return null;
     }
     
     /**
@@ -289,4 +308,20 @@ public class SceduleManager extends JFrame {
     private javax.swing.JPanel modelPanel;
     private javax.swing.JScrollPane modelScrollPane;
     // End of variables declaration//GEN-END:variables
+    
+    class CustomCellRenderer extends DefaultTableCellRenderer {
+        private Color backgroundColor;
+
+        public CustomCellRenderer(Color backgroundColor) {
+            this.backgroundColor = backgroundColor;
+        }
+
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            cell.setBackground(backgroundColor);
+            return cell;
+        }
+    }
+
 }
+

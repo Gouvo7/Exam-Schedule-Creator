@@ -163,12 +163,12 @@ public class ExcelManager {
                 throw new Exception();
             }
             excel5 = true;
-
+            addProfsToCourses(profs, courses, fileName);
+            
             if (excel1 && excel2 && excel3 && excel4 && excel5) {
                 createTemplate(profs, timeslots, dates, classrooms);
             }
             saveObjects();
-            System.out.println("After step3 ");
 
         } catch (Exception e) {
             return;
@@ -292,7 +292,7 @@ public class ExcelManager {
                 if (!availabilityList.isEmpty()){
                     classroom.setAvailability(availabilityList);
                 }
-                classroom.prinAvailable();
+                //classroom.prinAvailable();
             }
             file.close();
             return ;
@@ -830,7 +830,7 @@ public class ExcelManager {
             profs = (List<Professor>) oi.readObject();
             courses = (List<Course>) oi.readObject();
             for (Course c : courses){
-                c.gamaTa();
+                //c.gamaTa();
             }
             classrooms = (List<Classroom>) oi.readObject();
             timeslots = (List<String>) oi.readObject();

@@ -51,10 +51,30 @@ public class Professor implements Serializable{
         this.availability = availability;
     }
     
+    public int isAvailable(String date, String timeslot){
+        date.trim();
+        timeslot.trim();
+        for (Availability a : availability){
+            if (a.getDate().equals(date) && a.getTimeSlot().equals(timeslot)){
+                if(a.getIsAvailable() == 0){
+                    System.out.println("Ο καθηγητής: " + this.getProfSurname() + " δεν είναι διαθέσιμος για την ημερομηνία: " + a.getDate() + " + ώρα: " + a.getTimeSlot());
+                    return 0;
+                }else if (a.getIsAvailable() == 1){
+                    System.out.println("Ο καθηγητής: " + this.getProfSurname() + " είναι διαθέσιμος για την ημερομηνία: " + a.getDate() + " + ώρα: " + a.getTimeSlot());
+                    return 1;
+                }else if (a.getIsAvailable() == 2){
+                    System.out.println("Ο καθηγητής: " + this.getProfSurname() + " έχει άλλο μάθημα για την ημερομηνία: " + a.getDate() + " + ώρα: " + a.getTimeSlot());
+                    return 2;
+                }
+            }
+        }
+        return -1;
+    }
+    
     /**
      * Η μέθοδος εκτυπώνει όλα τα στοιχεία ενός καθηγητή.
      */
-    public void printText(){
+/*    public void printText(){
         System.out.println(profSurname + " " + profFirstname + " " + profField);
     }
     
@@ -63,7 +83,7 @@ public class Professor implements Serializable{
             System.out.println(this.getProfSurname() + " " + x.getDate() +  " " + x.getTimeSlot() + " " + x.getIsAvailable());
         }
     }
-    
+*/    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

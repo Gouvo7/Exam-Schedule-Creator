@@ -23,6 +23,14 @@ public class Course implements Serializable{
         isExamined = d;
         examiners = new ArrayList<>();
     }
+    
+    Course(Course course){
+        courseName = course.getCourseName();
+        courseShort = course.getCourseShort();
+        courseSem = course.getCourseSem();
+        isExamined = course.isIsExamined();
+        examiners = new ArrayList<>(course.getExaminers());
+    }
 
     public Course getCourse(){
         return this;
@@ -96,9 +104,9 @@ public class Course implements Serializable{
         examiners.add(prof);
     }
     
-    public void gamaTa(){
+    public void printStatistics(){
         int i = 0;
-        System.out.println("Course is:" + this.getCourseName());
+        System.out.println("Course is:" + this.getCourseName() + examiners.size());
         for (Professor prof : examiners){
             System.out.println("Professor " + i + ": " + prof.getProfFirstname());
         }
