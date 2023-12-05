@@ -34,10 +34,10 @@ import org.gmele.general.sheets.exception.SheetExc;
  *
  * @author gouvo
  * 
- * Η κλάση είναι υπεύθυνη για την δημιουργία και διαχείριση αντικειμένων αλλά και την
- * ανάγνωση/δημιουργία αρχείων .xlsx
- * @param - myJFrame - Το παράθυρο που το καλεί.
- * @param - fileName - Το όνομα του αρχείου προς ανάγνωση.
+ * Ξ— ΞΊΞ»Ξ¬ΟƒΞ· ΞµΞ―Ξ½Ξ±ΞΉ Ο…Ο€ΞµΟΞΈΟ…Ξ½Ξ· Ξ³ΞΉΞ± Ο„Ξ·Ξ½ Ξ΄Ξ·ΞΌΞΉΞΏΟ…ΟΞ³Ξ―Ξ± ΞΊΞ±ΞΉ Ξ΄ΞΉΞ±Ο‡ΞµΞ―ΟΞΉΟƒΞ· Ξ±Ξ½Ο„ΞΉΞΊΞµΞΉΞΌΞ­Ξ½Ο‰Ξ½ Ξ±Ξ»Ξ»Ξ¬ ΞΊΞ±ΞΉ Ο„Ξ·Ξ½
+ * Ξ±Ξ½Ξ¬Ξ³Ξ½Ο‰ΟƒΞ·/Ξ΄Ξ·ΞΌΞΉΞΏΟ…ΟΞ³Ξ―Ξ± Ξ±ΟΟ‡ΞµΞ―Ο‰Ξ½ .xlsx
+ * @param - myJFrame - Ξ¤ΞΏ Ο€Ξ±ΟΞ¬ΞΈΟ…ΟΞΏ Ο€ΞΏΟ… Ο„ΞΏ ΞΊΞ±Ξ»ΞµΞ―.
+ * @param - fileName - Ξ¤ΞΏ ΟΞ½ΞΏΞΌΞ± Ο„ΞΏΟ… Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… Ο€ΟΞΏΟ‚ Ξ±Ξ½Ξ¬Ξ³Ξ½Ο‰ΟƒΞ·.
  */
 
 public class ExcelManager {
@@ -95,7 +95,7 @@ public class ExcelManager {
         this.dates = dates;
     }
     
-    // Δήλωση των στατικών ονομασιών των φύλλων του excel προς επεξεργασία.
+    // Ξ”Ξ®Ξ»Ο‰ΟƒΞ· Ο„Ο‰Ξ½ ΟƒΟ„Ξ±Ο„ΞΉΞΊΟΞ½ ΞΏΞ½ΞΏΞΌΞ±ΟƒΞΉΟΞ½ Ο„Ο‰Ξ½ Ο†ΟΞ»Ξ»Ο‰Ξ½ Ο„ΞΏΟ… excel Ο€ΟΞΏΟ‚ ΞµΟ€ΞµΞΎΞµΟΞ³Ξ±ΟƒΞ―Ξ±.
     
     ExcelManager(JFrame x, String y){
         myJFrame = x;
@@ -112,17 +112,17 @@ public class ExcelManager {
     }
     
     /**
-     * 1) Διαβάζει το αρχείο από το μονοπάτι που καθορίζει ο χρήστης από την εφαρμογή.
-     * 2) Αποθηκεύει τα δεδομένα σε αντικείμενα κατάλληλου τύπου
-     * 3) Παράγει δύο νέα αρχεία όπου το 1ο συμπληρώνεται από τους καθηγητές και 
-     * αφορά την διαθεσιμότητά τους για τις ημερομηνίες της εξεταστικής. Για κάθε 
-     * καθηγητή παράγεται ένα φύλλο, με γραμμές για τις ημερομηνίες και τα χρονικά 
-     * διαστήματα μεταξύ των ωρών λειτουργίας του Πανεπιστημίου. Το 2ο αρχείο
-     * συμπληρώνεται από τον υπεύθυνο σύνταξης του προγράμματος εξεταστικής και
-     * αφορά την διαθεσιμότητα των αιθουσών για τις ημερομηνίες της εξεταστικής.
+     * 1) Ξ”ΞΉΞ±Ξ²Ξ¬Ξ¶ΞµΞΉ Ο„ΞΏ Ξ±ΟΟ‡ΞµΞ―ΞΏ Ξ±Ο€Ο Ο„ΞΏ ΞΌΞΏΞ½ΞΏΟ€Ξ¬Ο„ΞΉ Ο€ΞΏΟ… ΞΊΞ±ΞΈΞΏΟΞ―Ξ¶ΞµΞΉ ΞΏ Ο‡ΟΞ®ΟƒΟ„Ξ·Ο‚ Ξ±Ο€Ο Ο„Ξ·Ξ½ ΞµΟ†Ξ±ΟΞΌΞΏΞ³Ξ®.
+     * 2) Ξ‘Ο€ΞΏΞΈΞ·ΞΊΞµΟΞµΞΉ Ο„Ξ± Ξ΄ΞµΞ΄ΞΏΞΌΞ­Ξ½Ξ± ΟƒΞµ Ξ±Ξ½Ο„ΞΉΞΊΞµΞ―ΞΌΞµΞ½Ξ± ΞΊΞ±Ο„Ξ¬Ξ»Ξ»Ξ·Ξ»ΞΏΟ… Ο„ΟΟ€ΞΏΟ…
+     * 3) Ξ Ξ±ΟΞ¬Ξ³ΞµΞΉ Ξ΄ΟΞΏ Ξ½Ξ­Ξ± Ξ±ΟΟ‡ΞµΞ―Ξ± ΟΟ€ΞΏΟ… Ο„ΞΏ 1ΞΏ ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟΞ½ΞµΟ„Ξ±ΞΉ Ξ±Ο€Ο Ο„ΞΏΟ…Ο‚ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„Ξ­Ο‚ ΞΊΞ±ΞΉ 
+     * Ξ±Ο†ΞΏΟΞ¬ Ο„Ξ·Ξ½ Ξ΄ΞΉΞ±ΞΈΞµΟƒΞΉΞΌΟΟ„Ξ·Ο„Ξ¬ Ο„ΞΏΟ…Ο‚ Ξ³ΞΉΞ± Ο„ΞΉΟ‚ Ξ·ΞΌΞµΟΞΏΞΌΞ·Ξ½Ξ―ΞµΟ‚ Ο„Ξ·Ο‚ ΞµΞΎΞµΟ„Ξ±ΟƒΟ„ΞΉΞΊΞ®Ο‚. Ξ“ΞΉΞ± ΞΊΞ¬ΞΈΞµ 
+     * ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„Ξ® Ο€Ξ±ΟΞ¬Ξ³ΞµΟ„Ξ±ΞΉ Ξ­Ξ½Ξ± Ο†ΟΞ»Ξ»ΞΏ, ΞΌΞµ Ξ³ΟΞ±ΞΌΞΌΞ­Ο‚ Ξ³ΞΉΞ± Ο„ΞΉΟ‚ Ξ·ΞΌΞµΟΞΏΞΌΞ·Ξ½Ξ―ΞµΟ‚ ΞΊΞ±ΞΉ Ο„Ξ± Ο‡ΟΞΏΞ½ΞΉΞΊΞ¬ 
+     * Ξ΄ΞΉΞ±ΟƒΟ„Ξ®ΞΌΞ±Ο„Ξ± ΞΌΞµΟ„Ξ±ΞΎΟ Ο„Ο‰Ξ½ Ο‰ΟΟΞ½ Ξ»ΞµΞΉΟ„ΞΏΟ…ΟΞ³Ξ―Ξ±Ο‚ Ο„ΞΏΟ… Ξ Ξ±Ξ½ΞµΟ€ΞΉΟƒΟ„Ξ·ΞΌΞ―ΞΏΟ…. Ξ¤ΞΏ 2ΞΏ Ξ±ΟΟ‡ΞµΞ―ΞΏ
+     * ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟΞ½ΞµΟ„Ξ±ΞΉ Ξ±Ο€Ο Ο„ΞΏΞ½ Ο…Ο€ΞµΟΞΈΟ…Ξ½ΞΏ ΟƒΟΞ½Ο„Ξ±ΞΎΞ·Ο‚ Ο„ΞΏΟ… Ο€ΟΞΏΞ³ΟΞ¬ΞΌΞΌΞ±Ο„ΞΏΟ‚ ΞµΞΎΞµΟ„Ξ±ΟƒΟ„ΞΉΞΊΞ®Ο‚ ΞΊΞ±ΞΉ
+     * Ξ±Ο†ΞΏΟΞ¬ Ο„Ξ·Ξ½ Ξ΄ΞΉΞ±ΞΈΞµΟƒΞΉΞΌΟΟ„Ξ·Ο„Ξ± Ο„Ο‰Ξ½ Ξ±ΞΉΞΈΞΏΟ…ΟƒΟΞ½ Ξ³ΞΉΞ± Ο„ΞΉΟ‚ Ξ·ΞΌΞµΟΞΏΞΌΞ·Ξ½Ξ―ΞµΟ‚ Ο„Ξ·Ο‚ ΞµΞΎΞµΟ„Ξ±ΟƒΟ„ΞΉΞΊΞ®Ο‚.
      * 
-     * Σε περίπτωση που κάποιο από τα φύλλα δεν είναι συμπληρωμένο με έγκυρες πληροφορίες
-     * ή κενά, θα προκληθεί ένα Exception και η διαδικασία θα διακοπεί.
+     * Ξ£Ξµ Ο€ΞµΟΞ―Ο€Ο„Ο‰ΟƒΞ· Ο€ΞΏΟ… ΞΊΞ¬Ο€ΞΏΞΉΞΏ Ξ±Ο€Ο Ο„Ξ± Ο†ΟΞ»Ξ»Ξ± Ξ΄ΞµΞ½ ΞµΞ―Ξ½Ξ±ΞΉ ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟ‰ΞΌΞ­Ξ½ΞΏ ΞΌΞµ Ξ­Ξ³ΞΊΟ…ΟΞµΟ‚ Ο€Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―ΞµΟ‚
+     * Ξ® ΞΊΞµΞ½Ξ¬, ΞΈΞ± Ο€ΟΞΏΞΊΞ»Ξ·ΞΈΞµΞ― Ξ­Ξ½Ξ± Exception ΞΊΞ±ΞΉ Ξ· Ξ΄ΞΉΞ±Ξ΄ΞΉΞΊΞ±ΟƒΞ―Ξ± ΞΈΞ± Ξ΄ΞΉΞ±ΞΊΞΏΟ€ΞµΞ―.
      */
     public void createExcels(){
         try {
@@ -176,9 +176,9 @@ public class ExcelManager {
     }
 
     /**
-     * Η μέθοδος διαβάζει το κύριο excel που εμπεριέχει πληροφορίες για τους καθηγητές,
-     * τα μαθήματα, τις σχέσεις τους κ.α.Έπειτα, καλεί 2 μεθόδους που συμπληρώνουν
-     * στα αντικείμενα καθηγητών και αιθουσών την διαθεσιμότητά τους με βάση τα συμπληρωμένα
+     * Ξ— ΞΌΞ­ΞΈΞΏΞ΄ΞΏΟ‚ Ξ΄ΞΉΞ±Ξ²Ξ¬Ξ¶ΞµΞΉ Ο„ΞΏ ΞΊΟΟΞΉΞΏ excel Ο€ΞΏΟ… ΞµΞΌΟ€ΞµΟΞΉΞ­Ο‡ΞµΞΉ Ο€Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―ΞµΟ‚ Ξ³ΞΉΞ± Ο„ΞΏΟ…Ο‚ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„Ξ­Ο‚,
+     * Ο„Ξ± ΞΌΞ±ΞΈΞ®ΞΌΞ±Ο„Ξ±, Ο„ΞΉΟ‚ ΟƒΟ‡Ξ­ΟƒΞµΞΉΟ‚ Ο„ΞΏΟ…Ο‚ ΞΊ.Ξ±.ΞΟ€ΞµΞΉΟ„Ξ±, ΞΊΞ±Ξ»ΞµΞ― 2 ΞΌΞµΞΈΟΞ΄ΞΏΟ…Ο‚ Ο€ΞΏΟ… ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟΞ½ΞΏΟ…Ξ½
+     * ΟƒΟ„Ξ± Ξ±Ξ½Ο„ΞΉΞΊΞµΞ―ΞΌΞµΞ½Ξ± ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„ΟΞ½ ΞΊΞ±ΞΉ Ξ±ΞΉΞΈΞΏΟ…ΟƒΟΞ½ Ο„Ξ·Ξ½ Ξ΄ΞΉΞ±ΞΈΞµΟƒΞΉΞΌΟΟ„Ξ·Ο„Ξ¬ Ο„ΞΏΟ…Ο‚ ΞΌΞµ Ξ²Ξ¬ΟƒΞ· Ο„Ξ± ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟ‰ΞΌΞ­Ξ½Ξ±
      * template.
      * 
      * @return 
@@ -193,19 +193,19 @@ public class ExcelManager {
             return true;
         }catch (Exception e){
             e.printStackTrace();
-            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά την ανάγνωση των δεδομένων. ",
-            " Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ£Ο†Ξ¬Ξ»ΞΌΞ± ΞΊΞ±Ο„Ξ¬ Ο„Ξ·Ξ½ Ξ±Ξ½Ξ¬Ξ³Ξ½Ο‰ΟƒΞ· Ο„Ο‰Ξ½ Ξ΄ΞµΞ΄ΞΏΞΌΞ­Ξ½Ο‰Ξ½. ",
+            " ΞΞ®Ξ½Ο…ΞΌΞ± Ξ»Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         }
         return false;
     }
     
     /**
-     * Συμπληρώνει για όλη την λίστα των καθηγητών, την διαθεσιμότητά τους από το
-     * συμπληρωμένο φύλλο που παράχθηκε από το πρόγραμμα σε προηγούμενο βήμα. 
-     * @param professors Η λίστα με τους καθηγητές που θα προστεθεί η διαθεσιμότητά τους.
-     * @param lastColumn Το μέγεθος της λίστας timeslots ή το πλήθος των διαφορετικών
-     * χρονικών πλαισίων.
-     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
+     * Ξ£Ο…ΞΌΟ€Ξ»Ξ·ΟΟΞ½ΞµΞΉ Ξ³ΞΉΞ± ΟΞ»Ξ· Ο„Ξ·Ξ½ Ξ»Ξ―ΟƒΟ„Ξ± Ο„Ο‰Ξ½ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„ΟΞ½, Ο„Ξ·Ξ½ Ξ΄ΞΉΞ±ΞΈΞµΟƒΞΉΞΌΟΟ„Ξ·Ο„Ξ¬ Ο„ΞΏΟ…Ο‚ Ξ±Ο€Ο Ο„ΞΏ
+     * ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟ‰ΞΌΞ­Ξ½ΞΏ Ο†ΟΞ»Ξ»ΞΏ Ο€ΞΏΟ… Ο€Ξ±ΟΞ¬Ο‡ΞΈΞ·ΞΊΞµ Ξ±Ο€Ο Ο„ΞΏ Ο€ΟΟΞ³ΟΞ±ΞΌΞΌΞ± ΟƒΞµ Ο€ΟΞΏΞ·Ξ³ΞΏΟΞΌΞµΞ½ΞΏ Ξ²Ξ®ΞΌΞ±. 
+     * @param professors Ξ— Ξ»Ξ―ΟƒΟ„Ξ± ΞΌΞµ Ο„ΞΏΟ…Ο‚ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„Ξ­Ο‚ Ο€ΞΏΟ… ΞΈΞ± Ο€ΟΞΏΟƒΟ„ΞµΞΈΞµΞ― Ξ· Ξ΄ΞΉΞ±ΞΈΞµΟƒΞΉΞΌΟΟ„Ξ·Ο„Ξ¬ Ο„ΞΏΟ…Ο‚.
+     * @param lastColumn Ξ¤ΞΏ ΞΌΞ­Ξ³ΞµΞΈΞΏΟ‚ Ο„Ξ·Ο‚ Ξ»Ξ―ΟƒΟ„Ξ±Ο‚ timeslots Ξ® Ο„ΞΏ Ο€Ξ»Ξ®ΞΈΞΏΟ‚ Ο„Ο‰Ξ½ Ξ΄ΞΉΞ±Ο†ΞΏΟΞµΟ„ΞΉΞΊΟΞ½
+     * Ο‡ΟΞΏΞ½ΞΉΞΊΟΞ½ Ο€Ξ»Ξ±ΞΉΟƒΞ―Ο‰Ξ½.
+     * @param filename Ξ¤ΞΏ ΟΞ½ΞΏΞΌΞ± Ο„ΞΏΟ… Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… Ξ±Ο€Ο Ο„ΞΏ ΞΏΟ€ΞΏΞ―ΞΏ ΞΈΞ± Ξ±Ξ½Ο„Ξ»Ξ®ΟƒΞΏΟ…ΞΌΞµ Ο„Ξ·Ξ½ Ο€Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―Ξ±.
      */    
     public void addProfessorsAvailability(List<Professor> professors,int lastColumn, String filename) throws SheetExc{
         try{
@@ -245,30 +245,30 @@ public class ExcelManager {
             file.close();
             return ;
         } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ¤ΞΏ Ξ±ΟΟ‡ΞµΞ―ΞΏ '" + filename + "' Ξ΄ΞµΞ½ Ξ²ΟΞ­ΞΈΞ·ΞΊΞµ.",
+               "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
             return ;
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ¤ΞΏ Ξ±ΟΟ‡ΞµΞ―ΞΏ '" + filename + "' Ξ΄ΞµΞ½ Ξ²ΟΞ­ΞΈΞ·ΞΊΞµ.",
+               "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (SheetExc ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα αρχεία διαθεσιμότητας αιθουσών.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ ΟΟΞ²Ξ»Ξ·ΞΌΞ± ΞΌΞµ Ο„Ξ± ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟ‰ΞΌΞ­Ξ½Ξ± Ξ±ΟΟ‡ΞµΞ―Ξ± Ξ΄ΞΉΞ±ΞΈΞµΟƒΞΉΞΌΟΟ„Ξ·Ο„Ξ±Ο‚ Ξ±ΞΉΞΈΞΏΟ…ΟƒΟΞ½.",
+               "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα  αρχεία διαθεσιμότητας καθηγητών.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ ΟΟΞ²Ξ»Ξ·ΞΌΞ± ΞΌΞµ Ο„Ξ± ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟ‰ΞΌΞ­Ξ½Ξ±  Ξ±ΟΟ‡ΞµΞ―Ξ± Ξ΄ΞΉΞ±ΞΈΞµΟƒΞΉΞΌΟΟ„Ξ·Ο„Ξ±Ο‚ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„ΟΞ½.",
+               "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         }
         
         return ;
     }
     
     /**
-     * Συμπληρώνει για όλη την λίστα των αιθουσών, την διαθεσιμότητά τους από το
-     * συμπληρωμένο φύλλο που παράχθηκε από το πρόγραμμα σε προηγούμενο βήμα. 
-     * @param classrooms Η λίστα με τις αίθουσες που θα προστεθεί η διαθεσιμότητά τους.
-     * @param lastColumn Το μέγεθος της λίστας timeslots ή το πλήθος των διαφορετικών
-     * χρονικών πλαισίων.
-     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
+     * Ξ£Ο…ΞΌΟ€Ξ»Ξ·ΟΟΞ½ΞµΞΉ Ξ³ΞΉΞ± ΟΞ»Ξ· Ο„Ξ·Ξ½ Ξ»Ξ―ΟƒΟ„Ξ± Ο„Ο‰Ξ½ Ξ±ΞΉΞΈΞΏΟ…ΟƒΟΞ½, Ο„Ξ·Ξ½ Ξ΄ΞΉΞ±ΞΈΞµΟƒΞΉΞΌΟΟ„Ξ·Ο„Ξ¬ Ο„ΞΏΟ…Ο‚ Ξ±Ο€Ο Ο„ΞΏ
+     * ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟ‰ΞΌΞ­Ξ½ΞΏ Ο†ΟΞ»Ξ»ΞΏ Ο€ΞΏΟ… Ο€Ξ±ΟΞ¬Ο‡ΞΈΞ·ΞΊΞµ Ξ±Ο€Ο Ο„ΞΏ Ο€ΟΟΞ³ΟΞ±ΞΌΞΌΞ± ΟƒΞµ Ο€ΟΞΏΞ·Ξ³ΞΏΟΞΌΞµΞ½ΞΏ Ξ²Ξ®ΞΌΞ±. 
+     * @param classrooms Ξ— Ξ»Ξ―ΟƒΟ„Ξ± ΞΌΞµ Ο„ΞΉΟ‚ Ξ±Ξ―ΞΈΞΏΟ…ΟƒΞµΟ‚ Ο€ΞΏΟ… ΞΈΞ± Ο€ΟΞΏΟƒΟ„ΞµΞΈΞµΞ― Ξ· Ξ΄ΞΉΞ±ΞΈΞµΟƒΞΉΞΌΟΟ„Ξ·Ο„Ξ¬ Ο„ΞΏΟ…Ο‚.
+     * @param lastColumn Ξ¤ΞΏ ΞΌΞ­Ξ³ΞµΞΈΞΏΟ‚ Ο„Ξ·Ο‚ Ξ»Ξ―ΟƒΟ„Ξ±Ο‚ timeslots Ξ® Ο„ΞΏ Ο€Ξ»Ξ®ΞΈΞΏΟ‚ Ο„Ο‰Ξ½ Ξ΄ΞΉΞ±Ο†ΞΏΟΞµΟ„ΞΉΞΊΟΞ½
+     * Ο‡ΟΞΏΞ½ΞΉΞΊΟΞ½ Ο€Ξ»Ξ±ΞΉΟƒΞ―Ο‰Ξ½.
+     * @param filename Ξ¤ΞΏ ΟΞ½ΞΏΞΌΞ± Ο„ΞΏΟ… Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… Ξ±Ο€Ο Ο„ΞΏ ΞΏΟ€ΞΏΞ―ΞΏ ΞΈΞ± Ξ±Ξ½Ο„Ξ»Ξ®ΟƒΞΏΟ…ΞΌΞµ Ο„Ξ·Ξ½ Ο€Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―Ξ±.
      */
     public void addClassroomsAvailability(List<Classroom> classrooms,int lastColumn, String filename){
         try{
@@ -309,28 +309,28 @@ public class ExcelManager {
             return ;
             
         } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ¤ΞΏ Ξ±ΟΟ‡ΞµΞ―ΞΏ '" + filename + "' Ξ΄ΞµΞ½ Ξ²ΟΞ­ΞΈΞ·ΞΊΞµ.",
+               "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
             return ;
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ¤ΞΏ Ξ±ΟΟ‡ΞµΞ―ΞΏ '" + filename + "' Ξ΄ΞµΞ½ Ξ²ΟΞ­ΞΈΞ·ΞΊΞµ.",
+               "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (SheetExc ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα αρχεία διαθεσιμότητας αιθουσών.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ ΟΟΞ²Ξ»Ξ·ΞΌΞ± ΞΌΞµ Ο„Ξ± ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟ‰ΞΌΞ­Ξ½Ξ± Ξ±ΟΟ‡ΞµΞ―Ξ± Ξ΄ΞΉΞ±ΞΈΞµΟƒΞΉΞΌΟΟ„Ξ·Ο„Ξ±Ο‚ Ξ±ΞΉΞΈΞΏΟ…ΟƒΟΞ½.",
+               "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα αρχεία διαθεσιμότητας αιθουσών.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ ΟΟΞ²Ξ»Ξ·ΞΌΞ± ΞΌΞµ Ο„Ξ± ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟ‰ΞΌΞ­Ξ½Ξ± Ξ±ΟΟ‡ΞµΞ―Ξ± Ξ΄ΞΉΞ±ΞΈΞµΟƒΞΉΞΌΟΟ„Ξ·Ο„Ξ±Ο‚ Ξ±ΞΉΞΈΞΏΟ…ΟƒΟΞ½.",
+               "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         }
         return ;
     }
     
     /**
-     * Ενημέρωση της λίστας των καθηγητών που εξετάζουν το μάθημα σε ολόκληρη την λίστα
-     * αντικειμένων Course.
-     * @param profs Η λίστα με τους καθηγητές.
-     * @param courses Η λίστα με τα μαθήματα.
-     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
+     * Ξ•Ξ½Ξ·ΞΌΞ­ΟΟ‰ΟƒΞ· Ο„Ξ·Ο‚ Ξ»Ξ―ΟƒΟ„Ξ±Ο‚ Ο„Ο‰Ξ½ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„ΟΞ½ Ο€ΞΏΟ… ΞµΞΎΞµΟ„Ξ¬Ξ¶ΞΏΟ…Ξ½ Ο„ΞΏ ΞΌΞ¬ΞΈΞ·ΞΌΞ± ΟƒΞµ ΞΏΞ»ΟΞΊΞ»Ξ·ΟΞ· Ο„Ξ·Ξ½ Ξ»Ξ―ΟƒΟ„Ξ±
+     * Ξ±Ξ½Ο„ΞΉΞΊΞµΞΉΞΌΞ­Ξ½Ο‰Ξ½ Course.
+     * @param profs Ξ— Ξ»Ξ―ΟƒΟ„Ξ± ΞΌΞµ Ο„ΞΏΟ…Ο‚ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„Ξ­Ο‚.
+     * @param courses Ξ— Ξ»Ξ―ΟƒΟ„Ξ± ΞΌΞµ Ο„Ξ± ΞΌΞ±ΞΈΞ®ΞΌΞ±Ο„Ξ±.
+     * @param filename Ξ¤ΞΏ ΟΞ½ΞΏΞΌΞ± Ο„ΞΏΟ… Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… Ξ±Ο€Ο Ο„ΞΏ ΞΏΟ€ΞΏΞ―ΞΏ ΞΈΞ± Ξ±Ξ½Ο„Ξ»Ξ®ΟƒΞΏΟ…ΞΌΞµ Ο„Ξ·Ξ½ Ο€Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―Ξ±.
      * @throws SheetExc 
      */
     public void addProfsToCourses(List<Professor> profs, List<Course> courses, String filename) throws SheetExc{
@@ -345,9 +345,9 @@ public class ExcelManager {
                 if (rowIndex != 0){
                     String course = s.GetCellString(rowIndex, 0).trim();
                     if (uniqueCourses.contains(course)){
-                        JOptionPane.showMessageDialog(myJFrame, "Βρέθηκε το ίδιο μάθημα"
-                                + " παραπάνω από μια φορά στο φύλλο " + sheet6 + ". Παρακαλώ ελέγξτε τα στοιχεία"
-                                + "  και δοκιμάστε ξανά.","Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(myJFrame, "Ξ’ΟΞ­ΞΈΞ·ΞΊΞµ Ο„ΞΏ Ξ―Ξ΄ΞΉΞΏ ΞΌΞ¬ΞΈΞ·ΞΌΞ±"
+                                + " Ο€Ξ±ΟΞ±Ο€Ξ¬Ξ½Ο‰ Ξ±Ο€Ο ΞΌΞΉΞ± Ο†ΞΏΟΞ¬ ΟƒΟ„ΞΏ Ο†ΟΞ»Ξ»ΞΏ " + sheet6 + ". Ξ Ξ±ΟΞ±ΞΊΞ±Ξ»Ο ΞµΞ»Ξ­Ξ³ΞΎΟ„Ξµ Ο„Ξ± ΟƒΟ„ΞΏΞΉΟ‡ΞµΞ―Ξ±"
+                                + "  ΞΊΞ±ΞΉ Ξ΄ΞΏΞΊΞΉΞΌΞ¬ΟƒΟ„Ξµ ΞΎΞ±Ξ½Ξ¬.","ΞΞ®Ξ½Ο…ΞΌΞ± Ξ»Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
                         return ;
                     }else{
                         uniqueCourses.add(course);
@@ -388,23 +388,23 @@ public class ExcelManager {
             }
             file.close();
         } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ¤ΞΏ Ξ±ΟΟ‡ΞµΞ―ΞΏ '" + filename + "' Ξ΄ΞµΞ½ Ξ²ΟΞ­ΞΈΞ·ΞΊΞµ.",
+               "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex){
-            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
-                    + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ£Ο†Ξ¬Ξ»ΞΌΞ± ΞΊΞ±Ο„Ξ¬ Ο„ΞΏ Ξ¬Ξ½ΞΏΞΉΞ³ΞΌΞ±"
+                    + " Ο„ΞΏΟ… Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… '" + filename + "'.","ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex){
-            JOptionPane.showMessageDialog(myJFrame, "Βρέθηκε μάθημα στο φύλλο '" + sheet6 + "' που δεν υπάρχει"
-                                + " στο φύλλο των μαθημάτων.","Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ’ΟΞ­ΞΈΞ·ΞΊΞµ ΞΌΞ¬ΞΈΞ·ΞΌΞ± ΟƒΟ„ΞΏ Ο†ΟΞ»Ξ»ΞΏ '" + sheet6 + "' Ο€ΞΏΟ… Ξ΄ΞµΞ½ Ο…Ο€Ξ¬ΟΟ‡ΞµΞΉ"
+                                + " ΟƒΟ„ΞΏ Ο†ΟΞ»Ξ»ΞΏ Ο„Ο‰Ξ½ ΞΌΞ±ΞΈΞ·ΞΌΞ¬Ο„Ο‰Ξ½.","ΞΞ®Ξ½Ο…ΞΌΞ± Ξ»Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         }
         return ;
     }
     
     /**
-     * Εντοπισμός όλων των μαθημάτων που έχουν καταχωρηθεί στο βασικό αρχείο.
-     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
-     * @param profs Η λίστα με τους καθηγητές.
-     * @return Μία λίστα με αντικείμενα τύπου Course.
+     * Ξ•Ξ½Ο„ΞΏΟ€ΞΉΟƒΞΌΟΟ‚ ΟΞ»Ο‰Ξ½ Ο„Ο‰Ξ½ ΞΌΞ±ΞΈΞ·ΞΌΞ¬Ο„Ο‰Ξ½ Ο€ΞΏΟ… Ξ­Ο‡ΞΏΟ…Ξ½ ΞΊΞ±Ο„Ξ±Ο‡Ο‰ΟΞ·ΞΈΞµΞ― ΟƒΟ„ΞΏ Ξ²Ξ±ΟƒΞΉΞΊΟ Ξ±ΟΟ‡ΞµΞ―ΞΏ.
+     * @param filename Ξ¤ΞΏ ΟΞ½ΞΏΞΌΞ± Ο„ΞΏΟ… Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… Ξ±Ο€Ο Ο„ΞΏ ΞΏΟ€ΞΏΞ―ΞΏ ΞΈΞ± Ξ±Ξ½Ο„Ξ»Ξ®ΟƒΞΏΟ…ΞΌΞµ Ο„Ξ·Ξ½ Ο€Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―Ξ±.
+     * @param profs Ξ— Ξ»Ξ―ΟƒΟ„Ξ± ΞΌΞµ Ο„ΞΏΟ…Ο‚ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„Ξ­Ο‚.
+     * @return ΞΞ―Ξ± Ξ»Ξ―ΟƒΟ„Ξ± ΞΌΞµ Ξ±Ξ½Ο„ΞΉΞΊΞµΞ―ΞΌΞµΞ½Ξ± Ο„ΟΟ€ΞΏΟ… Course.
      * @throws SheetExc 
      */
     public List<Course> readCourses(String filename, List<Professor> profs) throws SheetExc{
@@ -455,23 +455,23 @@ public class ExcelManager {
             file.close();
             return courses;
         } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ¤ΞΏ Ξ±ΟΟ‡ΞµΞ―ΞΏ '" + filename + "' Ξ΄ΞµΞ½ Ξ²ΟΞ­ΞΈΞ·ΞΊΞµ.",
+               "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex){
-            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
-                    + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ£Ο†Ξ¬Ξ»ΞΌΞ± ΞΊΞ±Ο„Ξ¬ Ο„ΞΏ Ξ¬Ξ½ΞΏΞΉΞ³ΞΌΞ±"
+                    + " Ο„ΞΏΟ… Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… '" + filename + "'.","ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα δεδομένα του φύλλου: '"
-            + sheet5 + "'. Βεβαιωθείτε ότι δεν υπάρχουν κενά κελιά ή διπλότυπες εγγραφές.",
-            "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ ΟΟΞ²Ξ»Ξ·ΞΌΞ± ΞΌΞµ Ο„Ξ± Ξ΄ΞµΞ΄ΞΏΞΌΞ­Ξ½Ξ± Ο„ΞΏΟ… Ο†ΟΞ»Ξ»ΞΏΟ…: '"
+            + sheet5 + "'. Ξ’ΞµΞ²Ξ±ΞΉΟ‰ΞΈΞµΞ―Ο„Ξµ ΟΟ„ΞΉ Ξ΄ΞµΞ½ Ο…Ο€Ξ¬ΟΟ‡ΞΏΟ…Ξ½ ΞΊΞµΞ½Ξ¬ ΞΊΞµΞ»ΞΉΞ¬ Ξ® Ξ΄ΞΉΟ€Ξ»ΟΟ„Ο…Ο€ΞµΟ‚ ΞµΞ³Ξ³ΟΞ±Ο†Ξ­Ο‚.",
+            "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
     
     /**
-     * Εντοπισμός όλων των αιθουσών που έχουν καταχωρηθεί στο βασικό αρχείο.
-     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
-     * @return Μία λίστα με αντικείμενα τύπου Classroom.
+     * Ξ•Ξ½Ο„ΞΏΟ€ΞΉΟƒΞΌΟΟ‚ ΟΞ»Ο‰Ξ½ Ο„Ο‰Ξ½ Ξ±ΞΉΞΈΞΏΟ…ΟƒΟΞ½ Ο€ΞΏΟ… Ξ­Ο‡ΞΏΟ…Ξ½ ΞΊΞ±Ο„Ξ±Ο‡Ο‰ΟΞ·ΞΈΞµΞ― ΟƒΟ„ΞΏ Ξ²Ξ±ΟƒΞΉΞΊΟ Ξ±ΟΟ‡ΞµΞ―ΞΏ.
+     * @param filename Ξ¤ΞΏ ΟΞ½ΞΏΞΌΞ± Ο„ΞΏΟ… Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… Ξ±Ο€Ο Ο„ΞΏ ΞΏΟ€ΞΏΞ―ΞΏ ΞΈΞ± Ξ±Ξ½Ο„Ξ»Ξ®ΟƒΞΏΟ…ΞΌΞµ Ο„Ξ·Ξ½ Ο€Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―Ξ±.
+     * @return ΞΞ―Ξ± Ξ»Ξ―ΟƒΟ„Ξ± ΞΌΞµ Ξ±Ξ½Ο„ΞΉΞΊΞµΞ―ΞΌΞµΞ½Ξ± Ο„ΟΟ€ΞΏΟ… Classroom.
      * @throws SheetExc 
      */
     public List<Classroom> readClassrooms(String filename) throws SheetExc{
@@ -506,23 +506,23 @@ public class ExcelManager {
             file.close();
             return classrooms;
         } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ¤ΞΏ Ξ±ΟΟ‡ΞµΞ―ΞΏ '" + filename + "' Ξ΄ΞµΞ½ Ξ²ΟΞ­ΞΈΞ·ΞΊΞµ.",
+               "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex){
-            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
-                    + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ£Ο†Ξ¬Ξ»ΞΌΞ± ΞΊΞ±Ο„Ξ¬ Ο„ΞΏ Ξ¬Ξ½ΞΏΞΉΞ³ΞΌΞ±"
+                    + " Ο„ΞΏΟ… Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… '" + filename + "'.","ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα δεδομένα του φύλλου: '"
-            + sheet4 + "'. Βεβαιωθείτε ότι δεν υπάρχουν κενά κελιά ή διπλότυπες εγγραφές.",
-            "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ ΟΟΞ²Ξ»Ξ·ΞΌΞ± ΞΌΞµ Ο„Ξ± Ξ΄ΞµΞ΄ΞΏΞΌΞ­Ξ½Ξ± Ο„ΞΏΟ… Ο†ΟΞ»Ξ»ΞΏΟ…: '"
+            + sheet4 + "'. Ξ’ΞµΞ²Ξ±ΞΉΟ‰ΞΈΞµΞ―Ο„Ξµ ΟΟ„ΞΉ Ξ΄ΞµΞ½ Ο…Ο€Ξ¬ΟΟ‡ΞΏΟ…Ξ½ ΞΊΞµΞ½Ξ¬ ΞΊΞµΞ»ΞΉΞ¬ Ξ® Ξ΄ΞΉΟ€Ξ»ΟΟ„Ο…Ο€ΞµΟ‚ ΞµΞ³Ξ³ΟΞ±Ο†Ξ­Ο‚.",
+            "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
     
     /**
-     * Εντοπισμός όλων των ημερομηνιών της εξεταστικής που έχουν καταχωρηθεί στο βασικό αρχείο.
-     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
-     * @return Ένα HashMap με ζευγάρια ημέρας - ημερομηνίας.
+     * Ξ•Ξ½Ο„ΞΏΟ€ΞΉΟƒΞΌΟΟ‚ ΟΞ»Ο‰Ξ½ Ο„Ο‰Ξ½ Ξ·ΞΌΞµΟΞΏΞΌΞ·Ξ½ΞΉΟΞ½ Ο„Ξ·Ο‚ ΞµΞΎΞµΟ„Ξ±ΟƒΟ„ΞΉΞΊΞ®Ο‚ Ο€ΞΏΟ… Ξ­Ο‡ΞΏΟ…Ξ½ ΞΊΞ±Ο„Ξ±Ο‡Ο‰ΟΞ·ΞΈΞµΞ― ΟƒΟ„ΞΏ Ξ²Ξ±ΟƒΞΉΞΊΟ Ξ±ΟΟ‡ΞµΞ―ΞΏ.
+     * @param filename Ξ¤ΞΏ ΟΞ½ΞΏΞΌΞ± Ο„ΞΏΟ… Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… Ξ±Ο€Ο Ο„ΞΏ ΞΏΟ€ΞΏΞ―ΞΏ ΞΈΞ± Ξ±Ξ½Ο„Ξ»Ξ®ΟƒΞΏΟ…ΞΌΞµ Ο„Ξ·Ξ½ Ο€Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―Ξ±.
+     * @return ΞΞ½Ξ± HashMap ΞΌΞµ Ξ¶ΞµΟ…Ξ³Ξ¬ΟΞΉΞ± Ξ·ΞΌΞ­ΟΞ±Ο‚ - Ξ·ΞΌΞµΟΞΏΞΌΞ·Ξ½Ξ―Ξ±Ο‚.
      * @throws SheetExc 
      */
     public List<String> readDates(String filename) throws SheetExc{
@@ -542,8 +542,8 @@ public class ExcelManager {
                     try {
                         date = inputDateFormat.parse(s.GetCellDate(rowIndex, 0).toString());
                     } catch (ParseException ex) {
-                        JOptionPane.showMessageDialog(myJFrame, "Λάθος τύπος "
-                                + "δεδομένων στο φύλλο '" + sheet3 + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(myJFrame, "Ξ›Ξ¬ΞΈΞΏΟ‚ Ο„ΟΟ€ΞΏΟ‚ "
+                                + "Ξ΄ΞµΞ΄ΞΏΞΌΞ­Ξ½Ο‰Ξ½ ΟƒΟ„ΞΏ Ο†ΟΞ»Ξ»ΞΏ '" + sheet3 + "'.","ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
                         file.close();
                         return null;
                     }
@@ -560,23 +560,23 @@ public class ExcelManager {
             file.close();
             return dates;
         } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ¤ΞΏ Ξ±ΟΟ‡ΞµΞ―ΞΏ '" + filename + "' Ξ΄ΞµΞ½ Ξ²ΟΞ­ΞΈΞ·ΞΊΞµ.",
+               "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex){
-            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
-                    + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ£Ο†Ξ¬Ξ»ΞΌΞ± ΞΊΞ±Ο„Ξ¬ Ο„ΞΏ Ξ¬Ξ½ΞΏΞΉΞ³ΞΌΞ±"
+                    + " Ο„ΞΏΟ… Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… '" + filename + "'.","ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα δεδομένα του φύλλου: '"
-            + sheet3 + "'. Βεβαιωθείτε ότι δεν υπάρχουν κενά κελιά ή διπλότυπες εγγραφές.",
-            "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ ΟΟΞ²Ξ»Ξ·ΞΌΞ± ΞΌΞµ Ο„Ξ± Ξ΄ΞµΞ΄ΞΏΞΌΞ­Ξ½Ξ± Ο„ΞΏΟ… Ο†ΟΞ»Ξ»ΞΏΟ…: '"
+            + sheet3 + "'. Ξ’ΞµΞ²Ξ±ΞΉΟ‰ΞΈΞµΞ―Ο„Ξµ ΟΟ„ΞΉ Ξ΄ΞµΞ½ Ο…Ο€Ξ¬ΟΟ‡ΞΏΟ…Ξ½ ΞΊΞµΞ½Ξ¬ ΞΊΞµΞ»ΞΉΞ¬ Ξ® Ξ΄ΞΉΟ€Ξ»ΟΟ„Ο…Ο€ΞµΟ‚ ΞµΞ³Ξ³ΟΞ±Ο†Ξ­Ο‚.",
+            "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
     
     /**
-     * Εντοπισμός όλων των διαστημάτων εξέτασης που έχουν καταχωρηθεί στο βασικό αρχείο.
-     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
-     * @return Μία λίστα με Strings.
+     * Ξ•Ξ½Ο„ΞΏΟ€ΞΉΟƒΞΌΟΟ‚ ΟΞ»Ο‰Ξ½ Ο„Ο‰Ξ½ Ξ΄ΞΉΞ±ΟƒΟ„Ξ·ΞΌΞ¬Ο„Ο‰Ξ½ ΞµΞΎΞ­Ο„Ξ±ΟƒΞ·Ο‚ Ο€ΞΏΟ… Ξ­Ο‡ΞΏΟ…Ξ½ ΞΊΞ±Ο„Ξ±Ο‡Ο‰ΟΞ·ΞΈΞµΞ― ΟƒΟ„ΞΏ Ξ²Ξ±ΟƒΞΉΞΊΟ Ξ±ΟΟ‡ΞµΞ―ΞΏ.
+     * @param filename Ξ¤ΞΏ ΟΞ½ΞΏΞΌΞ± Ο„ΞΏΟ… Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… Ξ±Ο€Ο Ο„ΞΏ ΞΏΟ€ΞΏΞ―ΞΏ ΞΈΞ± Ξ±Ξ½Ο„Ξ»Ξ®ΟƒΞΏΟ…ΞΌΞµ Ο„Ξ·Ξ½ Ο€Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―Ξ±.
+     * @return ΞΞ―Ξ± Ξ»Ξ―ΟƒΟ„Ξ± ΞΌΞµ Strings.
      * @throws SheetExc 
      */
     public List<String> readTimeslots(String filename) throws SheetExc{
@@ -602,23 +602,23 @@ public class ExcelManager {
             file.close();
             return timeslots;
         } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" +filename + "' δεν βρέθηκε.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ¤ΞΏ Ξ±ΟΟ‡ΞµΞ―ΞΏ '" +filename + "' Ξ΄ΞµΞ½ Ξ²ΟΞ­ΞΈΞ·ΞΊΞµ.",
+               "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex){
-            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
-                    + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ£Ο†Ξ¬Ξ»ΞΌΞ± ΞΊΞ±Ο„Ξ¬ Ο„ΞΏ Ξ¬Ξ½ΞΏΞΉΞ³ΞΌΞ±"
+                    + " Ο„ΞΏΟ… Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… '" + filename + "'.","ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα δεδομένα του φύλλου: '"
-            + sheet3 + "'. Βεβαιωθείτε ότι δεν υπάρχουν κενά κελιά ή διπλότυπες εγγραφές.",
-            "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ ΟΟΞ²Ξ»Ξ·ΞΌΞ± ΞΌΞµ Ο„Ξ± Ξ΄ΞµΞ΄ΞΏΞΌΞ­Ξ½Ξ± Ο„ΞΏΟ… Ο†ΟΞ»Ξ»ΞΏΟ…: '"
+            + sheet3 + "'. Ξ’ΞµΞ²Ξ±ΞΉΟ‰ΞΈΞµΞ―Ο„Ξµ ΟΟ„ΞΉ Ξ΄ΞµΞ½ Ο…Ο€Ξ¬ΟΟ‡ΞΏΟ…Ξ½ ΞΊΞµΞ½Ξ¬ ΞΊΞµΞ»ΞΉΞ¬ Ξ® Ξ΄ΞΉΟ€Ξ»ΟΟ„Ο…Ο€ΞµΟ‚ ΞµΞ³Ξ³ΟΞ±Ο†Ξ­Ο‚.",
+            "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
     
     /**
-     * Εντοπισμός όλων των καθηγητών που έχουν καταχωρηθεί στο βασικό αρχείο.
-     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
-     * @return Μία λίστα με αντικείμενα τύπου Professor.
+     * Ξ•Ξ½Ο„ΞΏΟ€ΞΉΟƒΞΌΟΟ‚ ΟΞ»Ο‰Ξ½ Ο„Ο‰Ξ½ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„ΟΞ½ Ο€ΞΏΟ… Ξ­Ο‡ΞΏΟ…Ξ½ ΞΊΞ±Ο„Ξ±Ο‡Ο‰ΟΞ·ΞΈΞµΞ― ΟƒΟ„ΞΏ Ξ²Ξ±ΟƒΞΉΞΊΟ Ξ±ΟΟ‡ΞµΞ―ΞΏ.
+     * @param filename Ξ¤ΞΏ ΟΞ½ΞΏΞΌΞ± Ο„ΞΏΟ… Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… Ξ±Ο€Ο Ο„ΞΏ ΞΏΟ€ΞΏΞ―ΞΏ ΞΈΞ± Ξ±Ξ½Ο„Ξ»Ξ®ΟƒΞΏΟ…ΞΌΞµ Ο„Ξ·Ξ½ Ο€Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―Ξ±.
+     * @return ΞΞ―Ξ± Ξ»Ξ―ΟƒΟ„Ξ± ΞΌΞµ Ξ±Ξ½Ο„ΞΉΞΊΞµΞ―ΞΌΞµΞ½Ξ± Ο„ΟΟ€ΞΏΟ… Professor.
      * @throws SheetExc 
      */
     public List<Professor> readProfs(String filename) throws SheetExc{
@@ -665,26 +665,26 @@ public class ExcelManager {
             
             return profs;
         } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ¤ΞΏ Ξ±ΟΟ‡ΞµΞ―ΞΏ '" + filename + "' Ξ΄ΞµΞ½ Ξ²ΟΞ­ΞΈΞ·ΞΊΞµ.",
+               "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex){
-            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά το άνοιγμα"
-                    + " του αρχείου '" + filename + "'.","Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ£Ο†Ξ¬Ξ»ΞΌΞ± ΞΊΞ±Ο„Ξ¬ Ο„ΞΏ Ξ¬Ξ½ΞΏΞΉΞ³ΞΌΞ±"
+                    + " Ο„ΞΏΟ… Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… '" + filename + "'.","ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα δεδομένα του φύλλου: '"
-            + sheet1 + "'. Βεβαιωθείτε ότι δεν υπάρχουν κενά κελιά ή διπλότυπες εγγραφές.",
-            "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ ΟΟΞ²Ξ»Ξ·ΞΌΞ± ΞΌΞµ Ο„Ξ± Ξ΄ΞµΞ΄ΞΏΞΌΞ­Ξ½Ξ± Ο„ΞΏΟ… Ο†ΟΞ»Ξ»ΞΏΟ…: '"
+            + sheet1 + "'. Ξ’ΞµΞ²Ξ±ΞΉΟ‰ΞΈΞµΞ―Ο„Ξµ ΟΟ„ΞΉ Ξ΄ΞµΞ½ Ο…Ο€Ξ¬ΟΟ‡ΞΏΟ…Ξ½ ΞΊΞµΞ½Ξ¬ ΞΊΞµΞ»ΞΉΞ¬ Ξ® Ξ΄ΞΉΟ€Ξ»ΟΟ„Ο…Ο€ΞµΟ‚ ΞµΞ³Ξ³ΟΞ±Ο†Ξ­Ο‚.",
+            "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ›Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         }
         return null;
     }
     
     /**
-     * Έλεγχος για διπλοεγγραφή καθηγητή.
-     * @param prof Αντικείμενο καθηγητή.
-     * @param cellA Πληροφορία από 1η στήλη.
-     * @param cellB Πληροφορία από 2η στήλη.
-     * @param cellC Πληροφορία από 3η στήλη.
-     * @return εάν υπάρχει ήδη ή όχι.
+     * ΞΞ»ΞµΞ³Ο‡ΞΏΟ‚ Ξ³ΞΉΞ± Ξ΄ΞΉΟ€Ξ»ΞΏΞµΞ³Ξ³ΟΞ±Ο†Ξ® ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„Ξ®.
+     * @param prof Ξ‘Ξ½Ο„ΞΉΞΊΞµΞ―ΞΌΞµΞ½ΞΏ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„Ξ®.
+     * @param cellA Ξ Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―Ξ± Ξ±Ο€Ο 1Ξ· ΟƒΟ„Ξ®Ξ»Ξ·.
+     * @param cellB Ξ Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―Ξ± Ξ±Ο€Ο 2Ξ· ΟƒΟ„Ξ®Ξ»Ξ·.
+     * @param cellC Ξ Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―Ξ± Ξ±Ο€Ο 3Ξ· ΟƒΟ„Ξ®Ξ»Ξ·.
+     * @return ΞµΞ¬Ξ½ Ο…Ο€Ξ¬ΟΟ‡ΞµΞΉ Ξ®Ξ΄Ξ· Ξ® ΟΟ‡ΞΉ.
      */
     public boolean checkDuplicateProfessor(Professor prof, String cellA, String cellB, String cellC){
         if(prof.getProfSurname().equals(cellA) && prof.getProfFirstname().equals(cellB) && prof.getProfField().equals(cellC) ){
@@ -694,10 +694,10 @@ public class ExcelManager {
     }
     
     /**
-     * Έλεγχος για διπλοεγγραφή μαθήματος.
-     * @param course Αντικείμενο καθηγητή.
-     * @param cellA Πληροφορία από 1η στήλη.
-     * @return εάν υπάρχει ήδη ή όχι.
+     * ΞΞ»ΞµΞ³Ο‡ΞΏΟ‚ Ξ³ΞΉΞ± Ξ΄ΞΉΟ€Ξ»ΞΏΞµΞ³Ξ³ΟΞ±Ο†Ξ® ΞΌΞ±ΞΈΞ®ΞΌΞ±Ο„ΞΏΟ‚.
+     * @param course Ξ‘Ξ½Ο„ΞΉΞΊΞµΞ―ΞΌΞµΞ½ΞΏ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„Ξ®.
+     * @param cellA Ξ Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―Ξ± Ξ±Ο€Ο 1Ξ· ΟƒΟ„Ξ®Ξ»Ξ·.
+     * @return ΞµΞ¬Ξ½ Ο…Ο€Ξ¬ΟΟ‡ΞµΞΉ Ξ®Ξ΄Ξ· Ξ® ΟΟ‡ΞΉ.
      */
     public boolean checkDuplicateCourse(Course course, String cellA){
         if(course.getCourseName().equals(cellA)){
@@ -707,9 +707,9 @@ public class ExcelManager {
     }
     
     /**
-     * Έλεγχος για έγκυρη πληροφορία.
-     * @param s Το string προς έλεγχο.
-     * @return εάν είναι έγκυρο ή όχι.
+     * ΞΞ»ΞµΞ³Ο‡ΞΏΟ‚ Ξ³ΞΉΞ± Ξ­Ξ³ΞΊΟ…ΟΞ· Ο€Ξ»Ξ·ΟΞΏΟ†ΞΏΟΞ―Ξ±.
+     * @param s Ξ¤ΞΏ string Ο€ΟΞΏΟ‚ Ξ­Ξ»ΞµΞ³Ο‡ΞΏ.
+     * @return ΞµΞ¬Ξ½ ΞµΞ―Ξ½Ξ±ΞΉ Ξ­Ξ³ΞΊΟ…ΟΞΏ Ξ® ΟΟ‡ΞΉ.
      */
     public boolean checkIfValid(String s){
         if(s != null && !s.equals("") && !s.equals(" ")){
@@ -720,15 +720,15 @@ public class ExcelManager {
     }
     
     /**
-     * Δημιουργία των template αρχείων προς συμπλήρωση. 
-     * 1 αρχείο αφορά τους καθηγητές και την διαθεσιμότητά τους για τις ημερομηνίες 
-     * της εξεταστικής. Κάθε φύλλο θα συμπληρώνεται από τον κάθε καθηγητή ξεχωριστά.
-     * 2 αρχείο αφορά τις αίθουσες και την διαθεσιμότητά τους για τις ημερομηνίες
-     * της εξεταστικής. Τα φύλλα συμπληρώνονται από τον υπεύθυνο για το πρόγραμμα.
-     * @param uniqueProfs Λίστα αντικειμένων καθηγητών (Professor).
-     * @param timeslots Λίστα strings με τα διαστήματα εξέτασης. 
-     * @param dates Λίστα strings με τα ζευγάρια ημέρας - ημερομηνίας.
-     * @param classrooms Λίστα αντικειμένων αιθουσών (Course).
+     * Ξ”Ξ·ΞΌΞΉΞΏΟ…ΟΞ³Ξ―Ξ± Ο„Ο‰Ξ½ template Ξ±ΟΟ‡ΞµΞ―Ο‰Ξ½ Ο€ΟΞΏΟ‚ ΟƒΟ…ΞΌΟ€Ξ»Ξ®ΟΟ‰ΟƒΞ·. 
+     * 1 Ξ±ΟΟ‡ΞµΞ―ΞΏ Ξ±Ο†ΞΏΟΞ¬ Ο„ΞΏΟ…Ο‚ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„Ξ­Ο‚ ΞΊΞ±ΞΉ Ο„Ξ·Ξ½ Ξ΄ΞΉΞ±ΞΈΞµΟƒΞΉΞΌΟΟ„Ξ·Ο„Ξ¬ Ο„ΞΏΟ…Ο‚ Ξ³ΞΉΞ± Ο„ΞΉΟ‚ Ξ·ΞΌΞµΟΞΏΞΌΞ·Ξ½Ξ―ΞµΟ‚ 
+     * Ο„Ξ·Ο‚ ΞµΞΎΞµΟ„Ξ±ΟƒΟ„ΞΉΞΊΞ®Ο‚. ΞΞ¬ΞΈΞµ Ο†ΟΞ»Ξ»ΞΏ ΞΈΞ± ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟΞ½ΞµΟ„Ξ±ΞΉ Ξ±Ο€Ο Ο„ΞΏΞ½ ΞΊΞ¬ΞΈΞµ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„Ξ® ΞΎΞµΟ‡Ο‰ΟΞΉΟƒΟ„Ξ¬.
+     * 2 Ξ±ΟΟ‡ΞµΞ―ΞΏ Ξ±Ο†ΞΏΟΞ¬ Ο„ΞΉΟ‚ Ξ±Ξ―ΞΈΞΏΟ…ΟƒΞµΟ‚ ΞΊΞ±ΞΉ Ο„Ξ·Ξ½ Ξ΄ΞΉΞ±ΞΈΞµΟƒΞΉΞΌΟΟ„Ξ·Ο„Ξ¬ Ο„ΞΏΟ…Ο‚ Ξ³ΞΉΞ± Ο„ΞΉΟ‚ Ξ·ΞΌΞµΟΞΏΞΌΞ·Ξ½Ξ―ΞµΟ‚
+     * Ο„Ξ·Ο‚ ΞµΞΎΞµΟ„Ξ±ΟƒΟ„ΞΉΞΊΞ®Ο‚. Ξ¤Ξ± Ο†ΟΞ»Ξ»Ξ± ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟΞ½ΞΏΞ½Ο„Ξ±ΞΉ Ξ±Ο€Ο Ο„ΞΏΞ½ Ο…Ο€ΞµΟΞΈΟ…Ξ½ΞΏ Ξ³ΞΉΞ± Ο„ΞΏ Ο€ΟΟΞ³ΟΞ±ΞΌΞΌΞ±.
+     * @param uniqueProfs Ξ›Ξ―ΟƒΟ„Ξ± Ξ±Ξ½Ο„ΞΉΞΊΞµΞΉΞΌΞ­Ξ½Ο‰Ξ½ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„ΟΞ½ (Professor).
+     * @param timeslots Ξ›Ξ―ΟƒΟ„Ξ± strings ΞΌΞµ Ο„Ξ± Ξ΄ΞΉΞ±ΟƒΟ„Ξ®ΞΌΞ±Ο„Ξ± ΞµΞΎΞ­Ο„Ξ±ΟƒΞ·Ο‚. 
+     * @param dates Ξ›Ξ―ΟƒΟ„Ξ± strings ΞΌΞµ Ο„Ξ± Ξ¶ΞµΟ…Ξ³Ξ¬ΟΞΉΞ± Ξ·ΞΌΞ­ΟΞ±Ο‚ - Ξ·ΞΌΞµΟΞΏΞΌΞ·Ξ½Ξ―Ξ±Ο‚.
+     * @param classrooms Ξ›Ξ―ΟƒΟ„Ξ± Ξ±Ξ½Ο„ΞΉΞΊΞµΞΉΞΌΞ­Ξ½Ο‰Ξ½ Ξ±ΞΉΞΈΞΏΟ…ΟƒΟΞ½ (Course).
      */
     public void createTemplate(List<Professor> uniqueProfs, List<String> timeslots, List<String> dates,List<Classroom> classrooms){
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -736,12 +736,12 @@ public class ExcelManager {
             CellStyle style = getStyle(workbook);
 
             for (Professor professor : uniqueProfs) {
-                // Δημιουργία φύλλου (sheet) για κάθε καθηγητή
+                // Ξ”Ξ·ΞΌΞΉΞΏΟ…ΟΞ³Ξ―Ξ± Ο†ΟΞ»Ξ»ΞΏΟ… (sheet) Ξ³ΞΉΞ± ΞΊΞ¬ΞΈΞµ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„Ξ®
                 String sheetName = professor.getProfSurname()+ " " + professor.getProfFirstname();
                     XSSFSheet sheet = workbook.createSheet(sheetName);
                 
                 
-                    // Προσθήκη των χρονικών διαστημάτων (timeslots) ως headers στις στήλες
+                    // Ξ ΟΞΏΟƒΞΈΞ®ΞΊΞ· Ο„Ο‰Ξ½ Ο‡ΟΞΏΞ½ΞΉΞΊΟΞ½ Ξ΄ΞΉΞ±ΟƒΟ„Ξ·ΞΌΞ¬Ο„Ο‰Ξ½ (timeslots) Ο‰Ο‚ headers ΟƒΟ„ΞΉΟ‚ ΟƒΟ„Ξ®Ξ»ΞµΟ‚
                     Row timeslotRow = sheet.createRow(0);
                     for (int i = 0; i < timeslots.size(); i++) {
                         Cell cell = timeslotRow.createCell(i+1);
@@ -749,7 +749,7 @@ public class ExcelManager {
                         sheet.autoSizeColumn(i+1);
                     }
 
-                    // Προσθήκη των ημερομηνιών στις γραμμές της 1ης στήλης
+                    // Ξ ΟΞΏΟƒΞΈΞ®ΞΊΞ· Ο„Ο‰Ξ½ Ξ·ΞΌΞµΟΞΏΞΌΞ·Ξ½ΞΉΟΞ½ ΟƒΟ„ΞΉΟ‚ Ξ³ΟΞ±ΞΌΞΌΞ­Ο‚ Ο„Ξ·Ο‚ 1Ξ·Ο‚ ΟƒΟ„Ξ®Ξ»Ξ·Ο‚
                     int rowIndex = 1;
                     for (String tmp : dates) {
                         Row row = sheet.createRow(rowIndex++);
@@ -766,31 +766,31 @@ public class ExcelManager {
                     sheet.autoSizeColumn(0);
             }
 
-            // Αποθήκευση αρχείου προς συμπλήρωση για τους καθηγητές
-        try (FileOutputStream outputStream = new FileOutputStream("C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\prof.xlsx")) {
+            // Ξ‘Ο€ΞΏΞΈΞ®ΞΊΞµΟ…ΟƒΞ· Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… Ο€ΟΞΏΟ‚ ΟƒΟ…ΞΌΟ€Ξ»Ξ®ΟΟ‰ΟƒΞ· Ξ³ΞΉΞ± Ο„ΞΏΟ…Ο‚ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„Ξ­Ο‚
+        try (FileOutputStream outputStream = new FileOutputStream("C:\\Users\\gouvo\\OneDrive\\Documents\\Ξ Ξ¤Ξ¥Ξ§Ξ™Ξ‘ΞΞ—\\prof.xlsx")) {
                 workbook.write(outputStream);
             }
-            logger.appendLogger("Η δημιουργία του template για τους καθηγητές ολοκληρώθηκε επιτυχώς.");
+            logger.appendLogger("Ξ— Ξ΄Ξ·ΞΌΞΉΞΏΟ…ΟΞ³Ξ―Ξ± Ο„ΞΏΟ… template Ξ³ΞΉΞ± Ο„ΞΏΟ…Ο‚ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„Ξ­Ο‚ ΞΏΞ»ΞΏΞΊΞ»Ξ·ΟΟΞΈΞ·ΞΊΞµ ΞµΟ€ΞΉΟ„Ο…Ο‡ΟΟ‚.");
         }catch (Exception e){
-            logger.appendLogger("Η δημιουργία του template για τους καθηγητές απέτυχε.");
+            logger.appendLogger("Ξ— Ξ΄Ξ·ΞΌΞΉΞΏΟ…ΟΞ³Ξ―Ξ± Ο„ΞΏΟ… template Ξ³ΞΉΞ± Ο„ΞΏΟ…Ο‚ ΞΊΞ±ΞΈΞ·Ξ³Ξ·Ο„Ξ­Ο‚ Ξ±Ο€Ξ­Ο„Ο…Ο‡Ξµ.");
         }
         
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             CellStyle style = getStyle(workbook);
 
             for (Classroom classroom : classrooms) {
-                // Δημιουργία ενός φύλλου (sheet) για κάθε αίθουσα
+                // Ξ”Ξ·ΞΌΞΉΞΏΟ…ΟΞ³Ξ―Ξ± ΞµΞ½ΟΟ‚ Ο†ΟΞ»Ξ»ΞΏΟ… (sheet) Ξ³ΞΉΞ± ΞΊΞ¬ΞΈΞµ Ξ±Ξ―ΞΈΞΏΟ…ΟƒΞ±
                 String sheetName = classroom.getClassroomName();
                 XSSFSheet sheet = workbook.createSheet(sheetName);
 
-                // Προσθήκη των χρονικών διαστημάτων (timeslots) ως headers στις στήλες
+                // Ξ ΟΞΏΟƒΞΈΞ®ΞΊΞ· Ο„Ο‰Ξ½ Ο‡ΟΞΏΞ½ΞΉΞΊΟΞ½ Ξ΄ΞΉΞ±ΟƒΟ„Ξ·ΞΌΞ¬Ο„Ο‰Ξ½ (timeslots) Ο‰Ο‚ headers ΟƒΟ„ΞΉΟ‚ ΟƒΟ„Ξ®Ξ»ΞµΟ‚
                 Row timeslotRow = sheet.createRow(0);
                 for (int i = 0; i < timeslots.size(); i++) {
                     Cell cell = timeslotRow.createCell(i + 1);
                     cell.setCellValue(timeslots.get(i));
                     sheet.autoSizeColumn(i+1);
                 }
-                // Προσθήκη των ημερομηνιών στις γραμμές της 1ης στήλης
+                // Ξ ΟΞΏΟƒΞΈΞ®ΞΊΞ· Ο„Ο‰Ξ½ Ξ·ΞΌΞµΟΞΏΞΌΞ·Ξ½ΞΉΟΞ½ ΟƒΟ„ΞΉΟ‚ Ξ³ΟΞ±ΞΌΞΌΞ­Ο‚ Ο„Ξ·Ο‚ 1Ξ·Ο‚ ΟƒΟ„Ξ®Ξ»Ξ·Ο‚
                 int rowIndex = 1;
                 for (String tmp : dates) {
                         Row row = sheet.createRow(rowIndex++);
@@ -806,22 +806,22 @@ public class ExcelManager {
                 }
                 sheet.autoSizeColumn(0);
             }
-            // Αποθήκευση αρχείου προς συμπλήρωση για τις αίθουσες
-            try (FileOutputStream outputStream1 = new FileOutputStream("C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\class.xlsx")) {
+            // Ξ‘Ο€ΞΏΞΈΞ®ΞΊΞµΟ…ΟƒΞ· Ξ±ΟΟ‡ΞµΞ―ΞΏΟ… Ο€ΟΞΏΟ‚ ΟƒΟ…ΞΌΟ€Ξ»Ξ®ΟΟ‰ΟƒΞ· Ξ³ΞΉΞ± Ο„ΞΉΟ‚ Ξ±Ξ―ΞΈΞΏΟ…ΟƒΞµΟ‚
+            try (FileOutputStream outputStream1 = new FileOutputStream("C:\\Users\\gouvo\\OneDrive\\Documents\\Ξ Ξ¤Ξ¥Ξ§Ξ™Ξ‘ΞΞ—\\class.xlsx")) {
                 workbook.write(outputStream1);
             }
-            logger.appendLogger("Η δημιουργία του template για τις αίθουσες ολοκληρώθηκε επιτυχώς.");
+            logger.appendLogger("Ξ— Ξ΄Ξ·ΞΌΞΉΞΏΟ…ΟΞ³Ξ―Ξ± Ο„ΞΏΟ… template Ξ³ΞΉΞ± Ο„ΞΉΟ‚ Ξ±Ξ―ΞΈΞΏΟ…ΟƒΞµΟ‚ ΞΏΞ»ΞΏΞΊΞ»Ξ·ΟΟΞΈΞ·ΞΊΞµ ΞµΟ€ΞΉΟ„Ο…Ο‡ΟΟ‚.");
         }catch (Exception e){
-            logger.appendLogger("Η δημιουργία του template για τις αίθουσες απέτυχε.");
+            logger.appendLogger("Ξ— Ξ΄Ξ·ΞΌΞΉΞΏΟ…ΟΞ³Ξ―Ξ± Ο„ΞΏΟ… template Ξ³ΞΉΞ± Ο„ΞΉΟ‚ Ξ±Ξ―ΞΈΞΏΟ…ΟƒΞµΟ‚ Ξ±Ο€Ξ­Ο„Ο…Ο‡Ξµ.");
         }
         JOptionPane.showMessageDialog(myJFrame,logger.getLoggerTxt(),
-               "Μήνυμα Εφαρμογής", JOptionPane.INFORMATION_MESSAGE);
+               "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ•Ο†Ξ±ΟΞΌΞΏΞ³Ξ®Ο‚", JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
-     * Μέθοδος που δημιουργεί ένα αντικείμενο CellStyle με κάποια ορισμένα χαρακτηριστικά.
-     * @param workbook Αντικείμενο τύπου XSSFWorkbook που θα λάβει την τροποποίηση.
-     * @return style Το αντικείμενο τύπου CellStyle.
+     * ΞΞ­ΞΈΞΏΞ΄ΞΏΟ‚ Ο€ΞΏΟ… Ξ΄Ξ·ΞΌΞΉΞΏΟ…ΟΞ³ΞµΞ― Ξ­Ξ½Ξ± Ξ±Ξ½Ο„ΞΉΞΊΞµΞ―ΞΌΞµΞ½ΞΏ CellStyle ΞΌΞµ ΞΊΞ¬Ο€ΞΏΞΉΞ± ΞΏΟΞΉΟƒΞΌΞ­Ξ½Ξ± Ο‡Ξ±ΟΞ±ΞΊΟ„Ξ·ΟΞΉΟƒΟ„ΞΉΞΊΞ¬.
+     * @param workbook Ξ‘Ξ½Ο„ΞΉΞΊΞµΞ―ΞΌΞµΞ½ΞΏ Ο„ΟΟ€ΞΏΟ… XSSFWorkbook Ο€ΞΏΟ… ΞΈΞ± Ξ»Ξ¬Ξ²ΞµΞΉ Ο„Ξ·Ξ½ Ο„ΟΞΏΟ€ΞΏΟ€ΞΏΞ―Ξ·ΟƒΞ·.
+     * @return style Ξ¤ΞΏ Ξ±Ξ½Ο„ΞΉΞΊΞµΞ―ΞΌΞµΞ½ΞΏ Ο„ΟΟ€ΞΏΟ… CellStyle.
      */
     
     private CellStyle getStyle(XSSFWorkbook workbook) {
@@ -850,11 +850,11 @@ public class ExcelManager {
             fi.close();
             return true;
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά την ανάγνωση των αποθηκευμένων αρχείων."
-            + "Τα δεδομένα των συμπληρωμένων αρχείων δεν είναι σωστά." + 
-            " Παρακαλώ ελέγξτε τα δεδομένα σας και δοκιμάστε ξανά.", "Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ£Ο†Ξ¬Ξ»ΞΌΞ± ΞΊΞ±Ο„Ξ¬ Ο„Ξ·Ξ½ Ξ±Ξ½Ξ¬Ξ³Ξ½Ο‰ΟƒΞ· Ο„Ο‰Ξ½ Ξ±Ο€ΞΏΞΈΞ·ΞΊΞµΟ…ΞΌΞ­Ξ½Ο‰Ξ½ Ξ±ΟΟ‡ΞµΞ―Ο‰Ξ½."
+            + "Ξ¤Ξ± Ξ΄ΞµΞ΄ΞΏΞΌΞ­Ξ½Ξ± Ο„Ο‰Ξ½ ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟ‰ΞΌΞ­Ξ½Ο‰Ξ½ Ξ±ΟΟ‡ΞµΞ―Ο‰Ξ½ Ξ΄ΞµΞ½ ΞµΞ―Ξ½Ξ±ΞΉ ΟƒΟ‰ΟƒΟ„Ξ¬." + 
+            " Ξ Ξ±ΟΞ±ΞΊΞ±Ξ»Ο ΞµΞ»Ξ­Ξ³ΞΎΟ„Ξµ Ο„Ξ± Ξ΄ΞµΞ΄ΞΏΞΌΞ­Ξ½Ξ± ΟƒΞ±Ο‚ ΞΊΞ±ΞΉ Ξ΄ΞΏΞΊΞΉΞΌΞ¬ΟƒΟ„Ξµ ΞΎΞ±Ξ½Ξ¬.", "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ»Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (ClassNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα εφαρμογής", "Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ ΟΟΞ²Ξ»Ξ·ΞΌΞ± ΞµΟ†Ξ±ΟΞΌΞΏΞ³Ξ®Ο‚", "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ»Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         }
         return false;
     }
@@ -866,8 +866,8 @@ public class ExcelManager {
             f = new FileOutputStream(new File(dir +"\\data\\myObjects.dat"));
             ObjectOutputStream o = new ObjectOutputStream(f);
             if (profs == null || courses == null || classrooms == null || timeslots == null || dates == null ){
-                JOptionPane.showMessageDialog(myJFrame, "Τα δεδομένα των συμπληρωμένων αρχείων δεν είναι σωστά." + 
-                    " Παρακαλώ ελέγξτε τα δεδομένα σας και δοκιμάστε ξανά.", "Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(myJFrame, "Ξ¤Ξ± Ξ΄ΞµΞ΄ΞΏΞΌΞ­Ξ½Ξ± Ο„Ο‰Ξ½ ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟ‰ΞΌΞ­Ξ½Ο‰Ξ½ Ξ±ΟΟ‡ΞµΞ―Ο‰Ξ½ Ξ΄ΞµΞ½ ΞµΞ―Ξ½Ξ±ΞΉ ΟƒΟ‰ΟƒΟ„Ξ¬." + 
+                    " Ξ Ξ±ΟΞ±ΞΊΞ±Ξ»Ο ΞµΞ»Ξ­Ξ³ΞΎΟ„Ξµ Ο„Ξ± Ξ΄ΞµΞ΄ΞΏΞΌΞ­Ξ½Ξ± ΟƒΞ±Ο‚ ΞΊΞ±ΞΉ Ξ΄ΞΏΞΊΞΉΞΌΞ¬ΟƒΟ„Ξµ ΞΎΞ±Ξ½Ξ¬.", "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ»Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             o.writeObject(profs);
@@ -878,11 +878,11 @@ public class ExcelManager {
             o.close();
             f.close();
         } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα εντοπισμού " + 
-                    "των αποθηκευμένων αρχείων του προγράμματος.", "Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ ΟΟΞ²Ξ»Ξ·ΞΌΞ± ΞµΞ½Ο„ΞΏΟ€ΞΉΟƒΞΌΞΏΟ " + 
+                    "Ο„Ο‰Ξ½ Ξ±Ο€ΞΏΞΈΞ·ΞΊΞµΟ…ΞΌΞ­Ξ½Ο‰Ξ½ Ξ±ΟΟ‡ΞµΞ―Ο‰Ξ½ Ο„ΞΏΟ… Ο€ΟΞΏΞ³ΟΞ¬ΞΌΞΌΞ±Ο„ΞΏΟ‚.", "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ»Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα αποθηκευμένα " + 
-                    "δεδομένα. Παρακαλώ ελέγξτε τα δεδομένα σας και δοκιμάστε ξανά.", "Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(myJFrame, "Ξ ΟΟΞ²Ξ»Ξ·ΞΌΞ± ΞΌΞµ Ο„Ξ± Ξ±Ο€ΞΏΞΈΞ·ΞΊΞµΟ…ΞΌΞ­Ξ½Ξ± " + 
+                    "Ξ΄ΞµΞ΄ΞΏΞΌΞ­Ξ½Ξ±. Ξ Ξ±ΟΞ±ΞΊΞ±Ξ»Ο ΞµΞ»Ξ­Ξ³ΞΎΟ„Ξµ Ο„Ξ± Ξ΄ΞµΞ΄ΞΏΞΌΞ­Ξ½Ξ± ΟƒΞ±Ο‚ ΞΊΞ±ΞΉ Ξ΄ΞΏΞΊΞΉΞΌΞ¬ΟƒΟ„Ξµ ΞΎΞ±Ξ½Ξ¬.", "ΞΞ®Ξ½Ο…ΞΌΞ± Ξ»Ξ¬ΞΈΞΏΟ…Ο‚", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

@@ -7,14 +7,14 @@ import java.util.logging.Logger;
 import org.gmele.general.sheets.exception.SheetExc;
 
 /**
- * Η κλάση MainForm είναι η κλάση που χρησιμοποιείται για το γραφικό περιβάλλον 
- * (user interface - UI) της εφαρμογής (προς το παρόν διαχειρίζεται και όλο το πρόγραμμα).
+ * οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½ MainForm οΏ½οΏ½οΏ½οΏ½οΏ½ οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½ οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½ 
+ * (user interface - UI) οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½ (οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½ οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½).
  * @author gouvo
  */
 public class MainForm extends javax.swing.JFrame {
 
     /**
-     * Ο κατασκευαστής της κεντρικής φόρμας MainForm.
+     * οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½ MainForm.
      */
     public MainForm(){
         initComponents();
@@ -47,12 +47,12 @@ public class MainForm extends javax.swing.JFrame {
         jLabel4.setText("Input Path");
 
         jTextField1.setFont(new java.awt.Font("Consolas", 0, 10)); // NOI18N
-        jTextField1.setText("C:\\\\Users\\\\gouvo\\\\OneDrive\\\\Documents\\\\ΠΤΥΧΙΑΚΗ\\\\1) General.xlsx");
+        jTextField1.setText("C:\\\\Users\\\\gouvo\\\\OneDrive\\\\Documents\\\\Ξ Ξ¤Ξ¥Ξ§Ξ™Ξ‘ΞΞ—\\\\1) General.xlsx");
         jTextField1.setToolTipText("");
         jTextField1.setEnabled(false);
 
         jTextField2.setFont(new java.awt.Font("Consolas", 0, 10)); // NOI18N
-        jTextField2.setText("C:\\\\Users\\\\gouvo\\\\OneDrive\\\\Documents\\\\ΠΤΥΧΙΑΚΗ\\\\");
+        jTextField2.setText("C:\\\\Users\\\\gouvo\\\\OneDrive\\\\Documents\\\\Ξ Ξ¤Ξ¥Ξ§Ξ™Ξ‘ΞΞ—\\\\");
             jTextField2.setEnabled(false);
 
             loadBtn.setFont(new java.awt.Font("Consolas", 0, 18)); // NOI18N
@@ -82,7 +82,7 @@ public class MainForm extends javax.swing.JFrame {
                         .addComponent(jLabel1))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jTextField2)
+                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                             .addGap(0, 0, Short.MAX_VALUE)
                             .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 378, javax.swing.GroupLayout.PREFERRED_SIZE))))
@@ -123,9 +123,9 @@ public class MainForm extends javax.swing.JFrame {
             if (hasRead){
                 SceduleManager b = new SceduleManager(a);
             }else {
-                System.out.println("Πρόβλημα κατά την ανάγνωση των δεδομένων από τα συμπληρωμένα templates.");
+                System.out.println("Ξ ΟΟΞ²Ξ»Ξ·ΞΌΞ± ΞΊΞ±Ο„Ξ¬ Ο„Ξ·Ξ½ Ξ±Ξ½Ξ¬Ξ³Ξ½Ο‰ΟƒΞ· Ο„Ο‰Ξ½ Ξ΄ΞµΞ΄ΞΏΞΌΞ­Ξ½Ο‰Ξ½ Ξ±Ο€Ο Ο„Ξ± ΟƒΟ…ΞΌΟ€Ξ»Ξ·ΟΟ‰ΞΌΞ­Ξ½Ξ± templates.");
             }
-            System.out.println("Τέλος ScheduleManager.");
+            System.out.println("Ξ¤Ξ­Ξ»ΞΏΟ‚ ScheduleManager.");
         } catch (SheetExc ex) {
             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -149,7 +149,7 @@ public class MainForm extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         /**
-         * Εμφάνιση και εκτέλεση του κώδικα της φόρμας.
+         * οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½ οΏ½οΏ½οΏ½οΏ½οΏ½οΏ½.
          */
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
