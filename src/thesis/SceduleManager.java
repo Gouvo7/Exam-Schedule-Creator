@@ -25,7 +25,6 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -40,6 +39,7 @@ public class SceduleManager extends JFrame {
     private ExcelManager excelManager;
     private List<Course> courses;
     private List<Professor> professors;
+    private List<Classroom> classrooms;
     
 
     public SceduleManager() {
@@ -50,6 +50,7 @@ public class SceduleManager extends JFrame {
         this.excelManager = excelManager;
         courses = new ArrayList<>(excelManager.getCourses());
         professors = new ArrayList<>(excelManager.getProfs());
+        classrooms = new ArrayList<>(excelManager.getClassrooms());
         modelPanel.setLayout(new BorderLayout());
         modelPanel.add(populateTable());
         coursesPanel.setLayout(new GridLayout(0,3));
@@ -119,6 +120,7 @@ public class SceduleManager extends JFrame {
         table.setShowGrid(true);
         table.setGridColor(Color.BLACK);
         table.setDropTarget(new DropTarget() {
+            @Override
             public synchronized void drop(DropTargetDropEvent evt) {
                 try {
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
@@ -159,6 +161,7 @@ public class SceduleManager extends JFrame {
         
 
         table.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int selectedRow = table.getSelectedRow();
@@ -174,6 +177,7 @@ public class SceduleManager extends JFrame {
                         button.setBackground(Color.lightGray);
                         button.setTransferHandler(new ButtonTransferHandler(buttonText));
                         button.addMouseListener(new MouseAdapter() {
+                            @Override
                             public void mousePressed(MouseEvent evt) {
                                 JComponent comp = (JComponent) evt.getSource();
                                 TransferHandler handler = comp.getTransferHandler();
@@ -209,7 +213,7 @@ public class SceduleManager extends JFrame {
     
     public boolean checkAvailabilityForProfessors(Course course, String dateStr, String timeslotStr){
         List<Professor> profs = new ArrayList<>(course.getExaminers());
-        List<Integer> results = new ArrayList<Integer>();
+        List<Integer> results = new ArrayList<>();
         String date = getDateWithGreekFormat(dateStr);
         for (Professor prof : profs){
             int tmp = prof.isAvailable(date, timeslotStr);
@@ -247,7 +251,7 @@ public class SceduleManager extends JFrame {
         coursesPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Ξ¦ΟΟΞΌΞ± Ξ”Ξ·ΞΌΞΉΞΏΟ…ΟΞ³Ξ―Ξ±Ο‚ Ξ ΟΞΏΞ³ΟΞ¬ΞΌΞΌΞ±Ο„ΞΏΟ‚");
+        setTitle("Φόρμα Δημιουργίας Προγράμματος");
         setPreferredSize(new java.awt.Dimension(1200, 1000));
         getContentPane().setLayout(new java.awt.FlowLayout());
 

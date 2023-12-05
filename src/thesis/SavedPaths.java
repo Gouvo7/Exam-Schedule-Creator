@@ -17,11 +17,6 @@ public class SavedPaths {
     static String sheet5 = "COURSES_LIST";
     static String sheet6 = "COURSES_PROFESSORS";
     
-    //static String importFolderPath = "C:\\Users\\dbuser1\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ";
-    //static String importFilePath = "C:\\Users\\dbuser1\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\1) General.xlsx";
-    //static String importFilePath1 = "C:\\Users\\dbuser1\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\TEST2.xlsx";
-    //static String importFilePath2 = "C:\\Users\\dbuser1\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\TEST3.xlsx";
-    
     public void SavedPaths(){
     }
 

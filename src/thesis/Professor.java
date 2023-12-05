@@ -71,6 +71,18 @@ public class Professor implements Serializable{
         return -1;
     }
     
+    public void prinAvailable(){
+        for (Availability x : availability){
+            System.out.println(this.getProfSurname()+ " " + x.getDate() + " " + x.getTimeSlot() + " " + x.getIsAvailable());
+            if (x.getDate() == null){
+                System.out.println("Date is null");
+            }
+            if (x.getTimeSlot() == null){
+                System.out.println("Timeslot is null");
+            }
+        }
+    }
+    
     /**
      * Η μέθοδος εκτυπώνει όλα τα στοιχεία ενός καθηγητή.
      */
