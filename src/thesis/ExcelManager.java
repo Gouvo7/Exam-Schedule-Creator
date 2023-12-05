@@ -838,7 +838,8 @@ public class ExcelManager {
     
     public boolean readObjects(){
         try {
-            FileInputStream fi = new FileInputStream(new File("myObjects.dat"));
+            String dir = System.getProperty("user.dir");
+            FileInputStream fi = new FileInputStream(new File( dir +"\\data\\myObjects.dat"));
             ObjectInputStream oi = new ObjectInputStream(fi);
             profs = (List<Professor>) oi.readObject();
             courses = (List<Course>) oi.readObject();
@@ -861,7 +862,8 @@ public class ExcelManager {
     public void saveObjects(){
         FileOutputStream f = null;
         try {
-            f = new FileOutputStream(new File("myObjects.dat"));
+            String dir = System.getProperty("user.dir");
+            f = new FileOutputStream(new File(dir +"\\data\\myObjects.dat"));
             ObjectOutputStream o = new ObjectOutputStream(f);
             if (profs == null || courses == null || classrooms == null || timeslots == null || dates == null ){
                 JOptionPane.showMessageDialog(myJFrame, "Τα δεδομένα των συμπληρωμένων αρχείων δεν είναι σωστά." + 

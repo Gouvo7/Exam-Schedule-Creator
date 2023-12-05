@@ -7,14 +7,14 @@ import java.util.logging.Logger;
 import org.gmele.general.sheets.exception.SheetExc;
 
 /**
- * Ξ— ΞΊΞ»Ξ¬ΟƒΞ· MainForm ΞµΞ―Ξ½Ξ±ΞΉ Ξ· ΞΊΞ»Ξ¬ΟƒΞ· Ο€ΞΏΟ… Ο‡ΟΞ·ΟƒΞΉΞΌΞΏΟ€ΞΏΞΉΞµΞ―Ο„Ξ±ΞΉ Ξ³ΞΉΞ± Ο„ΞΏ Ξ³ΟΞ±Ο†ΞΉΞΊΟ Ο€ΞµΟΞΉΞ²Ξ¬Ξ»Ξ»ΞΏΞ½ 
- * (user interface - UI) Ο„Ξ·Ο‚ ΞµΟ†Ξ±ΟΞΌΞΏΞ³Ξ®Ο‚. (Ξ ΟΞΏΟ‚ Ο„ΞΏ Ο€Ξ±ΟΟΞ½ Ξ΄ΞΉΞ±Ο‡ΞµΞΉΟΞ―Ξ¶ΞµΟ„Ξ±ΞΉ ΞΊΞ±ΞΉ ΟΞ»ΞΏ Ο„ΞΏ Ο€ΟΟΞ³ΟΞ±ΞΌΞΌΞ±).
+ * Η κλάση MainForm είναι η κλάση που χρησιμοποιείται για το γραφικό περιβάλλον 
+ * (user interface - UI) της εφαρμογής (προς το παρόν διαχειρίζεται και όλο το πρόγραμμα).
  * @author gouvo
  */
 public class MainForm extends javax.swing.JFrame {
 
     /**
-     * Ξ ΞΊΞ±Ο„Ξ±ΟƒΞΊΞµΟ…Ξ±ΟƒΟ„Ξ®Ο‚ Ο„Ξ·Ο‚ ΞΊΞµΞ½Ο„ΟΞΉΞΊΞ®Ο‚ Ο†ΟΟΞΌΞ±Ο‚ MainForm.
+     * Ο κατασκευαστής της κεντρικής φόρμας MainForm.
      */
     public MainForm(){
         initComponents();
@@ -47,12 +47,12 @@ public class MainForm extends javax.swing.JFrame {
         jLabel4.setText("Input Path");
 
         jTextField1.setFont(new java.awt.Font("Consolas", 0, 10)); // NOI18N
-        jTextField1.setText("C:\\\\Users\\\\gouvo\\\\OneDrive\\\\Documents\\\\Ξ Ξ¤Ξ¥Ξ§Ξ™Ξ‘ΞΞ—\\\\1) General.xlsx");
+        jTextField1.setText("C:\\\\Users\\\\gouvo\\\\OneDrive\\\\Documents\\\\ΠΤΥΧΙΑΚΗ\\\\1) General.xlsx");
         jTextField1.setToolTipText("");
         jTextField1.setEnabled(false);
 
         jTextField2.setFont(new java.awt.Font("Consolas", 0, 10)); // NOI18N
-        jTextField2.setText("C:\\\\Users\\\\gouvo\\\\OneDrive\\\\Documents\\\\Ξ Ξ¤Ξ¥Ξ§Ξ™Ξ‘ΞΞ—\\\\");
+        jTextField2.setText("C:\\\\Users\\\\gouvo\\\\OneDrive\\\\Documents\\\\ΠΤΥΧΙΑΚΗ\\\\");
             jTextField2.setEnabled(false);
 
             loadBtn.setFont(new java.awt.Font("Consolas", 0, 18)); // NOI18N
@@ -123,9 +123,9 @@ public class MainForm extends javax.swing.JFrame {
             if (hasRead){
                 SceduleManager b = new SceduleManager(a);
             }else {
-                System.out.println("Ξ ΟΟΞ²Ξ»Ξ·ΞΌΞ± ΞΌΞµ ScheduleManager");
+                System.out.println("Πρόβλημα κατά την ανάγνωση των δεδομένων από τα συμπληρωμένα templates.");
             }
-            System.out.println("Ξ¤Ξ­Ξ»ΞΏΟ‚ ScheduleManager");
+            System.out.println("Τέλος ScheduleManager.");
         } catch (SheetExc ex) {
             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -133,7 +133,6 @@ public class MainForm extends javax.swing.JFrame {
 
     private void produceBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_produceBtnActionPerformed
         String path = jTextField1.getText();
-        System.out.println(path);
         ExcelManager a = new ExcelManager(this,path);
         a.createExcels();
     }//GEN-LAST:event_produceBtnActionPerformed
@@ -150,7 +149,7 @@ public class MainForm extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         /**
-         * Ξ•ΞΌΟ†Ξ¬Ξ½ΞΉΟƒΞ· ΞΊΞ±ΞΉ ΞµΞΊΟ„Ξ­Ξ»ΞµΟƒΞ· Ο„ΞΏΟ… ΞΊΟΞ΄ΞΉΞΊΞ± Ο„Ξ·Ο‚ Ο†ΟΟΞΌΞ±Ο‚.
+         * Εμφάνιση και εκτέλεση του κώδικα της φόρμας.
          */
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override

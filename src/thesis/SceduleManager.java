@@ -58,7 +58,6 @@ public class SceduleManager extends JFrame {
         
         this.setVisible(true);
         this.setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public void populateCourses() {
