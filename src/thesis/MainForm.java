@@ -7,8 +7,8 @@ import java.util.logging.Logger;
 import org.gmele.general.sheets.exception.SheetExc;
 
 /**
- * � ����� MainForm ����� � ����� ��� ��������������� ��� �� ������� ���������� 
- * (user interface - UI) ��� ��������� (���� �� ����� ������������� ��� ��� �� ���������).
+ * Κεντρικό παράθυρο εφαρμογής
+ * (user interface - UI) απλό UI φιλικό προς τον χρήση
  * @author gouvo
  */
 public class MainForm extends javax.swing.JFrame {
@@ -148,9 +148,6 @@ public class MainForm extends javax.swing.JFrame {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        /**
-         * �������� ��� �������� ��� ������ ��� ������.
-         */
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
