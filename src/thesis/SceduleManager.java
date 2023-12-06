@@ -30,7 +30,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 /**
- *
  * @author gouvo
  */
 public class SceduleManager extends JFrame {
@@ -40,6 +39,8 @@ public class SceduleManager extends JFrame {
     private List<Course> courses;
     private List<Professor> professors;
     private List<Classroom> classrooms;
+    private Scheduled scheduled;
+    private Unscheduled unscheduled;
     
 
     public SceduleManager() {
@@ -51,6 +52,8 @@ public class SceduleManager extends JFrame {
         courses = new ArrayList<>(excelManager.getCourses());
         professors = new ArrayList<>(excelManager.getProfs());
         classrooms = new ArrayList<>(excelManager.getClassrooms());
+        scheduled = new Scheduled();
+        unscheduled = new Unscheduled(excelManager.getCourses());
         modelPanel.setLayout(new BorderLayout());
         modelPanel.add(populateTable());
         coursesPanel.setLayout(new GridLayout(0,3));
@@ -61,7 +64,8 @@ public class SceduleManager extends JFrame {
     }
 
     public void populateCourses() {
-        for (Course course : courses) {
+        List<Course> notSettled = new ArrayList<>(unscheduled.getCourses());
+        for (Course course : notSettled) {
             // Create a custom component (e.g., JPanel or JButton) for each course
             JButton courseButton = new JButton(course.getCourseName());
             courseButton.setPreferredSize(new Dimension(270, 40)); // Set preferred size as needed
@@ -78,6 +82,30 @@ public class SceduleManager extends JFrame {
             });
             coursesPanel.add(courseButton);
         }
+    }
+    
+    public boolean checkExaminersConflict(Course course, String date, String timeslot){
+        boolean myBool = false;
+        for (Course crs : unscheduled.getCourses()){
+            if (crs.getCourseName().equals(course.getCourseName())){
+                List<Professor> newCourse = new ArrayList<>(course.getExaminers());
+                for (Professor prf1 : newCourse){
+                    int res1 = prf1.isAvailable(date, timeslot);
+                    if (res1 == 0 || res1 == 1){
+                        System.out.println("\nÎœÎ¬Î³ÎºÎ± Î´ÎµÎ½ ÎºÎ¬Î½ÎµÎ¹Ï‚ Î´Î¿Ï…Î»ÎµÎ¹Î¬ Î­Ï„ÏƒÎ¹\n");
+                        return false;
+                    }
+                }
+            }
+            for (Professor prf1 : course.getExaminers()){
+                prf1.changeSpecificAvailability(date, timeslot, 2);
+            }
+            scheduled.addCourse(crs, date, timeslot);
+            unscheduled.getCourses().remove(crs);
+            System.out.println("\nÎœÏ€Î®ÎºÎ±Î¼Îµ!\n");
+            return true;
+        }
+        return false;
     }
     
     public JScrollPane populateTable(){
@@ -128,35 +156,40 @@ public class SceduleManager extends JFrame {
                     Point dropLocation = evt.getLocation();
                     int row = table.rowAtPoint(dropLocation);
                     int col = table.columnAtPoint(dropLocation);
+                    
                     Course tmpCourse = new Course(findCourse(buttonText));
-                    //tmpCourse.printStatistics();
                     String rowValue = (String) table.getValueAt(row, 0);
                     String colValue = (String) table.getValueAt(0, col);
-                    boolean isValid = checkAvailabilityForProfessors(tmpCourse, rowValue, colValue);
-                    Color cellColor = isValid ? Color.GREEN : Color.RED;
-                    table.getColumnModel().getColumn(col).setCellRenderer(new CustomCellRenderer(cellColor));
-                    model.setValueAt(buttonText, row, col);
-                    // Remove the button from coursesPanel
-                    Component[] components = coursesPanel.getComponents();
-                    for (Component component : components) {
-                        if (component instanceof JButton) {
-                            JButton button = (JButton) component;
-                            if (buttonText.equals(button.getText())) {
-                                coursesPanel.remove(button);
-                                break;
+                    
+                    // Format from 'dd/mm/YYYY Weekday' to simply 'dd/mm/YYYY'
+                    rowValue = getDateWithGreekFormat(rowValue);
+                    boolean check1 = checkExaminersConflict(tmpCourse, rowValue, colValue);
+                    if (check1){
+                        table.getColumnModel().getColumn(col).setCellRenderer(new CustomCellRenderer(Color.GREEN));
+                        model.setValueAt(buttonText, row, col);
+                        Component[] components = coursesPanel.getComponents();
+                        for (Component component : components) {
+                            if (component instanceof JButton) {
+                                JButton button = (JButton) component;
+                                if (buttonText.equals(button.getText())) {
+                                    coursesPanel.remove(button);
+                                    break;
+                                }
                             }
                         }
+                        coursesPanel.revalidate();
+                        coursesPanel.repaint();
+                        evt.dropComplete(true);
+                    }else{
+                        evt.rejectDrop();
                     }
-                    coursesPanel.revalidate();
-                    coursesPanel.repaint();
-
-                    evt.dropComplete(true);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     evt.rejectDrop();
                 }
             }
         });
+        
         
 
         table.addMouseListener(new MouseAdapter() {
@@ -235,11 +268,6 @@ public class SceduleManager extends JFrame {
         return null;
     }
     
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -250,7 +278,7 @@ public class SceduleManager extends JFrame {
         coursesPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Öüñìá Äçìéïõñãßáò ÐñïãñÜììáôïò");
+        setTitle("ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
         setPreferredSize(new java.awt.Dimension(1200, 1000));
         getContentPane().setLayout(new java.awt.FlowLayout());
 
@@ -274,11 +302,6 @@ public class SceduleManager extends JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -295,9 +318,7 @@ public class SceduleManager extends JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(SceduleManager.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
 
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new SceduleManager().setVisible(true);

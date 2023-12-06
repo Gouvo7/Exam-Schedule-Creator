@@ -1,7 +1,8 @@
 package thesis;
 
 
-/** @author gouvo
+/**
+ * @author gouvo
  * Η κλάση που δηλώνονται τα ονόματα των αρχείων/φύλλων excel που χρησιμοποιούνται στο πρόγραμμα.
  */
 public class SavedPaths {

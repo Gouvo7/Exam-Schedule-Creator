@@ -6,7 +6,6 @@ import java.awt.datatransfer.StringSelection;
 import javax.swing.JComponent;
 
 /**
- *
  * @author gouvo
  */
 

@@ -95,8 +95,6 @@ public class ExcelManager {
         this.dates = dates;
     }
     
-    // Δήλωση των στατικών ονομασιών των φύλλων του excel προς επεξεργασία.
-    
     ExcelManager(JFrame x, String y){
         myJFrame = x;
         fileName = y;

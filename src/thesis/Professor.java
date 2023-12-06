@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-
-/** @author gouvo
+/** 
+ * @author gouvo
  * Η κλάση Professors χρησιμοποιείται για την αποθήκευση στοιχείων των καθηγητών.
  * @param profSurname Επώνυμο καθηγητή.
  * @param profFirstname Όνομα καθηγητή.
  * @param profField Ειδικότητα καθηγητή.
- * 
  */
+
 public class Professor implements Serializable{
     
     private String profSurname;
@@ -71,6 +71,14 @@ public class Professor implements Serializable{
         return -1;
     }
     
+    public void changeSpecificAvailability(String date, String timeslot, int res){
+        for (Availability a : availability){
+            if (a.getDate().equals(date) && a.getTimeSlot().equals(timeslot)){
+                a.setIsAvailable(res);
+            }
+        }
+    }
+    
     public void prinAvailable(){
         for (Availability x : availability){
             System.out.println(this.getProfSurname()+ " " + x.getDate() + " " + x.getTimeSlot() + " " + x.getIsAvailable());
@@ -86,7 +94,9 @@ public class Professor implements Serializable{
     /**
      * Η μέθοδος εκτυπώνει όλα τα στοιχεία ενός καθηγητή.
      */
-/*    public void printText(){
+    
+    /*
+    public void printText(){
         System.out.println(profSurname + " " + profFirstname + " " + profField);
     }
     
@@ -95,7 +105,7 @@ public class Professor implements Serializable{
             System.out.println(this.getProfSurname() + " " + x.getDate() +  " " + x.getTimeSlot() + " " + x.getIsAvailable());
         }
     }
-*/    
+    */    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

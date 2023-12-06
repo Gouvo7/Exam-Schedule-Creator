@@ -1,8 +1,7 @@
 package thesis;
 
 /**
- *
- * @author dbuser1
+ * @author gouvo
  */
 public class Logs{
         private String log;

@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 import javax.swing.TransferHandler;
 
 /**
- *
  * @author gouvo
  */
 public class CoursePanel extends JPanel {

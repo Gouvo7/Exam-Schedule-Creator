@@ -4,7 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/** @author gouvo
+/** 
+ * @author gouvo
  * Η κλάση Course χρησιμοποιείται για την αποθήκευση στοιχείων μαθημάτων καθώς και
  * τους εξεταστές αυτών.
  */
