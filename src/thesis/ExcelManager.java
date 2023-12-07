@@ -186,8 +186,11 @@ public class ExcelManager {
         try {
             boolean outcome = readObjects();
             addProfessorsAvailability(profs, timeslots.size(), paths.getImportFilePath1());
+            for (Professor prf : this.profs){
+                //Wprf.prinAvailable();
+            }
             addClassroomsAvailability(classrooms, timeslots.size(), paths.getImportFilePath2());
-            System.out.println("Fox");
+            System.out.println("Excels have been read.");
             return true;
         }catch (Exception e){
             e.printStackTrace();
@@ -209,6 +212,7 @@ public class ExcelManager {
         try{
             FileInputStream file = new FileInputStream(new File(filename));
             //XSSFWorkbook workbook = new XSSFWorkbook(f);
+            System.out.print(filename);
             XlsxSheet s = new XlsxSheet(filename);
             SimpleDateFormat inputFormat = new SimpleDateFormat("EEEE dd/MM/yyyy");
             SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");

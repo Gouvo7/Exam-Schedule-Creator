@@ -58,7 +58,11 @@ public class SceduleManager extends JFrame {
         modelPanel.add(populateTable());
         coursesPanel.setLayout(new GridLayout(0,3));
         populateCourses();
-        
+        for (Course course : unscheduled.getCourses()){
+            for (Professor prf : course.getExaminers()){
+                //prf.prinAvailable();
+            }
+        }
         this.setVisible(true);
         this.setLocationRelativeTo(null);
     }
@@ -91,6 +95,7 @@ public class SceduleManager extends JFrame {
                 List<Professor> newCourse = new ArrayList<>(course.getExaminers());
                 for (Professor prf1 : newCourse){
                     int res1 = prf1.isAvailable(date, timeslot);
+                    prf1.prinAvailable();
                     if (res1 == 0 || res1 == 1){
                         System.out.println("\nΜάγκα δεν κάνεις δουλειά έτσι\n");
                         return false;
@@ -153,6 +158,7 @@ public class SceduleManager extends JFrame {
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
                     Transferable transferable = evt.getTransferable();
                     String buttonText = (String) transferable.getTransferData(DataFlavor.stringFlavor);
+                    System.out.println(buttonText);
                     Point dropLocation = evt.getLocation();
                     int row = table.rowAtPoint(dropLocation);
                     int col = table.columnAtPoint(dropLocation);

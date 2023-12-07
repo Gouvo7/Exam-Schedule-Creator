@@ -11,7 +11,7 @@ public class SavedPaths {
     static String importFilePath1 = "C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\TEST2.xlsx";
     static String importFilePath2 = "C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\TEST3.xlsx";
     
-    static String sheet1 = "PROFESSORS_LIST";
+    static String sheet1 = "PROFESSORS_LIST"; 
     static String sheet2 = "TIMESLOTS";
     static String sheet3 = "DATES";
     static String sheet4 = "CLASSROOMS";
