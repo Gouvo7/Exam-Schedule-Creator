@@ -198,7 +198,6 @@ public class SceduleManager extends JFrame {
                 if (e.getClickCount() == 2) {
                     int selectedRow = table.getSelectedRow();
                     int selectedColumn = table.getSelectedColumn();
-
                     Object cellValue = model.getValueAt(selectedRow, selectedColumn);
                     if (cellValue != null && cellValue instanceof String) {
                         String buttonText = (String) cellValue;
@@ -278,13 +277,12 @@ public class SceduleManager extends JFrame {
         coursesPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("����� ����������� ������������");
+        setTitle("Φόρμα Δημιουργίας Προγράμματος");
         setPreferredSize(new java.awt.Dimension(1200, 1000));
         getContentPane().setLayout(new java.awt.FlowLayout());
 
         modelScrollPane.setPreferredSize(new java.awt.Dimension(1000, 600));
 
-        modelPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         modelPanel.setPreferredSize(new java.awt.Dimension(900, 500));
         modelPanel.setLayout(null);
         modelScrollPane.setViewportView(modelPanel);
