@@ -35,7 +35,7 @@ import javax.swing.table.JTableHeader;
 public class SceduleManager extends JFrame {
     
     private JTable table;
-    private ExcelManager excelManager;
+    private ExcelManager excelManager1;
     private List<Course> courses;
     private List<Professor> professors;
     private List<Classroom> classrooms;
@@ -48,17 +48,27 @@ public class SceduleManager extends JFrame {
     
     public SceduleManager(ExcelManager excelManager) {
         initComponents();
-        this.excelManager = excelManager;
-        courses = new ArrayList<>(excelManager.getCourses());
-        professors = new ArrayList<>(excelManager.getProfs());
-        classrooms = new ArrayList<>(excelManager.getClassrooms());
+        this.excelManager1 = excelManager;
+        
+        courses = new ArrayList<>(excelManager1.getCourses());
+        
+        /*
+        for (Course crs : courses){
+            List<Professor> ex = crs.getExaminers();
+            for (Professor prf : ex){
+                prf.prinAvailable();
+            }
+        }
+        */
+        professors = new ArrayList<>(excelManager1.getProfs());
+        classrooms = new ArrayList<>(excelManager1.getClassrooms());
         scheduled = new Scheduled();
-        unscheduled = new Unscheduled(excelManager.getCourses());
+        unscheduled = new Unscheduled(excelManager1.getCourses());
         modelPanel.setLayout(new BorderLayout());
         modelPanel.add(populateTable());
         coursesPanel.setLayout(new GridLayout(0,3));
         populateCourses();
-        for (Course course : unscheduled.getCourses()){
+        for (Course course : courses){
             for (Professor prf : course.getExaminers()){
                 //prf.prinAvailable();
             }
@@ -90,32 +100,36 @@ public class SceduleManager extends JFrame {
     
     public boolean checkExaminersConflict(Course course, String date, String timeslot){
         boolean myBool = false;
+        List<Professor> newCourseExaminers = null;
         for (Course crs : unscheduled.getCourses()){
             if (crs.getCourseName().equals(course.getCourseName())){
-                List<Professor> newCourse = new ArrayList<>(course.getExaminers());
-                for (Professor prf1 : newCourse){
+                newCourseExaminers = new ArrayList<>(course.getExaminers());
+                for (Professor prf1 : newCourseExaminers){
+                    System.out.println(prf1.getProfSurname());
+                }
+                for (Professor prf1 : newCourseExaminers){
                     int res1 = prf1.isAvailable(date, timeslot);
-                    prf1.prinAvailable();
-                    if (res1 == 0 || res1 == 1){
-                        System.out.println("\nΜάγκα δεν κάνεις δουλειά έτσι\n");
+                    if (res1 == 0 || res1 == 2){
                         return false;
                     }
                 }
+                for (Professor prf1 : newCourseExaminers){
+                    prf1.changeSpecificAvailability(date, timeslot, 2);
+                }
+                scheduled.addCourse(crs, date, timeslot);
+                unscheduled.getCourses().remove(crs);
+                
             }
-            for (Professor prf1 : course.getExaminers()){
-                prf1.changeSpecificAvailability(date, timeslot, 2);
+            if (newCourseExaminers != null){
+                return true;
             }
-            scheduled.addCourse(crs, date, timeslot);
-            unscheduled.getCourses().remove(crs);
-            System.out.println("\nΜπήκαμε!\n");
-            return true;
         }
         return false;
     }
     
     public JScrollPane populateTable(){
-        List<String> timeslots = excelManager.getTimeslots();
-        List<String> dates = new ArrayList<>(excelManager.getDates());
+        List<String> timeslots = excelManager1.getTimeslots();
+        List<String> dates = new ArrayList<>(excelManager1.getDates());
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         int excelRows = dates.size();
@@ -158,7 +172,6 @@ public class SceduleManager extends JFrame {
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
                     Transferable transferable = evt.getTransferable();
                     String buttonText = (String) transferable.getTransferData(DataFlavor.stringFlavor);
-                    System.out.println(buttonText);
                     Point dropLocation = evt.getLocation();
                     int row = table.rowAtPoint(dropLocation);
                     int col = table.columnAtPoint(dropLocation);
@@ -187,7 +200,7 @@ public class SceduleManager extends JFrame {
                         coursesPanel.repaint();
                         evt.dropComplete(true);
                     }else{
-                        evt.rejectDrop();
+                        //evt.rejectDrop();
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -204,10 +217,19 @@ public class SceduleManager extends JFrame {
                 if (e.getClickCount() == 2) {
                     int selectedRow = table.getSelectedRow();
                     int selectedColumn = table.getSelectedColumn();
+                    String date = table.getValueAt(selectedRow, 0).toString();
+                    String timeslot = table.getValueAt(0, selectedColumn).toString();
                     Object cellValue = model.getValueAt(selectedRow, selectedColumn);
                     if (cellValue != null && cellValue instanceof String) {
                         String buttonText = (String) cellValue;
-
+                        for (Course crs : unscheduled.getCourses()){
+                            if (crs.getCourseName().equals(buttonText)){
+                                for (Professor prf : crs.getExaminers()){
+                                    System.out.println(date + " και " + timeslot);
+                                    prf.setAvailable(date, timeslot);
+                                }
+                            }
+                        }
                         // Add the button back to coursesPanel
                         JButton button = new JButton(buttonText);
                         button.setPreferredSize(new Dimension(270, 40));

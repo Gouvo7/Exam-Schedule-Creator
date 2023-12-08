@@ -2,6 +2,8 @@ package thesis;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.gmele.general.sheets.exception.SheetExc;
@@ -112,12 +114,12 @@ public class MainForm extends javax.swing.JFrame {
         ExcelManager a = new ExcelManager(this,path);
         try {
             boolean hasRead = a.readTemplates();
+            List<Course> crs = new ArrayList<>(a.getCourses());
             if (hasRead){
                 SceduleManager b = new SceduleManager(a);
             }else {
                 System.out.println("Πρόβλημα κατά την ανάγνωση των δεδομένων από τα συμπληρωμένα templates.");
             }
-            System.out.println("Τέλος ScheduleManager.");
         } catch (SheetExc ex) {
             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -79,9 +79,20 @@ public class Professor implements Serializable{
         }
     }
     
+    public void setAvailable(String date, String timeslot){
+        for (Availability a : availability){
+            if (a.getDate().equals(date) && a.getTimeSlot().equals(timeslot)){
+                if (a.getIsAvailable() == 2)
+                {
+                    a.setIsAvailable(1);
+                }
+            }
+        }
+    }
+   
     public void prinAvailable(){
         for (Availability x : availability){
-          //System.out.println(this.getProfSurname()+ " " + x.getDate() + " " + x.getTimeSlot() + " " + x.getIsAvailable());
+          System.out.println(this.getProfSurname()+ " " + x.getDate() + " " + x.getTimeSlot() + " " + x.getIsAvailable());
         }
     }
     

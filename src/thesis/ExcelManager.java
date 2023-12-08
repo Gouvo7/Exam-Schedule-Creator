@@ -109,6 +109,20 @@ public class ExcelManager {
         sheet6 = paths.getSheet6();
     }
     
+    ExcelManager(){
+        logger = new Logs();
+        paths = new SavedPaths();
+        fileName = paths.getImportFilePath();
+        sheet1 = paths.getSheet1();
+        sheet2 = paths.getSheet2();
+        sheet3 = paths.getSheet3();
+        sheet4 = paths.getSheet4();
+        sheet5 = paths.getSheet5();
+        sheet6 = paths.getSheet6();
+    }
+    
+    
+    
     /**
      * 1) Διαβάζει το αρχείο από το μονοπάτι που καθορίζει ο χρήστης από την εφαρμογή.
      * 2) Αποθηκεύει τα δεδομένα σε αντικείμενα κατάλληλου τύπου
@@ -162,7 +176,7 @@ public class ExcelManager {
             }
             excel5 = true;
             addProfsToCourses(profs, courses, fileName);
-            
+            removeCoursesWithNoExaminers();
             if (excel1 && excel2 && excel3 && excel4 && excel5) {
                 createTemplate(profs, timeslots, dates, classrooms);
             }
@@ -173,6 +187,24 @@ public class ExcelManager {
         }
     }
 
+    /**
+     * Διαγραφή εγγραφών μαθημάτων για όσα μαθήματα δεν έχουν εξεταστή
+     * (Τα θεωρούμε ως μαθήματα που δεν εξετάζονται).
+     */
+    public void removeCoursesWithNoExaminers(){
+        List<Course> copy = new ArrayList<>(courses);
+        for (Course course : copy){
+            int i = 0;
+            for (Professor prof : course.getExaminers()){
+                i = i + 1;
+            }
+            if (i == 0){
+                // remove this course from the 
+                courses.remove(course);
+            }
+        }
+    }
+    
     /**
      * Η μέθοδος διαβάζει το κύριο excel που εμπεριέχει πληροφορίες για τους καθηγητές,
      * τα μαθήματα, τις σχέσεις τους κ.α.Έπειτα, καλεί 2 μεθόδους που συμπληρώνουν
@@ -186,11 +218,8 @@ public class ExcelManager {
         try {
             boolean outcome = readObjects();
             addProfessorsAvailability(profs, timeslots.size(), paths.getImportFilePath1());
-            for (Professor prf : this.profs){
-                //Wprf.prinAvailable();
-            }
             addClassroomsAvailability(classrooms, timeslots.size(), paths.getImportFilePath2());
-            System.out.println("Excels have been read.");
+            System.out.println("Professor and classrooms filled template excels have been read.");
             return true;
         }catch (Exception e){
             e.printStackTrace();
@@ -212,8 +241,9 @@ public class ExcelManager {
         try{
             FileInputStream file = new FileInputStream(new File(filename));
             //XSSFWorkbook workbook = new XSSFWorkbook(f);
-            System.out.print(filename);
             XlsxSheet s = new XlsxSheet(filename);
+            
+            System.out.println("file is:" + filename);
             SimpleDateFormat inputFormat = new SimpleDateFormat("EEEE dd/MM/yyyy");
             SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
             for (Professor professor : professors){
@@ -225,9 +255,9 @@ public class ExcelManager {
                     String cellDate = s.GetCellString(rowIndex, 0);
                     Date date = inputFormat.parse(cellDate);
                     cellDate = outputFormat.format(date);
-                    for (int colIndex = 1; colIndex < lastColumn; colIndex++){
+                    for (int colIndex = 1; colIndex <= lastColumn; colIndex++){
                         String timeslot = s.GetCellString(0,colIndex);
-                        String curCell = s.GetCellString(rowIndex, colIndex).trim();
+                        String curCell = s.GetCellString(rowIndex, colIndex);
                         if (curCell.equals("+")){
                             Availability tmp = new Availability(cellDate, timeslot, 1);
                             availabilityList.add(tmp);
@@ -239,7 +269,6 @@ public class ExcelManager {
                         }
                     }
                 }
-
                 if (!availabilityList.isEmpty()){
                     professor.setAvailability(availabilityList);
                 }
@@ -254,13 +283,12 @@ public class ExcelManager {
             JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (SheetExc ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα αρχεία διαθεσιμότητας αιθουσών.",
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα αρχεία διαθεσιμότητας καθηγητών.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex){
             JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα  αρχεία διαθεσιμότητας καθηγητών.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
-        
         return ;
     }
     
@@ -288,7 +316,7 @@ public class ExcelManager {
                     String cellDate = s.GetCellString(rowIndex, 0);
                     Date date = inputFormat.parse(cellDate);
                     cellDate = outputFormat.format(date);
-                    for (int colIndex = 1; colIndex < lastColumn; colIndex++){
+                    for (int colIndex = 1; colIndex <= lastColumn; colIndex++){
                         String timeslot = s.GetCellString(0,colIndex);
                         String curCell = s.GetCellString(rowIndex, colIndex).trim();
                         if (curCell.equals("+")){
@@ -298,6 +326,7 @@ public class ExcelManager {
                             Availability tmp = new Availability(cellDate, timeslot, 0);
                             availabilityList.add(tmp);
                         }else{
+                            System.out.println(sheetName + " " + cellDate);
                             throw new Exception();
                         }
                     }
@@ -305,6 +334,7 @@ public class ExcelManager {
                 if (!availabilityList.isEmpty()){
                     classroom.setAvailability(availabilityList);
                 }
+                // Prints classroom availability
                 //classroom.prinAvailable();
             }
             file.close();
@@ -340,7 +370,7 @@ public class ExcelManager {
             FileInputStream file = new FileInputStream(new File(filename));
             XlsxSheet s = new XlsxSheet(filename);
             s.SelectSheet(sheet6);
-            int rowIndex = 0;
+            int rowIndex = 1;
             int lastRow = s.GetLastRow();
             List<String> uniqueCourses = new ArrayList<>();
             while (rowIndex <= lastRow){
@@ -357,7 +387,7 @@ public class ExcelManager {
                 }
                 rowIndex++;
             }
-            rowIndex = 0;
+            rowIndex = 1;
             while (rowIndex <= lastRow){
                 if (rowIndex != 0){
                     String course = s.GetCellString(rowIndex, 0).trim();
@@ -376,6 +406,7 @@ public class ExcelManager {
                                         if (!tmpCourse.getExaminers().contains(prof)){
                                             //tmpCourse.getExaminers().add(prof);
                                             tmpCourse.addExaminer(prof);
+                                            //System.out.println("Added "  + prof.getProfSurname() + " to course " + tmpCourse.getCourseName());
                                         }
                                     }
                                 }
