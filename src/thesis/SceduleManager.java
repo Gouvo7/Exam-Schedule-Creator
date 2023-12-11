@@ -220,15 +220,20 @@ public class SceduleManager extends JFrame {
                     String date = table.getValueAt(selectedRow, 0).toString();
                     String timeslot = table.getValueAt(0, selectedColumn).toString();
                     Object cellValue = model.getValueAt(selectedRow, selectedColumn);
+                    Course courseToDelete = null;
                     if (cellValue != null && cellValue instanceof String) {
                         String buttonText = (String) cellValue;
-                        for (Course crs : unscheduled.getCourses()){
+                        for (Course crs : scheduled.getCourses()){
                             if (crs.getCourseName().equals(buttonText)){
                                 for (Professor prf : crs.getExaminers()){
-                                    System.out.println(date + " και " + timeslot);
                                     prf.setAvailable(date, timeslot);
                                 }
+                                courseToDelete = crs;
                             }
+                        }
+                        if (courseToDelete != null){
+                            unscheduled.getCourses().add(courseToDelete);
+                            scheduled.getCourses().remove(courseToDelete);
                         }
                         // Add the button back to coursesPanel
                         JButton button = new JButton(buttonText);

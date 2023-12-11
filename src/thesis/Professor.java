@@ -80,6 +80,7 @@ public class Professor implements Serializable{
     }
     
     public void setAvailable(String date, String timeslot){
+        System.out.println(date + "kai " + timeslot);
         for (Availability a : availability){
             if (a.getDate().equals(date) && a.getTimeSlot().equals(timeslot)){
                 if (a.getIsAvailable() == 2)
