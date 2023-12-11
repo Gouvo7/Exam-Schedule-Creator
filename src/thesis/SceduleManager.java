@@ -99,28 +99,22 @@ public class SceduleManager extends JFrame {
     }
     
     public boolean checkExaminersConflict(Course course, String date, String timeslot){
-        boolean myBool = false;
         List<Professor> newCourseExaminers = null;
         for (Course crs : unscheduled.getCourses()){
             if (crs.getCourseName().equals(course.getCourseName())){
                 newCourseExaminers = new ArrayList<>(course.getExaminers());
-                for (Professor prf1 : newCourseExaminers){
-                    System.out.println(prf1.getProfSurname());
-                }
                 for (Professor prf1 : newCourseExaminers){
                     int res1 = prf1.isAvailable(date, timeslot);
                     if (res1 == 0 || res1 == 2){
                         return false;
                     }
                 }
-                for (Professor prf1 : newCourseExaminers){
-                    prf1.changeSpecificAvailability(date, timeslot, 2);
+                for (Professor prf2 : newCourseExaminers){
+                    prf2.changeSpecificAvailability(date, timeslot, 2);
+                    System.out.println("Άλλαξα για :" + prf2.getProfSurname());
                 }
                 scheduled.addCourse(crs, date, timeslot);
                 unscheduled.getCourses().remove(crs);
-                
-            }
-            if (newCourseExaminers != null){
                 return true;
             }
         }
@@ -184,7 +178,7 @@ public class SceduleManager extends JFrame {
                     rowValue = getDateWithGreekFormat(rowValue);
                     boolean check1 = checkExaminersConflict(tmpCourse, rowValue, colValue);
                     if (check1){
-                        table.getColumnModel().getColumn(col).setCellRenderer(new CustomCellRenderer(Color.GREEN));
+                        //table.getColumnModel().getColumn(col).setCellRenderer(new CustomCellRenderer(Color.GREEN));
                         model.setValueAt(buttonText, row, col);
                         Component[] components = coursesPanel.getComponents();
                         for (Component component : components) {
@@ -192,6 +186,8 @@ public class SceduleManager extends JFrame {
                                 JButton button = (JButton) component;
                                 if (buttonText.equals(button.getText())) {
                                     coursesPanel.remove(button);
+                                    
+                                    
                                     break;
                                 }
                             }
@@ -209,8 +205,6 @@ public class SceduleManager extends JFrame {
             }
         });
         
-        
-
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -218,6 +212,7 @@ public class SceduleManager extends JFrame {
                     int selectedRow = table.getSelectedRow();
                     int selectedColumn = table.getSelectedColumn();
                     String date = table.getValueAt(selectedRow, 0).toString();
+                    date = getDateWithGreekFormat(date);
                     String timeslot = table.getValueAt(0, selectedColumn).toString();
                     Object cellValue = model.getValueAt(selectedRow, selectedColumn);
                     Course courseToDelete = null;
@@ -263,6 +258,10 @@ public class SceduleManager extends JFrame {
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            //table.getColumnModel().getColumn(i).setCellRenderer(new CustomCellRenderer());
+        }
+        
         return scrollPane;
     }
     
@@ -374,9 +373,15 @@ public class SceduleManager extends JFrame {
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             cell.setBackground(backgroundColor);
+            String courseString = (String) table.getValueAt(row, column);
+            cell.setBackground(Color.RED);
+            for (Course course : scheduled.getCourses()){
+                if (course.getCourseName().equals(courseString)){
+                    cell.setBackground(Color.GREEN);
+                }
+            }
             return cell;
         }
     }
-
 }
 
