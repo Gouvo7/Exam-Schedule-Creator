@@ -2,10 +2,12 @@ package thesis;
 
 
 /**
- * @author gouvo
- * Η κλάση που δηλώνονται τα ονόματα των αρχείων/φύλλων excel που χρησιμοποιούνται στο πρόγραμμα.
+ * Η κλάση Paths είναι υπεύθυνη για την αποθήκευση των πληροφοριών που αφορούν διαδρομές (paths) αρχείων ή φακέλων του προγράμματος
+ * 
+ * @author Nektarios Gkouvousis
+ * @author ice18390193
  */
-public class SavedPaths {
+public class Paths {
     static String importFolderPath = "C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ";
     static String importFilePath = "C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\1) General.xlsx";
     static String importFilePath1 = "C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\TEST2.xlsx";
@@ -18,7 +20,7 @@ public class SavedPaths {
     static String sheet5 = "COURSES_LIST";
     static String sheet6 = "COURSES_PROFESSORS";
     
-    public void SavedPaths(){
+    public void Paths(){
     }
 
     public void setImportFolderPath(String tmp){
@@ -49,7 +51,7 @@ public class SavedPaths {
     }
 
     public static void setSheet1(String sheet1) {
-        SavedPaths.sheet1 = sheet1;
+        Paths.sheet1 = sheet1;
     }
 
     public String getSheet2() {
@@ -57,7 +59,7 @@ public class SavedPaths {
     }
 
     public static void setSheet2(String sheet2) {
-        SavedPaths.sheet2 = sheet2;
+        Paths.sheet2 = sheet2;
     }
 
     public String getSheet3() {
@@ -65,7 +67,7 @@ public class SavedPaths {
     }
 
     public static void setSheet3(String sheet3) {
-        SavedPaths.sheet3 = sheet3;
+        Paths.sheet3 = sheet3;
     }
 
     public String getSheet4() {
@@ -73,7 +75,7 @@ public class SavedPaths {
     }
 
     public static void setSheet4(String sheet4) {
-        SavedPaths.sheet4 = sheet4;
+        Paths.sheet4 = sheet4;
     }
 
     public String getSheet5() {
@@ -81,7 +83,7 @@ public class SavedPaths {
     }
 
     public static void setSheet5(String sheet5) {
-        SavedPaths.sheet5 = sheet5;
+        Paths.sheet5 = sheet5;
     }
 
     public String getSheet6() {
@@ -89,6 +91,6 @@ public class SavedPaths {
     }
     
     public static void setSheet6(String sheet6) {
-        SavedPaths.sheet6 = sheet6;
+        Paths.sheet6 = sheet6;
     }
 }

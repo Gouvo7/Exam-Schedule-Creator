@@ -6,9 +6,11 @@ import java.awt.datatransfer.StringSelection;
 import javax.swing.JComponent;
 
 /**
- * @author gouvo
+ * Η κλάση ButtonTransferHandler υλοποιεί την κλάση TramsferHandler και ευθύνεται για την μεταφορά των μαθημάτων στο excel
+ * 
+ * @author Nektarios Gkouvousis
+ * @author ice18390193
  */
-
 public class ButtonTransferHandler extends TransferHandler {
     private final String buttonText;
 

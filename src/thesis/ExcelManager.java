@@ -31,15 +31,14 @@ import org.gmele.general.sheets.XlsxSheet;
 import org.gmele.general.sheets.exception.SheetExc;
 
 /**
- *
- * @author gouvo
+ * Η κλάση ExcelManager είναι υπεύθυνη για την δημιουργία και διαχείριση των αρχείων .xlsx
  * 
- * Η κλάση είναι υπεύθυνη για την δημιουργία και διαχείριση αντικειμένων αλλά και την
- * ανάγνωση/δημιουργία αρχείων .xlsx
+ * @author Nektarios Gkouvousis
+ * @author ice18390193
+ * 
  * @param - myJFrame - Το παράθυρο που το καλεί.
  * @param - fileName - Το όνομα του αρχείου προς ανάγνωση.
  */
-
 public class ExcelManager {
     
     
@@ -47,13 +46,39 @@ public class ExcelManager {
     private static String sheet1, sheet2,sheet3, sheet4, sheet5, sheet6;
     private static JFrame myJFrame;
     private static Logs logger;
-    private SavedPaths paths;
+    private Paths paths;
 
     private List<Professor> profs;
     private List<Course> courses;
     private List<Classroom> classrooms;
     private List<String> timeslots;
     private List<String> dates;
+    
+    ExcelManager(JFrame x, String y){
+        myJFrame = x;
+        fileName = y;
+        logger = new Logs();
+        paths = new Paths();
+        fileName = paths.getImportFilePath();
+        sheet1 = paths.getSheet1();
+        sheet2 = paths.getSheet2();
+        sheet3 = paths.getSheet3();
+        sheet4 = paths.getSheet4();
+        sheet5 = paths.getSheet5();
+        sheet6 = paths.getSheet6();
+    }
+    
+    ExcelManager(){
+        logger = new Logs();
+        paths = new Paths();
+        fileName = paths.getImportFilePath();
+        sheet1 = paths.getSheet1();
+        sheet2 = paths.getSheet2();
+        sheet3 = paths.getSheet3();
+        sheet4 = paths.getSheet4();
+        sheet5 = paths.getSheet5();
+        sheet6 = paths.getSheet6();
+    }
     
     public List<Professor> getProfs() {
         return profs;
@@ -95,35 +120,8 @@ public class ExcelManager {
         this.dates = dates;
     }
     
-    ExcelManager(JFrame x, String y){
-        myJFrame = x;
-        fileName = y;
-        logger = new Logs();
-        paths = new SavedPaths();
-        fileName = paths.getImportFilePath();
-        sheet1 = paths.getSheet1();
-        sheet2 = paths.getSheet2();
-        sheet3 = paths.getSheet3();
-        sheet4 = paths.getSheet4();
-        sheet5 = paths.getSheet5();
-        sheet6 = paths.getSheet6();
-    }
-    
-    ExcelManager(){
-        logger = new Logs();
-        paths = new SavedPaths();
-        fileName = paths.getImportFilePath();
-        sheet1 = paths.getSheet1();
-        sheet2 = paths.getSheet2();
-        sheet3 = paths.getSheet3();
-        sheet4 = paths.getSheet4();
-        sheet5 = paths.getSheet5();
-        sheet6 = paths.getSheet6();
-    }
-    
-    
-    
     /**
+     * Η συνάρτηση:
      * 1) Διαβάζει το αρχείο από το μονοπάτι που καθορίζει ο χρήστης από την εφαρμογή.
      * 2) Αποθηκεύει τα δεδομένα σε αντικείμενα κατάλληλου τύπου
      * 3) Παράγει δύο νέα αρχεία όπου το 1ο συμπληρώνεται από τους καθηγητές και 
@@ -134,7 +132,7 @@ public class ExcelManager {
      * αφορά την διαθεσιμότητα των αιθουσών για τις ημερομηνίες της εξεταστικής.
      * 
      * Σε περίπτωση που κάποιο από τα φύλλα δεν είναι συμπληρωμένο με έγκυρες πληροφορίες
-     * ή κενά, θα προκληθεί ένα Exception και η διαδικασία θα διακοπεί.
+     * ή εμπεριέχει κενά, θα προκληθεί ένα Exception και η διαδικασία θα διακοπεί.
      */
     public void createExcels(){
         try {
@@ -187,179 +185,12 @@ public class ExcelManager {
         }
     }
 
-    /**
-     * Διαγραφή εγγραφών μαθημάτων για όσα μαθήματα δεν έχουν εξεταστή
-     * (Τα θεωρούμε ως μαθήματα που δεν εξετάζονται).
-     */
-    public void removeCoursesWithNoExaminers(){
-        List<Course> copy = new ArrayList<>(courses);
-        for (Course course : copy){
-            int i = 0;
-            for (Professor prof : course.getExaminers()){
-                i = i + 1;
-            }
-            if (i == 0){
-                // remove this course from the 
-                courses.remove(course);
-            }
-        }
-    }
+    
+    
+    
     
     /**
-     * Η μέθοδος διαβάζει το κύριο excel που εμπεριέχει πληροφορίες για τους καθηγητές,
-     * τα μαθήματα, τις σχέσεις τους κ.α.Έπειτα, καλεί 2 μεθόδους που συμπληρώνουν
-     * στα αντικείμενα καθηγητών και αιθουσών την διαθεσιμότητά τους με βάση τα συμπληρωμένα
-     * template.
-     * 
-     * @return 
-     * @throws org.gmele.general.sheets.exception.SheetExc
-     */
-    public boolean readTemplates() throws SheetExc{
-        try {
-            boolean outcome = readObjects();
-            addProfessorsAvailability(profs, timeslots.size(), paths.getImportFilePath1());
-            addClassroomsAvailability(classrooms, timeslots.size(), paths.getImportFilePath2());
-            System.out.println("Professor and classrooms filled template excels have been read.");
-            return true;
-        }catch (Exception e){
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά την ανάγνωση των δεδομένων. ",
-            " Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
-        }
-        return false;
-    }
-    
-    /**
-     * Συμπληρώνει για όλη την λίστα των καθηγητών, την διαθεσιμότητά τους από το
-     * συμπληρωμένο φύλλο που παράχθηκε από το πρόγραμμα σε προηγούμενο βήμα. 
-     * @param professors Η λίστα με τους καθηγητές που θα προστεθεί η διαθεσιμότητά τους.
-     * @param lastColumn Το μέγεθος της λίστας timeslots ή το πλήθος των διαφορετικών
-     * χρονικών πλαισίων.
-     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
-     */    
-    public void addProfessorsAvailability(List<Professor> professors,int lastColumn, String filename) throws SheetExc{
-        try{
-            FileInputStream file = new FileInputStream(new File(filename));
-            //XSSFWorkbook workbook = new XSSFWorkbook(f);
-            XlsxSheet s = new XlsxSheet(filename);
-            
-            System.out.println("file is:" + filename);
-            SimpleDateFormat inputFormat = new SimpleDateFormat("EEEE dd/MM/yyyy");
-            SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
-            for (Professor professor : professors){
-                String sheetName = professor.getProfSurname() + " " + professor.getProfFirstname();
-                s.SelectSheet(sheetName);
-                int lastRow = s.GetLastRow();
-                List<Availability> availabilityList = new ArrayList<>();
-                for (int rowIndex = 1; rowIndex <= lastRow; rowIndex++) {
-                    String cellDate = s.GetCellString(rowIndex, 0);
-                    Date date = inputFormat.parse(cellDate);
-                    cellDate = outputFormat.format(date);
-                    for (int colIndex = 1; colIndex <= lastColumn; colIndex++){
-                        String timeslot = s.GetCellString(0,colIndex);
-                        String curCell = s.GetCellString(rowIndex, colIndex);
-                        if (curCell.equals("+")){
-                            Availability tmp = new Availability(cellDate, timeslot, 1);
-                            availabilityList.add(tmp);
-                        }else if (curCell.equals("-")){
-                            Availability tmp = new Availability(cellDate, timeslot, 0);
-                            availabilityList.add(tmp);
-                        }else{
-                            throw new Exception();
-                        }
-                    }
-                }
-                if (!availabilityList.isEmpty()){
-                    professor.setAvailability(availabilityList);
-                }
-            }
-            file.close();
-            return ;
-        } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return ;
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-        } catch (SheetExc ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα αρχεία διαθεσιμότητας καθηγητών.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception ex){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα  αρχεία διαθεσιμότητας καθηγητών.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-        }
-        return ;
-    }
-    
-    /**
-     * Συμπληρώνει για όλη την λίστα των αιθουσών, την διαθεσιμότητά τους από το
-     * συμπληρωμένο φύλλο που παράχθηκε από το πρόγραμμα σε προηγούμενο βήμα. 
-     * @param classrooms Η λίστα με τις αίθουσες που θα προστεθεί η διαθεσιμότητά τους.
-     * @param lastColumn Το μέγεθος της λίστας timeslots ή το πλήθος των διαφορετικών
-     * χρονικών πλαισίων.
-     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
-     */
-    public void addClassroomsAvailability(List<Classroom> classrooms,int lastColumn, String filename){
-        try{
-            FileInputStream file = new FileInputStream(new File(filename));
-            //XSSFWorkbook workbook = new XSSFWorkbook(f);
-            XlsxSheet s = new XlsxSheet(filename);
-            SimpleDateFormat inputFormat = new SimpleDateFormat("EEEE dd/MM/yyyy");
-            SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
-            for (Classroom classroom : classrooms){
-                String sheetName = classroom.getClassroomName();
-                s.SelectSheet(sheetName);
-                int lastRow = s.GetLastRow();
-                List<Availability> availabilityList = new ArrayList<>();
-                for (int rowIndex = 1; rowIndex <= lastRow; rowIndex++) {
-                    String cellDate = s.GetCellString(rowIndex, 0);
-                    Date date = inputFormat.parse(cellDate);
-                    cellDate = outputFormat.format(date);
-                    for (int colIndex = 1; colIndex <= lastColumn; colIndex++){
-                        String timeslot = s.GetCellString(0,colIndex);
-                        String curCell = s.GetCellString(rowIndex, colIndex).trim();
-                        if (curCell.equals("+")){
-                            Availability tmp = new Availability(cellDate, timeslot, 1);
-                            availabilityList.add(tmp);
-                        }else if (curCell.equals("-")){
-                            Availability tmp = new Availability(cellDate, timeslot, 0);
-                            availabilityList.add(tmp);
-                        }else{
-                            System.out.println(sheetName + " " + cellDate);
-                            throw new Exception();
-                        }
-                    }
-                }
-                if (!availabilityList.isEmpty()){
-                    classroom.setAvailability(availabilityList);
-                }
-                // Prints classroom availability
-                //classroom.prinAvailable();
-            }
-            file.close();
-            return ;
-            
-        } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return ;
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-        } catch (SheetExc ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα αρχεία διαθεσιμότητας αιθουσών.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception ex){
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα αρχεία διαθεσιμότητας αιθουσών.",
-               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-        }
-        return ;
-    }
-    
-    /**
-     * Ενημέρωση της λίστας των καθηγητών που εξετάζουν το μάθημα σε ολόκληρη την λίστα
-     * αντικειμένων Course.
+     * Ενημέρωση της λίστας των καθηγητών που εξετάζουν το μάθημα σε ολόκληρη την λίστα αντικειμένων Course.
      * @param profs Η λίστα με τους καθηγητές.
      * @param courses Η λίστα με τα μαθήματα.
      * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
@@ -404,7 +235,6 @@ public class ExcelManager {
                                     if (prof.getProfSurname().equals(profA) || prof.getProfSurname().equals(profB) ||
                                         prof.getProfSurname().equals(profC) || prof.getProfSurname().equals(profD) ){
                                         if (!tmpCourse.getExaminers().contains(prof)){
-                                            //tmpCourse.getExaminers().add(prof);
                                             tmpCourse.addExaminer(prof);
                                             //System.out.println("Added "  + prof.getProfSurname() + " to course " + tmpCourse.getCourseName());
                                         }
@@ -657,7 +487,6 @@ public class ExcelManager {
     public List<Professor> readProfs(String filename) throws SheetExc{
         try{
             FileInputStream file = new FileInputStream(new File(filename));
-            //XSSFWorkbook workbook = new XSSFWorkbook(f);
             XlsxSheet s = new XlsxSheet(filename);
             s.SelectSheet(sheet1);
             int rowIndex = 0;
@@ -709,47 +538,6 @@ public class ExcelManager {
             "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
         return null;
-    }
-    
-    /**
-     * Έλεγχος για διπλοεγγραφή καθηγητή.
-     * @param prof Αντικείμενο καθηγητή.
-     * @param cellA Πληροφορία από 1η στήλη.
-     * @param cellB Πληροφορία από 2η στήλη.
-     * @param cellC Πληροφορία από 3η στήλη.
-     * @return εάν υπάρχει ήδη ή όχι.
-     */
-    public boolean checkDuplicateProfessor(Professor prof, String cellA, String cellB, String cellC){
-        if(prof.getProfSurname().equals(cellA) && prof.getProfFirstname().equals(cellB) && prof.getProfField().equals(cellC) ){
-            return true;
-        }
-        return false;
-    }
-    
-    /**
-     * Έλεγχος για διπλοεγγραφή μαθήματος.
-     * @param course Αντικείμενο καθηγητή.
-     * @param cellA Πληροφορία από 1η στήλη.
-     * @return εάν υπάρχει ήδη ή όχι.
-     */
-    public boolean checkDuplicateCourse(Course course, String cellA){
-        if(course.getCourseName().equals(cellA)){
-            return true;
-        }
-        return false;
-    }
-    
-    /**
-     * Έλεγχος για έγκυρη πληροφορία.
-     * @param s Το string προς έλεγχο.
-     * @return εάν είναι έγκυρο ή όχι.
-     */
-    public boolean checkIfValid(String s){
-        if(s != null && !s.equals("") && !s.equals(" ")){
-            return true;
-        }else{
-            return false;
-        }
     }
     
     /**
@@ -849,6 +637,211 @@ public class ExcelManager {
         }
         JOptionPane.showMessageDialog(myJFrame,logger.getLoggerTxt(),
                "Μήνυμα Εφαρμογής", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    
+    /**
+     * Η συνάρτηση διαβάζει το κύριο excel που εμπεριέχει πληροφορίες για τους καθηγητές, τα μαθήματα, τις σχέσεις τους κ.α.Έπειτα, καλεί 2 μεθόδους που συμπληρώνουν στα αντικείμενα καθηγητών και αιθουσών την διαθεσιμότητά τους με βάση τα συμπληρωμένα
+     * template.
+     * 
+     * @return true ή false αντίστοιχα με το εάν ολοκληρώθηκε η διαδικασία ανάγνωσης των αρχείων prof.xlsx και classrooms.xlsx ολοκληρώθηκε επιτυχώς ή όχι
+     * @throws org.gmele.general.sheets.exception.SheetExc
+     */
+    public boolean readTemplates() throws SheetExc{
+        try {
+            boolean outcome = readObjects();
+            addProfessorsAvailability(profs, timeslots.size(), paths.getImportFilePath1());
+            addClassroomsAvailability(classrooms, timeslots.size(), paths.getImportFilePath2());
+            System.out.println("Professor and classrooms filled template excels have been read.");
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(myJFrame, "Σφάλμα κατά την ανάγνωση των δεδομένων. ",
+            " Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
+        }
+        return false;
+    }
+    
+    /**
+     * Συμπληρώνει για όλη την λίστα των καθηγητών, την διαθεσιμότητά τους από το συμπληρωμένο φύλλο που παράχθηκε από το πρόγραμμα σε προηγούμενο βήμα. 
+     * @param professors Η λίστα με τους καθηγητές που θα προστεθεί η διαθεσιμότητά τους.
+     * @param lastColumn Το μέγεθος της λίστας timeslots ή το πλήθος των διαφορετικών
+     * χρονικών πλαισίων.
+     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
+     */    
+    public void addProfessorsAvailability(List<Professor> professors,int lastColumn, String filename) throws SheetExc{
+        try{
+            FileInputStream file = new FileInputStream(new File(filename));
+            //XSSFWorkbook workbook = new XSSFWorkbook(f);
+            XlsxSheet s = new XlsxSheet(filename);
+            
+            System.out.println("file is:" + filename);
+            SimpleDateFormat inputFormat = new SimpleDateFormat("EEEE dd/MM/yyyy");
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
+            for (Professor professor : professors){
+                String sheetName = professor.getProfSurname() + " " + professor.getProfFirstname();
+                s.SelectSheet(sheetName);
+                int lastRow = s.GetLastRow();
+                List<Availability> availabilityList = new ArrayList<>();
+                for (int rowIndex = 1; rowIndex <= lastRow; rowIndex++) {
+                    String cellDate = s.GetCellString(rowIndex, 0);
+                    Date date = inputFormat.parse(cellDate);
+                    cellDate = outputFormat.format(date);
+                    for (int colIndex = 1; colIndex <= lastColumn; colIndex++){
+                        String timeslot = s.GetCellString(0,colIndex);
+                        String curCell = s.GetCellString(rowIndex, colIndex);
+                        if (curCell.equals("+")){
+                            Availability tmp = new Availability(cellDate, timeslot, 1);
+                            availabilityList.add(tmp);
+                        }else if (curCell.equals("-")){
+                            Availability tmp = new Availability(cellDate, timeslot, 0);
+                            availabilityList.add(tmp);
+                        }else{
+                            throw new Exception();
+                        }
+                    }
+                }
+                if (!availabilityList.isEmpty()){
+                    professor.setAvailability(availabilityList);
+                }
+            }
+            file.close();
+            return ;
+        } catch (FileNotFoundException ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return ;
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (SheetExc ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα αρχεία διαθεσιμότητας καθηγητών.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα  αρχεία διαθεσιμότητας καθηγητών.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        }
+        return ;
+    }
+    
+    /**
+     * Συμπληρώνει για όλη την λίστα των αιθουσών, την διαθεσιμότητά τους από το συμπληρωμένο φύλλο που παράχθηκε από το πρόγραμμα σε προηγούμενο βήμα. 
+     * @param classrooms Η λίστα με τις αίθουσες που θα προστεθεί η διαθεσιμότητά τους.
+     * @param lastColumn Το μέγεθος της λίστας timeslots ή το πλήθος των διαφορετικών
+     * χρονικών πλαισίων.
+     * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
+     */
+    public void addClassroomsAvailability(List<Classroom> classrooms,int lastColumn, String filename){
+        try{
+            FileInputStream file = new FileInputStream(new File(filename));
+            //XSSFWorkbook workbook = new XSSFWorkbook(f);
+            XlsxSheet s = new XlsxSheet(filename);
+            SimpleDateFormat inputFormat = new SimpleDateFormat("EEEE dd/MM/yyyy");
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
+            for (Classroom classroom : classrooms){
+                String sheetName = classroom.getClassroomName();
+                s.SelectSheet(sheetName);
+                int lastRow = s.GetLastRow();
+                List<Availability> availabilityList = new ArrayList<>();
+                for (int rowIndex = 1; rowIndex <= lastRow; rowIndex++) {
+                    String cellDate = s.GetCellString(rowIndex, 0);
+                    Date date = inputFormat.parse(cellDate);
+                    cellDate = outputFormat.format(date);
+                    for (int colIndex = 1; colIndex <= lastColumn; colIndex++){
+                        String timeslot = s.GetCellString(0,colIndex);
+                        String curCell = s.GetCellString(rowIndex, colIndex).trim();
+                        if (curCell.equals("+")){
+                            Availability tmp = new Availability(cellDate, timeslot, 1);
+                            availabilityList.add(tmp);
+                        }else if (curCell.equals("-")){
+                            Availability tmp = new Availability(cellDate, timeslot, 0);
+                            availabilityList.add(tmp);
+                        }else{
+                            System.out.println(sheetName + " " + cellDate);
+                            throw new Exception();
+                        }
+                    }
+                }
+                if (!availabilityList.isEmpty()){
+                    classroom.setAvailability(availabilityList);
+                }
+            }
+            file.close();
+            return ;
+            
+        } catch (FileNotFoundException ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+            return ;
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (SheetExc ex) {
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα αρχεία διαθεσιμότητας αιθουσών.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex){
+            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα αρχεία διαθεσιμότητας αιθουσών.",
+               "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        }
+        return ;
+    }
+    
+    
+    /**
+     * Συνάρτηση όπου ελέγχει για διπλοεγγραφή καθηγητή.
+     * @param prof Αντικείμενο καθηγητή.
+     * @param cellA Πληροφορία από 1η στήλη.
+     * @param cellB Πληροφορία από 2η στήλη.
+     * @param cellC Πληροφορία από 3η στήλη.
+     * @return εάν υπάρχει ήδη ή όχι.
+     */
+    public boolean checkDuplicateProfessor(Professor prof, String cellA, String cellB, String cellC){
+        if(prof.getProfSurname().equals(cellA) && prof.getProfFirstname().equals(cellB) && prof.getProfField().equals(cellC) ){
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Συνάρτηση όπου ελέγχει για διπλοεγγραφή μαθήματος.
+     * @param course Αντικείμενο καθηγητή.
+     * @param cellA Πληροφορία από 1η στήλη.
+     * @return εάν υπάρχει ήδη ή όχι.
+     */
+    public boolean checkDuplicateCourse(Course course, String cellA){
+        if(course.getCourseName().equals(cellA)){
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Συνάρτηση όπου ελέγχει για έγκυρη πληροφορία.
+     * @param s Το string προς έλεγχο.
+     * @return εάν είναι έγκυρο ή όχι.
+     */
+    public boolean checkIfValid(String s){
+        if(s != null && !s.equals("") && !s.equals(" ")){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    /**
+     * Η μέθοδος αυτή αφαιρεί τα μαθήματα που δεν έχουν κάποιον εξεταστή (δεν υπάρχει δηλαδή σχέση μαθήματος - εξεταστών στο φύλλο 'COURSES_PROFESSORS'. Τα θεωρούμε ως μαθήματα που δεν εξετάζονται).
+     */
+    public void removeCoursesWithNoExaminers(){
+        List<Course> copy = new ArrayList<>(courses);
+        for (Course course : copy){
+            int i = 0;
+            for (Professor prof : course.getExaminers()){
+                i = i + 1;
+            }
+            if (i == 0){
+                courses.remove(course);
+            }
+        }
     }
 
     /**

@@ -9,9 +9,10 @@ import java.util.logging.Logger;
 import org.gmele.general.sheets.exception.SheetExc;
 
 /**
- * Κεντρικό παράθυρο εφαρμογής
- * (user interface - UI) απλό UI φιλικό προς τον χρήστη
- * @author gouvo
+ * Η κλάση MainForm είναι η κύρια κλάση του προγράμματος. Αποτελείται από ένα κεντρικό μενού, ένα απλό παράθυρο εφαρμογής που χρησιμοποιεί μια πολύ απλή και φιλική διεπαφή χρήστη. Διαχειρίζεται την ροή του προγράμματος.
+ * 
+ * @author Nektarios Gkouvousis
+ * @author ice18390193
  */
 public class MainForm extends javax.swing.JFrame {
 

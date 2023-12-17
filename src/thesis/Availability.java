@@ -3,11 +3,14 @@ package thesis;
 import java.io.Serializable;
 
 /**
- * @author gouvo
- * int isAvailable
- * isAvailable == 0 -> Η/Ο αίθουσα/καθηγητής δεν είναι διαθέσιμη/ος/η
- * isAvailable == 1 -> Ο καθηγητής έχει δηλώσει πως μπορεί.
- * isAvailable == 2 -> Ο καθηγητής έχει δηλώσει πως μπορεί αλλά έχει δεσμευθεί από άλλο μάθημα.
+ * Η κλάση Availability ευθύνεται για την διαχείριση της διαθεσιμότητας καθηγητών και αιθουσών
+ * Το isAvailable λαμβάνει τιμές:
+ * 0 - Όχι
+ * 1 - Ναι
+ * 2 - Όχι (Δεσμευμένος - λαμβάνει την τιμη 2 μόνο όταν αλλάξει η διαθεσιμότητα από Ναι σε Όχι.
+ *
+ * @author Nektarios Gkouvousis
+ * @author ice18390193
  */
 
 public class Availability implements Serializable{
@@ -45,5 +48,4 @@ public class Availability implements Serializable{
     public void setIsAvailable(int isAvailable) {
         this.isAvailable = isAvailable;
     }
-        
 }

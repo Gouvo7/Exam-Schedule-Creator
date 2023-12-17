@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author gouvo
+ * Η κλάση χρησιμοποιείται για την αποθήκευση των μαθημάτων που έχουν τοποθετηθεί στον πίνακα excel
+ * 
+ * @author Nektarios Gkouvousis
+ * @author ice18390193
  */
 public class Scheduled {
     

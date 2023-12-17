@@ -30,8 +30,12 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 /**
- * @author gouvo
+ * Η κλάση ScheduleManager κληρονομείται από την κλάση JFrame και είναι υπεύθυνη για την διαχείριση του παραθύρου της δημιουργίας του προγράμματος εξεταστικής
+ * 
+ * @author Nektarios Gkouvousis
+ * @author ice18390193
  */
+
 public class SceduleManager extends JFrame {
     
     private JTable table;
@@ -49,17 +53,7 @@ public class SceduleManager extends JFrame {
     public SceduleManager(ExcelManager excelManager) {
         initComponents();
         this.excelManager1 = excelManager;
-        
         courses = new ArrayList<>(excelManager1.getCourses());
-        
-        /*
-        for (Course crs : courses){
-            List<Professor> ex = crs.getExaminers();
-            for (Professor prf : ex){
-                prf.prinAvailable();
-            }
-        }
-        */
         professors = new ArrayList<>(excelManager1.getProfs());
         classrooms = new ArrayList<>(excelManager1.getClassrooms());
         scheduled = new Scheduled();
@@ -68,15 +62,13 @@ public class SceduleManager extends JFrame {
         modelPanel.add(populateTable());
         coursesPanel.setLayout(new GridLayout(0,3));
         populateCourses();
-        for (Course course : courses){
-            for (Professor prf : course.getExaminers()){
-                //prf.prinAvailable();
-            }
-        }
         this.setVisible(true);
         this.setLocationRelativeTo(null);
     }
 
+    /**
+     * Η μέθοδος χρησιμοποιείται για την δημιουργία των αντικειμένων των μαθημάτων στο κάτω παράθυρο του πραθύρου
+     */
     public void populateCourses() {
         List<Course> notSettled = new ArrayList<>(unscheduled.getCourses());
         for (Course course : notSettled) {
@@ -111,7 +103,7 @@ public class SceduleManager extends JFrame {
                 }
                 for (Professor prf2 : newCourseExaminers){
                     prf2.changeSpecificAvailability(date, timeslot, 2);
-                    System.out.println("Άλλαξα για :" + prf2.getProfSurname());
+                    System.out.println("Άλλαξα για : " + prf2.getProfSurname());
                 }
                 scheduled.addCourse(crs, date, timeslot);
                 unscheduled.getCourses().remove(crs);
@@ -186,8 +178,6 @@ public class SceduleManager extends JFrame {
                                 JButton button = (JButton) component;
                                 if (buttonText.equals(button.getText())) {
                                     coursesPanel.remove(button);
-                                    
-                                    
                                     break;
                                 }
                             }
@@ -221,7 +211,7 @@ public class SceduleManager extends JFrame {
                         for (Course crs : scheduled.getCourses()){
                             if (crs.getCourseName().equals(buttonText)){
                                 for (Professor prf : crs.getExaminers()){
-                                    prf.setAvailable(date, timeslot);
+                                    prf.changeSpecificAvailability(date, timeslot,1);
                                 }
                                 courseToDelete = crs;
                             }
@@ -274,6 +264,14 @@ public class SceduleManager extends JFrame {
         return formattedDate;
     }
     
+    /**
+     * Η μέθοδος ευθύνεται για τον έλεγχο διαθεσιμότητας των καθηγητών ενός μαθήματος για μία συγκεκριμενη ημερομηνία και χρονικό πλαίσιο
+     * 
+     * @param course Αντικείμενο της κλάσης Course όπου από αυτό θα αντλήσουμε τους εξεταστές καθηγητές
+     * @param dateStr Η ημερομηνία προς έλεγχο
+     * @param timeslotStr Το χρονικό πλαίσιο προς έλεγχο
+     * @return true ή false ανάλογα με το εάν όλοι οι καθηγητές του μαθήματος θα ήταν διαθέσιμοι εκείνη την συγκεκριμένη χρονική περίοδο ή όχι
+     */
     public boolean checkAvailabilityForProfessors(Course course, String dateStr, String timeslotStr){
         List<Professor> profs = new ArrayList<>(course.getExaminers());
         List<Integer> results = new ArrayList<>();
@@ -290,9 +288,15 @@ public class SceduleManager extends JFrame {
         return true;
     }
     
-    public Course findCourse(String tmp){
+    /**
+     * Η μέθοδος είναι υπεύθυνη για τον εντοπισμό του μαθήματος από ένα string
+     * 
+     * @param courseName Το όνομα του μαθήματος προς αναζήτηση
+     * @return Αντικείμενο Course ή null ανάλογα με το εάν εντοπίστηκε το μάθημα από το string ή όχι
+     */
+    public Course findCourse(String courseName){
         for (Course course : this.courses){
-            if (course.getCourseName().equals(tmp)){
+            if (course.getCourseName().equals(courseName)){
                 return course;
             }
         }
@@ -315,6 +319,7 @@ public class SceduleManager extends JFrame {
 
         modelScrollPane.setPreferredSize(new java.awt.Dimension(1000, 600));
 
+        modelPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         modelPanel.setPreferredSize(new java.awt.Dimension(900, 500));
         modelPanel.setLayout(null);
         modelScrollPane.setViewportView(modelPanel);

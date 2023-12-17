@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** 
- * @author gouvo
- * Η κλάση Classroom χρησιμοποιείται για την αποθήκευση στοιχείων αιθουσών
+ * Η κλάση Classroom ευθύνεται για την αποθήκευση στοιχείων αιθουσών
+ *
+ * @author Nektarios Gkouvousis
+ * @author ice18390193
  */
-
 public class Classroom implements Serializable{
     private String classroomCode;
     private String classroomName;
@@ -64,9 +65,20 @@ public class Classroom implements Serializable{
         this.availability = availability;
     }
     
-    public void prinAvailable(){
+    /**
+     * Η μέθοδος εκτυπώνει ολόκληρο το φύλλο διαθεσιμότητας για την αίθουσα
+     */
+    public void printClassroomAvailability(){
+        System.out.println("Διαθεσιμότητα αίθουσας " + this.getClassroomName() + " / " + this.getClassroomCode()+ ":");
+        String tmp = null;
         for (Availability x : availability){
-            System.out.println(this.getClassroomName() + " " + x.getDate() + " " + x.getTimeSlot() + " " + x.getIsAvailable());
+            if (x.getIsAvailable() == 1){
+                tmp = "Ναι";
+            }else{
+                tmp = "Όχι";
+            }
+            System.out.println(x.getDate() + " " + x.getTimeSlot() + " - " + tmp);
+            tmp = "";
         }
     }
 }

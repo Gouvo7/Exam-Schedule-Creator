@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** 
- * @author gouvo
- * Η κλάση Course χρησιμοποιείται για την αποθήκευση στοιχείων μαθημάτων καθώς και
- * τους εξεταστές αυτών.
+ * Η κλάση Course χρησιμοποιείται για την αποθήκευση στοιχείων μαθημάτων καθώς και τους εξεταστές αυτών.
+ * 
+ * @author Nektarios Gkouvousis
+ * @author ice18390193
  */
-
 public class Course implements Serializable{
     private String courseName;
     private String courseShort;
@@ -37,58 +37,34 @@ public class Course implements Serializable{
         return this;
     }
     
-    /**
-     * @return the courseName
-     */
     public String getCourseName() {
         return courseName;
     }
 
-    /**
-     * @param courseName the courseName to set
-     */
     public void setCourseName(String courseName) {
         this.courseName = courseName;
     }
 
-    /**
-     * @return the courseShort
-     */
     public String getCourseShort() {
         return courseShort;
     }
 
-    /**
-     * @param courseShort the courseShort to set
-     */
     public void setCourseShort(String courseShort) {
         this.courseShort = courseShort;
     }
 
-    /**
-     * @return the courseSem
-     */
     public String getCourseSem() {
         return courseSem;
     }
 
-    /**
-     * @param courseSem the courseSem to set
-     */
     public void setCourseSem(String courseSem) {
         this.courseSem = courseSem;
     }
 
-    /**
-     * @return the isExamined
-     */
     public boolean isIsExamined() {
         return isExamined;
     }
 
-    /**
-     * @param isExamined the isExamined to set
-     */
     public void setIsExamined(boolean isExamined) {
         this.isExamined = isExamined;
     }
@@ -104,12 +80,17 @@ public class Course implements Serializable{
     public void addExaminer(Professor prof){
         examiners.add(prof);
     }
-    
+
+    /**
+     * Εκτύπωση μαθήματος και εξεταστών.
+     */
+    /*
     public void printStatistics(){
         int i = 0;
         System.out.println("Course is:" + this.getCourseName() + examiners.size());
         for (Professor prof : examiners){
             System.out.println("Professor " + i + ": " + prof.getProfFirstname());
         }
-    }
+    }*/
+
 }

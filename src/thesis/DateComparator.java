@@ -6,10 +6,10 @@ import java.util.Comparator;
 import java.util.Date;
 
 /**
- * Η κλάση DateComparator είναι ένας συγκριτής για την σύγκριση δύο συμβολοσειρών που
- * αναπαριστούν ημερομηνίες με το μορφότυπο 'ηη/μμ/εεεε'. Υλοποιεί την διεπαφή Comparator
- * για την σύγκριση.
- * @author gouvo
+ * Η κλάση DateComparator υλοποιεί την κλάση Comparator και είναι υπεύθυνη για την σύγκριση δύο συμβολοσειρών που αναπαριστούν ημερομηνίες με το μορφότυπο  'ηη/μμ/εεεε'. Υλοποιεί την διεπαφή Comparator για την σύγκριση.
+ *
+ * @author Nektarios Gkouvousis
+ * @author ice18390193
  */
 public class DateComparator implements Comparator<String> {
     /**

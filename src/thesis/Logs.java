@@ -1,7 +1,10 @@
 package thesis;
 
 /**
- * @author gouvo
+ * Η κλάση Logs είναι υπεύθυνη για την καταγραφή ενός ιστορικού (log)
+ * 
+ * @author Nektarios Gkouvousis
+ * @author ice18390193
  */
 public class Logs{
         private String log;
