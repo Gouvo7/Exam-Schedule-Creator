@@ -16,6 +16,7 @@ public class Course implements Serializable{
     private String courseSem;
     private boolean isExamined;
     private List<Professor> examiners;
+    private List<Classroom> classrooms;
     
     Course(String a, String b, String c, boolean d){
         courseName = a;
@@ -23,14 +24,16 @@ public class Course implements Serializable{
         courseSem = c;
         isExamined = d;
         examiners = new ArrayList<>();
+        classrooms = new ArrayList<>();
     }
     
     Course(Course course){
         courseName = course.getCourseName();
         courseShort = course.getCourseShort();
         courseSem = course.getCourseSem();
-        isExamined = course.isIsExamined();
+        isExamined = course.getIsExamined();
         examiners = new ArrayList<>(course.getExaminers());
+        classrooms = new ArrayList<>();
     }
 
     public Course getCourse(){
@@ -60,11 +63,11 @@ public class Course implements Serializable{
     public void setCourseSem(String courseSem) {
         this.courseSem = courseSem;
     }
-
-    public boolean isIsExamined() {
+    
+    public boolean getIsExamined() {
         return isExamined;
     }
-
+    
     public void setIsExamined(boolean isExamined) {
         this.isExamined = isExamined;
     }
@@ -72,6 +75,8 @@ public class Course implements Serializable{
     public List<Professor> getExaminers() {
         return examiners;
     }
+
+    
 
     public void setExaminers(List<Professor> examiners) {
         this.examiners = examiners;
@@ -92,5 +97,4 @@ public class Course implements Serializable{
             System.out.println("Professor " + i + ": " + prof.getProfFirstname());
         }
     }*/
-
 }

@@ -553,8 +553,9 @@ public class ExcelManager {
      */
     public void createTemplate(List<Professor> uniqueProfs, List<String> timeslots, List<String> dates,List<Classroom> classrooms){
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        CellStyles cs = new CellStyles();
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-            CellStyle style = getStyle(workbook);
+            CellStyles style = new CellStyles();
 
             for (Professor professor : uniqueProfs) {
                 // Δημιουργία φύλλου (sheet) για κάθε καθηγητή
@@ -581,15 +582,15 @@ public class ExcelManager {
                     }
                     for (Row row : sheet) {
                         for (Cell cell : row) {
-                            cell.setCellStyle(style);
+                            cell.setCellStyle(cs.getTemplateStyle(workbook));
                         }
                     }
                     sheet.autoSizeColumn(0);
             }
 
             // Αποθήκευση αρχείου προς συμπλήρωση για τους καθηγητές
-        try (FileOutputStream outputStream = new FileOutputStream("C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\prof.xlsx")) {
-                workbook.write(outputStream);
+            try (FileOutputStream outputStream = new FileOutputStream("C:\\Users\\gouvo\\OneDrive\\Documents\\ΠΤΥΧΙΑΚΗ\\prof.xlsx")) {
+                    workbook.write(outputStream);
             }
             logger.appendLogger("Η δημιουργία του template για τους καθηγητές ολοκληρώθηκε επιτυχώς.");
         }catch (Exception e){
@@ -597,8 +598,6 @@ public class ExcelManager {
         }
         
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-            CellStyle style = getStyle(workbook);
-
             for (Classroom classroom : classrooms) {
                 // Δημιουργία ενός φύλλου (sheet) για κάθε αίθουσα
                 String sheetName = classroom.getClassroomName();
@@ -622,7 +621,7 @@ public class ExcelManager {
                 }
                 for (Row row : sheet) {
                     for (Cell cell : row) {
-                        cell.setCellStyle(style);
+                        cell.setCellStyle(cs.getTemplateStyle(workbook));
                     }
                 }
                 sheet.autoSizeColumn(0);
@@ -842,24 +841,6 @@ public class ExcelManager {
                 courses.remove(course);
             }
         }
-    }
-
-    /**
-     * Μέθοδος που δημιουργεί ένα αντικείμενο CellStyle με κάποια ορισμένα χαρακτηριστικά.
-     * @param workbook Αντικείμενο τύπου XSSFWorkbook που θα λάβει την τροποποίηση.
-     * @return style Το αντικείμενο τύπου CellStyle.
-     */
-    
-    private CellStyle getStyle(XSSFWorkbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        XSSFFont font = workbook.createFont();
-        font.setFontHeightInPoints((short) 12);
-        font.setBold(true);
-        style.setFont(font);
-        style.setWrapText(true);
-        style.setAlignment(HorizontalAlignment.CENTER);
-        style.setVerticalAlignment(VerticalAlignment.CENTER);
-        return style;
     }
     
     public boolean readObjects(){

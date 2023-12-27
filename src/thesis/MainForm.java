@@ -2,10 +2,24 @@ package thesis;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.gmele.general.sheets.exception.SheetExc;
 
 /**
@@ -117,7 +131,7 @@ public class MainForm extends javax.swing.JFrame {
             boolean hasRead = a.readTemplates();
             List<Course> crs = new ArrayList<>(a.getCourses());
             if (hasRead){
-                SceduleManager b = new SceduleManager(a);
+                ScheduleManager b = new ScheduleManager(a);
             }else {
                 System.out.println("Πρόβλημα κατά την ανάγνωση των δεδομένων από τα συμπληρωμένα templates.");
             }
@@ -131,17 +145,13 @@ public class MainForm extends javax.swing.JFrame {
         ExcelManager a = new ExcelManager(this,path);
         a.createExcels();
     }//GEN-LAST:event_produceBtnActionPerformed
-
+    
     public static void main(String[] args) throws FileNotFoundException, IOException {
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            System.exit(-1);
         }
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
@@ -159,5 +169,4 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton loadBtn;
     private javax.swing.JButton produceBtn;
     // End of variables declaration//GEN-END:variables
-    
 }
