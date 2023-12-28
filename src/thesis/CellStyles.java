@@ -93,16 +93,11 @@ public class CellStyles {
         font.setBold(true);
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
-
-        style.setFillForegroundColor(IndexedColors.AQUA.getIndex());
-        
         style.setBorderTop(BorderStyle.THIN);
         style.setBorderBottom(BorderStyle.THIN);
         style.setBorderLeft(BorderStyle.THIN);
         style.setBorderRight(BorderStyle.THIN);
-
         style.setWrapText(true);
-
         return style;
     }
 }

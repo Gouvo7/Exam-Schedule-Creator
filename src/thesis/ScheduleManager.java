@@ -32,13 +32,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import org.apache.poi.ss.usermodel.BorderStyle;
+import javax.swing.table.TableCellRenderer;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -58,7 +54,6 @@ public class ScheduleManager extends JFrame {
     private List<Classroom> classrooms;
     private Scheduled scheduled;
     private Unscheduled unscheduled;
-    
 
     public ScheduleManager() {
     }
@@ -209,9 +204,9 @@ public class ScheduleManager extends JFrame {
                     }
                 }
             }
-            
             autoSizeColumns(sheet, tableColumns);
             applyCellStyles(workbook, sheet, tableRows, tableColumns);
+            
             System.out.println("Fix");
             // Αποθήκευση αρχείου προς συμπλήρωση για τους καθηγητές
             try (FileOutputStream outputStream = new FileOutputStream("C:\\Users\\gouvo\\OneDrive\\Desktop\\tmp.xlsx")) {
@@ -232,22 +227,12 @@ public class ScheduleManager extends JFrame {
      */
     public String askUserToSaveFile(){
         JFileChooser fileChooser = new JFileChooser();
-        
-        // Set file filter (optional)
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Excel Files (*.xlsx, *.xls)", "xlsx");
         fileChooser.setFileFilter(filter);
-
-        // Show the file chooser dialog
         int result = fileChooser.showSaveDialog(this);
-
-        // Check if the user clicked "OK"
         if (result == JFileChooser.APPROVE_OPTION) {
-            // Get the selected file
             java.io.File selectedFile = fileChooser.getSelectedFile();
-            
-            // Get the full path and name of the file
             String fullPath = selectedFile.getAbsolutePath();
-
             if (!fullPath.contains(".xlsx")){
                 fullPath = fullPath + ".xlsx";
                 return fullPath;
@@ -269,7 +254,6 @@ public class ScheduleManager extends JFrame {
             JButton courseButton = new JButton(course.getCourseName());
             courseButton.setPreferredSize(new Dimension(270, 40)); // Set preferred size as needed
             courseButton.setText(course.getCourseName());
-            courseButton.setBackground(Color.darkGray);
             courseButton.setTransferHandler(new ButtonTransferHandler(course.getCourseName()));
 
             courseButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -305,7 +289,29 @@ public class ScheduleManager extends JFrame {
             }
         };
         
-        table = new JTable(model);
+        JTable table = new JTable(model) {
+        @Override
+        public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+            Component comp = super.prepareRenderer(renderer, row, column);
+            Color headerCells = Color.decode("#993366");
+            Color otherCells = Color.decode("#FF8080");
+            // Apply the custom background color logic
+            if (column == 0 && row == 0) {
+                // First cell in the first column and first row
+                comp.setBackground(Color.WHITE);
+            } else if (column == 0) {
+                // Any cell in the first column (excluding the first cell)
+                comp.setBackground(headerCells);
+            } else if (row == 0 && column > 0) {
+                // Any cell in the first row (excluding the first cell)
+                comp.setBackground(headerCells);
+            } else {
+                // All other cells
+                comp.setBackground(otherCells);
+            }
+            return comp;
+        }
+    };
         table.setRowHeight(60);
         table.setCellSelectionEnabled(false);
         table.setTableHeader(new JTableHeader());
@@ -313,15 +319,13 @@ public class ScheduleManager extends JFrame {
         table.setShowGrid(true);
         table.setGridColor(Color.BLACK);
         
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-        Color myWhite = new Color(226, 75, 42);
-        centerRenderer.setBackground(myWhite);
         for (int j = 0; j < excelCols; j++){
             model.setValueAt(timeslots.get(j), 0, j + 1);
-            table.getColumnModel().getColumn(j + 1).setCellRenderer(new CustomRenderer(centerRenderer));
+            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+            centerRenderer.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
+            table.getColumnModel().getColumn(j).setCellRenderer(centerRenderer);
         }
-        table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        
         for (int i = 0; i < excelRows; i++) {
             LocalDate date = LocalDate.parse(dates.get(i), dateFormatter);
             String greekDayName = date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("el-GR"));
@@ -343,15 +347,11 @@ public class ScheduleManager extends JFrame {
                     String rowValue = (String) table.getValueAt(row, 0);
                     String colValue = (String) table.getValueAt(0, col);
                     
-                    // Format from 'dd/mm/YYYY Weekday' to simply 'dd/mm/YYYY'
+                    // Μετατροπή της ημερομηνίας από την μορφή 'ηη/μμ/εεεε Ημέρα' to simply 'ηη/μμ/εεεε'
                     rowValue = getDateWithGreekFormat(rowValue);
                     boolean check1 = checkExaminersConflict(tmpCourse, rowValue, colValue);
                     if (check1){
-                        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-                        centerRenderer.setHorizontalAlignment(DefaultTableCellRenderer.CENTER);
-        
                         model.setValueAt(buttonText, row, col);
-                        table.getColumnModel().getColumn(col).setCellRenderer(centerRenderer);
                         Component[] components = coursesPanel.getComponents();
                         for (Component component : components) {
                             if (component instanceof JButton) {
@@ -413,25 +413,16 @@ public class ScheduleManager extends JFrame {
                                 handler.exportAsDrag(comp, evt, TransferHandler.COPY);
                             }
                         });
-
                         coursesPanel.add(button);
                         coursesPanel.revalidate();
                         coursesPanel.repaint();
-
-                        // Clear the cell value
                         model.setValueAt(null, selectedRow, selectedColumn);
                     }
                 }
             }
         });
-
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            //table.getColumnModel().getColumn(i).setCellRenderer(new CustomCellRenderer());
-        }
-        
         return scrollPane;
     }
         
@@ -582,7 +573,6 @@ public class ScheduleManager extends JFrame {
         }
     }
     
-    
     private static String removeAccents(String s) {
         return s.replaceAll("ά", "α")
             .replaceAll("έ", "ε")
@@ -599,7 +589,6 @@ public class ScheduleManager extends JFrame {
             .replaceAll("Ύ", "Υ")
             .replaceAll("Ώ", "Ω");
     }
-    
     
     private void autoSizeColumns(XSSFSheet sheet, int columns){
         for (int i = 0; i <= columns; i++){
@@ -618,25 +607,5 @@ public class ScheduleManager extends JFrame {
     private javax.swing.JPanel modelPanel;
     private javax.swing.JScrollPane modelScrollPane;
     // End of variables declaration//GEN-END:variables
-    
-    // Custom renderer that applies center alignment only to the first row of the columns
-    /**
-     * Τροποποιημένη κλάση που χρησιμοποιεί το DefaultTableCellRenderer και ο σκοπός
-     * της είναι η τοποθέτηση των σωστών χρωμάτων ως backround στα κελιά.
-     */
-    private static class CustomRenderer extends DefaultTableCellRenderer {
-        private final DefaultTableCellRenderer defaultRenderer;
-        public CustomRenderer(DefaultTableCellRenderer defaultRenderer) {
-            this.defaultRenderer = defaultRenderer;
-        }
 
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (row == 0 && column != 0) {
-                return defaultRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            } else {
-                return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            }
-        }
-    }
 }
