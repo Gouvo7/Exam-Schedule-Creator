@@ -182,24 +182,18 @@ public class ScheduleManager extends JFrame {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("ΠΡΟΓΡΑΜΜΑ ΕΞΕΤΑΣΤΙΚΗΣ");
             fillHeaders(workbook, sheet, dateFormatter, timeslots, dates);
-            
             int tableRows = table.getRowCount() - 1;
-            int tableColumns = table.getColumnCount();
-            System.out.println("Table rows: " + tableRows);
-            System.out.println("Table collumns: " + tableColumns);
+            int tableColumns = table.getColumnCount() - 1;
+            
             for (int i = 1; i < tableRows; i++){
-                System.out.println("Row is: " + i);
                 for (int j = 1; j < tableColumns; j++){
                     try{
-                        System.out.println("Column is: " + j);
                         String cellValue = (String) table.getValueAt(i, j);
                         if (cellValue != null && !cellValue.isEmpty()){
-                            System.out.println(cellValue);
                             Cell excelCell = (Cell) sheet.getRow(i).createCell(j + 1);
                             excelCell.setCellValue(cellValue);
                         }
                     }catch (Exception e){
-                        System.out.println(e);
                         JOptionPane.showMessageDialog(this, "Exception thrown:" + i + " " + j,"Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
                     }
                 }
@@ -207,7 +201,7 @@ public class ScheduleManager extends JFrame {
             autoSizeColumns(sheet, tableColumns);
             applyCellStyles(workbook, sheet, tableRows, tableColumns);
             
-            System.out.println("Fix");
+            JOptionPane.showMessageDialog(this, "Η δημιουργία του αρχείου προγράμματος εξεταστικής ολοκληρώθηκε επιτυχώς!", "Μήνυμα Λάθους", JOptionPane.INFORMATION_MESSAGE);
             // Αποθήκευση αρχείου προς συμπλήρωση για τους καθηγητές
             try (FileOutputStream outputStream = new FileOutputStream("C:\\Users\\gouvo\\OneDrive\\Desktop\\tmp.xlsx")) {
                 workbook.write(outputStream);
@@ -318,7 +312,7 @@ public class ScheduleManager extends JFrame {
         table.getTableHeader().setReorderingAllowed(false);
         table.setShowGrid(true);
         table.setGridColor(Color.BLACK);
-        
+        this.table = table;
         for (int j = 0; j < excelCols; j++){
             model.setValueAt(timeslots.get(j), 0, j + 1);
             DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -531,7 +525,7 @@ public class ScheduleManager extends JFrame {
         cell1.setCellValue("ΗΜ/ΝΙΑ");
         cell2.setCellValue("ΗΜΕΡΑ");
         for (int i = 0; i < timeslots.size(); i++) {
-        Cell cell = timeslotRow.createCell(i + 2);
+            Cell cell = timeslotRow.createCell(i + 2);
             cell.setCellValue(timeslots.get(i));
             cell.setCellStyle(cs.getDateValuesStyle(workbook));
         }
