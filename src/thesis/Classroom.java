@@ -1,27 +1,36 @@
 package thesis;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /** 
- * Η κλάση Classroom ευθύνεται για την αποθήκευση στοιχείων αιθουσών
- *
  * @author Nektarios Gkouvousis
  * @author ice18390193
+ * 
+ * Η κλάση Classroom αντιπροσωπεύει κάθε αίθουσα διδασκαλίας. Περιλαμβάνει στοιχεία όπως τον κωδικό, 
+ * το όνομα, τον αριθμό των θέσεων και αν πρόκειται για αίθουσα θεωρίας ή εργαστηρίου.
+ * Επίσης, διαχειρίζεται τη διαθεσιμότητα της αίθουσας.
  */
-public class Classroom implements Serializable{
+public class Classroom{
     private String classroomCode;
     private String classroomName;
     private int classroomSeats;
     private boolean isLabClassroom;
     private List<Availability> availability;
     
-    Classroom(String a, String b, int c, String d){
-        classroomCode = a;
-        classroomName = b;
-        classroomSeats = c;
-        if (d.equals("+")){
+    /**
+     * Κατασκευαστής για τη δημιουργία ενός νέου αντικειμένου Classroom.
+     *
+     * @param code Ο κωδικός της αίθουσας (string)
+     * @param name Το όνομα της αίθουσας (string)
+     * @param seats Ο αριθμός των θέσεων στην αίθουσα (integer > 0)
+     * @param type Τύπος αίθουσας (char '+' για εργαστηριακή, αλλιώς '-' για κανονική)
+     */
+    Classroom(String code, String name, int seats, String type){
+        classroomCode = code;
+        classroomName = name;
+        classroomSeats = seats;
+        if (type.equals("+")){
             isLabClassroom = true;
         }else{
             isLabClassroom = false;
@@ -66,7 +75,10 @@ public class Classroom implements Serializable{
     }
     
     /**
-     * Η μέθοδος εκτυπώνει ολόκληρο το φύλλο διαθεσιμότητας για την αίθουσα
+     * Εκτυπώνει την πλήρη διαθεσιμότητα της αίθουσας στην κονσόλα.
+     * Η έξοδος περιλαμβάνει την ημερομηνία, το χρονικό διάστημα και τη διαθεσιμότητα
+     * για κάθε διάστημα. Εκτυπώνεται το όνομα και ο κωδικός της αίθουσας
+     * καθώς και αν είναι διαθέσιμη ή όχι για κάθε διάστημα.
      */
     public void printClassroomAvailability(){
         System.out.println("Διαθεσιμότητα αίθουσας " + this.getClassroomName() + " / " + this.getClassroomCode()+ ":");

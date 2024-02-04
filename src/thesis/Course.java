@@ -5,32 +5,56 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** 
- * Η κλάση Course χρησιμοποιείται για την αποθήκευση στοιχείων μαθημάτων καθώς και τους εξεταστές αυτών.
- * 
  * @author Nektarios Gkouvousis
  * @author ice18390193
+ * 
+ * Η κλάση Course αντιπροσωπεύει κάθε μάθημα του τμήματος. Περιλαμβάνει πληροφορίες όπως το όνομα του μαθήματος,
+ * τη συντομογραφία του, το εξάμηνο στο οποίο διδάσκεται, εάν βρίσκεται σε χειμερινό ή εαρινό εξάμηνο, καθώς και αν εξετάζεται. 
+ * Αποθηκεύει επίσης τους εξεταστές του μαθήματος καθώς και τις αίθουσες διεξαγωγής της
+ * εξέτασης
  */
-public class Course implements Serializable{
+
+public class Course{
     private String courseName;
     private String courseShort;
     private String courseSem;
+    private String courseSeason;
     private boolean isExamined;
     private List<Professor> examiners;
     private List<Classroom> classrooms;
     
-    Course(String a, String b, String c, boolean d){
-        courseName = a;
-        courseShort = b;
-        courseSem = c;
-        isExamined = d;
+    
+    /**
+     * Κατασκευαστής για τη δημιουργία ενός νέου αντικειμένου Course.
+     *
+     * @param name Το όνομα του μαθήματος (String)
+     * @param nameShort Η συντομογραφία του μαθήματος (String)
+     * @param semester Το εξάμηνο διεξαγωγής του μαθήματος (String)
+     * @param season Περίοδος εξέστασης (String 'ΕΑΡΙΝΟ'/'ΧΕΙΜΕΡΙΝΟ')
+     * @param isExamined Εάν εξετάζεται το μάθημα ή όχι(boolean, true για '+', false για '-')
+     */
+    public Course(String name, String nameShort, String semester, String season, boolean isExamined){
+        courseName = name;
+        courseShort = nameShort;
+        courseSem = semester;
+        courseSeason = season;
+        isExamined = isExamined;
         examiners = new ArrayList<>();
         classrooms = new ArrayList<>();
     }
     
-    Course(Course course){
+    /**
+     * Ένας κατασκευαστής (copy-constrctor) ο οποίος δημιουργεί ένα νέο αντικείμενο
+     * τύπου Cousrse με τιμές από ένα άλλο αντικείμενο Course.
+     * 
+     * @param course Αντικείμενο τύπου Course από το οποίο θα αντληθούν τα στοιχεία
+     * που θα θέσουμε στο νέο αντικείμενο Course.
+     */
+    public Course(Course course){
         courseName = course.getCourseName();
         courseShort = course.getCourseShort();
         courseSem = course.getCourseSem();
+        courseSeason = course.getCourseSeason();
         isExamined = course.getIsExamined();
         examiners = new ArrayList<>(course.getExaminers());
         classrooms = new ArrayList<>();
@@ -76,14 +100,20 @@ public class Course implements Serializable{
         return examiners;
     }
 
-    
-
     public void setExaminers(List<Professor> examiners) {
         this.examiners = examiners;
     }
     
     public void addExaminer(Professor prof){
         examiners.add(prof);
+    }
+    
+    public void setCourseSeason(String s) {
+        this.courseSeason = s;
+    }
+    
+    public String getCourseSeason(){
+        return this.courseSeason;
     }
 
     /**

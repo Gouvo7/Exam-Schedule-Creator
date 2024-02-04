@@ -70,13 +70,10 @@ public class Professor implements Serializable{
         for (Availability a : availability){
             if (a.getDate().equals(date) && a.getTimeSlot().equals(timeslot)){
                 if(a.getIsAvailable() == 0){
-                    System.out.println("Ο καθηγητής: " + this.getProfSurname() + " δεν είναι διαθέσιμος για την ημερομηνία: " + a.getDate() + " + ώρα: " + a.getTimeSlot());
                     return 0;
                 }else if (a.getIsAvailable() == 1){
-                    System.out.println("Ο καθηγητής: " + this.getProfSurname() + " είναι διαθέσιμος για την ημερομηνία: " + a.getDate() + " + ώρα: " + a.getTimeSlot());
                     return 1;
                 }else if (a.getIsAvailable() == 2){
-                    System.out.println("Ο καθηγητής: " + this.getProfSurname() + " έχει άλλο μάθημα για την ημερομηνία: " + a.getDate() + " + ώρα: " + a.getTimeSlot());
                     return 2;
                 }
             }
@@ -100,23 +97,6 @@ public class Professor implements Serializable{
     }
 
     /**
-     * Η μέθοδος εκτυπώνει ολόκληρο το φύλλο διαθεσιμότητας του καθηγητή
-     */
-    public void printProfessorAvailability(){
-        System.out.println("Διαθεσιμότητα καθηγητή " + this.getProfSurname() + " " + this.getProfFirstname() + ":");
-        String tmp = null;
-        for (Availability x : availability){
-            if (x.getIsAvailable() == 1){
-                tmp = "Ναι";
-            }else{
-                tmp = "Όχι";
-            }
-            System.out.println(x.getDate() + " " + x.getTimeSlot() + " - " + tmp);
-            tmp = "";
-        }
-    }
-
-    /**
      * Η μέθοδος ελέγχει την ισότητα μεταξύ δύο αντικειμένων καθηγητών
      * @param obj Αντικείμενο
      * @return true ή false αντίστοιχα με το εάν είναι το ίδιο αντικείμενο καθηγητή ή όχι
@@ -133,5 +113,11 @@ public class Professor implements Serializable{
         return Objects.equals(profSurname, professor.profSurname) &&
                Objects.equals(profFirstname, professor.profFirstname) &&
                Objects.equals(profField, professor.profField);
+    }
+    
+    public void prinAvailability(){
+        for(Availability a: availability){
+            System.out.println("Professor: " + profSurname + " Date: " + a.getDate() + " and timeslot: " + a.getTimeSlot() + " : " + a.getIsAvailable());
+        }
     }
 }
