@@ -39,7 +39,7 @@ import org.gmele.general.sheets.exception.SheetExc;
  */
 public class ExcelManager {
     
-    private String[] weekdays = {"ΚΥΡΙΑΚΗ", "ΔΕΥΤΕΡΑ", "ΤΡΙΤΗ", "ΤΕΤΑΡΤΗ", "ΠΕΜΠΤΗ", "ΠΑΡΑΣΚΕΥΗ", "ΣΑΒΒΑΤΟ"};
+    private String[] weekdays = { "ΔΕΥΤΕΡΑ", "ΤΡΙΤΗ", "ΤΕΤΑΡΤΗ", "ΠΕΜΠΤΗ", "ΠΑΡΑΣΚΕΥΗ", "ΣΑΒΒΑΤΟ", "ΚΥΡΙΑΚΗ" };
     private static String fileName;
     private static String sheet1, sheet2,sheet3, sheet4, sheet5, sheet6;
     private boolean excel1, excel2, excel3, excel4, excel5, excel6;
@@ -55,12 +55,12 @@ public class ExcelManager {
     /**
      * Κατασκευαστής του ExcelManager αντικειμένου στον οποίο οι περισσότερες
      * ιδιότητες του ExcelManager αρχικοποιούνται με βάση τις σταθερές από το
-     * αντικείμενο της κλάσης Definitions
+     * αντικείμενο της κλάσης Definitions.
      * 
      * @param jFrame Το JFrame που χρησιμοποιείται για την εμφάνιση διαλογικών 
-     * παραθύρων και μηνυμάτων (JFrame)
+     * παραθύρων και μηνυμάτων (JFrame).
      * @param def Αντικείμενο της κλάσης Definitions που περιέχει ρυθμίσεις και 
-     * πληροφορίες διαδρομών αρχείων (Definitions)
+     * πληροφορίες διαδρομών αρχείων (Definitions).
      */
     public ExcelManager(JFrame jFrame, Definitions def){
         myJFrame = jFrame;
@@ -163,7 +163,7 @@ public class ExcelManager {
                 return false;
             }
             courses = new ArrayList<>();
-            courses = readCourses(fileName, profs);
+            courses = readCourses(fileName);
             if (courses == null) {
                 return false;
             }
@@ -184,13 +184,12 @@ public class ExcelManager {
      * Η μέθοδος προσθέτει στα μαθήματα (αντικείμενα τύπου Course) τους καθηγητές που
      * εξετάζουν το κάθε μάθημα.
      * 
-     * @param profs Η λίστα των καθηγητών List (<Professor>)
-     * @param courses Η λίστα των μαθημάτων List (<Course>)
+     * @param profs Η λίστα των καθηγητών List (<Professor>).
+     * @param courses Η λίστα των μαθημάτων List (<Course>).
      * @param filename Το όνομα του αρχείου που περιέχει τις αντιστοιχίσεις καθηγητών σε μαθήματα.
      * @return true εάν η προσθήκη ήταν επιτυχής, αλλιώς false.
-     * @throws SheetExc εάν υπάρχει σφάλμα στην επεξεργασία του φύλλου.
      */
-    public boolean addProfsToCourses(List<Professor> profs, List<Course> courses) throws SheetExc{
+    public boolean addProfsToCourses(List<Professor> profs, List<Course> courses){
         int rowIndex = 0;
         boolean error = false;
         String course = null;
@@ -290,12 +289,12 @@ public class ExcelManager {
     
     /**
      * Εντοπισμός όλων των μαθημάτων που έχουν καταχωρηθεί στο βασικό αρχείο.
+     * 
      * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
-     * @param profs Η λίστα με τους καθηγητές.
-     * @return Μία λίστα με αντικείμενα τύπου Course.
-     * @throws SheetExc 
+     * @param courses Η λίστα με τα μαθήματα.
+     * @return Την λίστα courses με όλα τα μαθήματα(List<Course>).
      */
-    public List<Course> readCourses(String filename, List<Professor> profs) throws SheetExc{
+    public List<Course> readCourses(String filename){
         int rowIndex = 0;
         boolean error = false;
         try (FileInputStream file = new FileInputStream(new File(filename))) {
@@ -388,9 +387,8 @@ public class ExcelManager {
      * Εντοπισμός όλων των αιθουσών που έχουν καταχωρηθεί στο βασικό αρχείο.
      * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
      * @return Μία λίστα με αντικείμενα τύπου Classroom.
-     * @throws SheetExc 
      */
-    public List<Classroom> readClassrooms(String filename) throws SheetExc{
+    public List<Classroom> readClassrooms(String filename){
         int rowIndex = 0;
         boolean error = false;
         try (FileInputStream file = new FileInputStream(new File(filename))) {
@@ -458,9 +456,8 @@ public class ExcelManager {
      * Εντοπισμός όλων των ημερομηνιών της εξεταστικής που έχουν καταχωρηθεί στο βασικό αρχείο.
      * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
      * @return Ένα HashMap με ζευγάρια ημέρας - ημερομηνίας.
-     * @throws SheetExc 
      */
-    public List<String> readDates(String filename) throws SheetExc{
+    public List<String> readDates(String filename){
         int rowIndex = 0;
         boolean error = false;
         try (FileInputStream file = new FileInputStream(new File(filename))) {
@@ -519,9 +516,8 @@ public class ExcelManager {
      * Εντοπισμός όλων των διαστημάτων εξέτασης που έχουν καταχωρηθεί στο βασικό αρχείο.
      * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
      * @return Μία λίστα με Strings.
-     * @throws SheetExc 
      */
-    public List<String> readTimeslots(String filename) throws SheetExc{
+    public List<String> readTimeslots(String filename){
         int rowIndex = 0;
         boolean error = false;
         try (FileInputStream file = new FileInputStream(new File(filename))) {
@@ -565,9 +561,8 @@ public class ExcelManager {
      * Εντοπισμός όλων των καθηγητών που έχουν καταχωρηθεί στο βασικό αρχείο.
      * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
      * @return Μία λίστα με αντικείμενα τύπου Professor.
-     * @throws SheetExc 
      */
-    public List<Professor> readProfs(String filename) throws SheetExc{
+    public List<Professor> readProfs(String filename){
         int rowIndex = 0;
         boolean error = false;
         try (FileInputStream file = new FileInputStream(new File(filename))) {
@@ -643,14 +638,13 @@ public class ExcelManager {
      * στην 1η στήλη σε κάθε γραμμή την ημερομηνία εξέτασης.
      *
      * @param uniqueProfs Λίστα μοναδικών αντικειμένων καθηγητών για τους οποίους 
-     * θα φτιαχτεί από ένα φύλλο στον καθένα (List<Professor>)
+     * θα φτιαχτεί από ένα φύλλο στον καθένα (List<Professor>).
      * @param timeslots Λίστα strings με τα διαστήματα εξέτασης που θα χρησιμοποιηθούν
-     * ως headers στις στήλες του κάθε φύλλου(List<String>)
+     * ως headers στις στήλες του κάθε φύλλου(List<String>).
      * @param dates Λίστα strings με τις ημερομηνίες της εξεταστικής που θα 
-     * χρησιμοποιθούν ως headers για τις γραμμές του κάθε φύλλου (List<String>)
+     * χρησιμοποιθούν ως headers για τις γραμμές του κάθε φύλλου (List<String>).
      * @param classrooms Λίστα αντικειμένων αιθουσών για τις οποίες θα φτιαχτεί
-     * από ένα φύλλο για την κάθε μία (List<Course>)
-     * @param fileName
+     * από ένα φύλλο για την κάθε μία (List<Course>).
      */
     public void createTemplate(List<Professor> uniqueProfs, List<String> timeslots, List<String> dates,List<Classroom> classrooms){
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -722,6 +716,7 @@ public class ExcelManager {
                         String greekDayNameWithoutAccents = Normalizer.normalize(greekDayName, Normalizer.Form.NFD)
                             .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
                         dateCell.setCellValue(greekDayNameWithoutAccents + " " + tmp);
+                        
                 }
                 for (Row row : sheet) {
                     for (Cell cell : row) {
@@ -744,17 +739,21 @@ public class ExcelManager {
     
     
     /**
-     * Η συνάρτηση διαβάζει το κύριο excel που εμπεριέχει πληροφορίες για τους καθηγητές, τα μαθήματα, τις σχέσεις τους κ.α.Έπειτα, καλεί 2 μεθόδους που συμπληρώνουν στα αντικείμενα καθηγητών και αιθουσών την διαθεσιμότητά τους με βάση τα συμπληρωμένα
-     * template.
+     * Η συνάρτηση καλεί δύο μεθόδους της κλάσης ExcelManager ώστε να 
+     * πραγματοποιηθεί ανάγνωση των συμπληρωμένων αρχείων διαθεσιμοτήτων για τους
+     * καθηγητές και τις αίθουσες. 
      * 
-     * @return true ή false αντίστοιχα με το εάν ολοκληρώθηκε η διαδικασία ανάγνωσης των αρχείων prof.xlsx και classrooms.xlsx ολοκληρώθηκε επιτυχώς ή όχι
-     * @throws org.gmele.general.sheets.exception.SheetExc
+     * @return Επιστρέφει true ή false ανάλογα με το εάν η διαδικασσία
+     * έχει ολοκληρωθεί επιτυχώς ή όχι (boolean).
      */
-    public boolean readAvailabilityTemplates() throws SheetExc{
+    public boolean readAvailabilityTemplates(){
         try {
-            addProfessorsAvailability(profs, timeslots.size(), def.getFolderPath() + "\\" + def.getProfessorsAvailabilityFile());
-            addClassroomsAvailability(classrooms, timeslots.size(), def.getFolderPath() + "\\" + def.getClassroomsAvailabilityFile());
-            return true;
+            if(addProfessorsAvailability(profs, timeslots.size())){
+                if(addClassroomsAvailability(classrooms, timeslots.size())){
+                    return true;
+                }
+            }
+            return false;
         }catch (Exception e){
             return false;
         }
@@ -767,11 +766,12 @@ public class ExcelManager {
      * χρονικών πλαισίων.
      * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
      */    
-    public void addProfessorsAvailability(List<Professor> professors,int lastColumn, String filename) throws SheetExc{
+    public boolean addProfessorsAvailability(List<Professor> professors,int lastColumn) throws SheetExc{
         int rowIndex = 0;
         int colIndex = 0;
         String sheetName="";
         String curCell="";
+        String filename = def.getFolderPath() + "\\" + def.getProfessorsAvailabilityFile();
         XlsxSheet sheet = null;
         DateFormatSymbols symbols = new DateFormatSymbols(new Locale("el", "GR"));
         symbols.setWeekdays(weekdays);
@@ -782,16 +782,17 @@ public class ExcelManager {
             for (Professor professor : professors){
                 sheetName = professor.getProfSurname() + " " + professor.getProfFirstname();
                 sheet.SelectSheet(sheetName);
-                
                 int lastRow = sheet.GetLastRow();
                 List<Availability> availabilityList = new ArrayList<>();
                 for (rowIndex = 1; rowIndex <= lastRow; rowIndex++) {
                     String cellDate = sheet.GetCellString(rowIndex, 0);
+                    System.out.println("kostas" + cellDate);
                     Date date = inputFormat.parse(cellDate);
                     cellDate = outputFormat.format(date);
                     for (colIndex = 1; colIndex <= lastColumn; colIndex++){
                         String timeslot = sheet.GetCellString(0,colIndex);
-                         curCell = sheet.GetCellString(rowIndex, colIndex);
+                        curCell = sheet.GetCellString(rowIndex, colIndex);
+                        System.out.println(cellDate + " - " + timeslot + ": '" + curCell + "'");
                         if (curCell.equals("+")){
                             Availability tmp = new Availability(cellDate, timeslot, 1);
                             availabilityList.add(tmp);
@@ -808,22 +809,18 @@ public class ExcelManager {
                 }
             }
             file.close();
-            return ;
+            return true;
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return ;
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-        } catch (SheetExc ex) {
-            JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα αρχεία διαθεσιμότητας καθηγητών"
-                    + " στο φύλλο '" + sheetName + "' στην γραμμή:στήλη " + rowIndex + ":" + colIndex + ".", "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex){
             JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα αρχεία διαθεσιμότητας καθηγητών"
-                    + " στο φύλλο '" + sheetName + "' στην γραμμή:στήλη " + rowIndex + ":" + colIndex + ".", "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+                    + " στο φύλλο '" + sheetName + "' στην γραμμή:στήλη " + rowIndex + ":" + colIndex + "." + ex, "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
-        return ;
+        return false;
     }
     
     /**
@@ -833,9 +830,10 @@ public class ExcelManager {
      * χρονικών πλαισίων.
      * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
      */
-    public void addClassroomsAvailability(List<Classroom> classrooms,int lastColumn, String filename){
+    public boolean addClassroomsAvailability(List<Classroom> classrooms, int lastColumn){
         int rowIndex = 0;
         int colIndex = 0;
+        String filename = def.getFolderPath() + "\\" + def.getClassroomsAvailabilityFile();
         String sheetName="";
         String curCell="";
         DateFormatSymbols symbols = new DateFormatSymbols(new Locale("el", "GR"));
@@ -873,12 +871,11 @@ public class ExcelManager {
                 }
             }
             file.close();
-            return ;
+            return true;
             
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
-            return ;
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(myJFrame, "Το αρχείο '" + filename + "' δεν βρέθηκε.",
                "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
@@ -889,36 +886,53 @@ public class ExcelManager {
             JOptionPane.showMessageDialog(myJFrame, "Πρόβλημα με τα συμπληρωμένα αρχεία διαθεσιμότητας αιθουσών"
                     + " στο φύλλο '" + sheetName + "' στην γραμμή:στήλη " + rowIndex + ":" + colIndex + ".", "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
         }
-        return ;
+        return false;
     }
     
     
     /**
      * Συνάρτηση όπου ελέγχει για διπλοεγγραφή καθηγητή.
-     * @param prof Αντικείμενο καθηγητή.
-     * @param cellA Πληροφορία από 1η στήλη.
-     * @param cellB Πληροφορία από 2η στήλη.
-     * @param cellC Πληροφορία από 3η στήλη.
+     * 
+     * @param prof Αντικείμενο καθηγητή (Professor).
+     * @param cellA Πληροφορία από 1η στήλη (String).
+     * @param cellB Πληροφορία από 2η στήλη (String).
      * @return εάν υπάρχει ήδη ή όχι.
      */
-    public boolean checkDuplicateProfessor(Professor prof, String cellA, String cellB){
-        if(prof.getProfSurname().equals(cellA) && prof.getProfFirstname().equals(cellB)){
+    private boolean checkDuplicateProfessor(Professor prof, String cellA, String cellB){
+        if(prof.getProfSurname().equals(cellA) && prof.getProfSurname().equals(cellB)){
             return true;
         }
         return false;
     }
     
-    public boolean checkIfProfessorExists(String cell){
-        boolean exists = false;
+    /**
+     * Συνάρτηση όπου ελέγχει εάν το string ανήκει σε επώνυμο καθηγητή στην 
+     * λίστα από τους διαβασμένους καθηγητές.
+     * 
+     * @param cell Το περιεχόμενο του κελιού (String).
+     * 
+     * @return true εφόσον το string ταιριάζει με επώνυμο καθηγητή και false 
+     * εάν όχι (boolean).
+     */
+    private boolean checkIfProfessorExists(String cell){
         for (Professor prf : this.profs){
             if (prf.getProfSurname().equals(cell)){
-                exists = true;
+                return true;
             }
         }
-        return exists;
+        return false;
     }
     
-    public boolean checkIfCellIsValid(String cell){
+    
+    /**
+     * Συνάρτηση που ελέγχει εάν οι το string που έχει δοθεί ως παράμετρο είναι
+     * είτε παύλα ('-') είτε καθηγητής.
+     * 
+     * @param cell Το περιεχόμενο ενός κελιού (String).
+     * @return true εάν ανήκει σε ένα από τις 2 αποδεκτές κατηγορίες και false
+     * εάν όχι (boolean).
+     */
+    private boolean checkIfCellIsValid(String cell){
         if(cell.equals("-") || checkIfProfessorExists(cell)){
             return true;
         }
@@ -927,9 +941,10 @@ public class ExcelManager {
     
     /**
      * Συνάρτηση όπου ελέγχει για διπλοεγγραφή μαθήματος.
-     * @param course Αντικείμενο καθηγητή.
-     * @param cellA Πληροφορία από 1η στήλη.
-     * @return εάν υπάρχει ήδη ή όχι.
+     * 
+     * @param course Αντικείμενο καθηγητή (Course).
+     * @param cellA Πληροφορία από 1η στήλη (String).
+     * @return εάν υπάρχει ήδη ή όχι (boolean).
      */
     public boolean checkDuplicateCourse(Course course, String cellA){
         if(course.getCourseName().equals(cellA)){
@@ -940,8 +955,9 @@ public class ExcelManager {
     
     /**
      * Συνάρτηση όπου ελέγχει για έγκυρη πληροφορία.
-     * @param s Το string προς έλεγχο.
-     * @return εάν είναι έγκυρο ή όχι.
+     * 
+     * @param s Το string προς έλεγχο (String).
+     * @return εάν είναι έγκυρο ή όχι (boolean).
      */
     public boolean checkIfValid(String s){
         if(s != null && !s.equals("") && !s.equals(" ")){
@@ -951,7 +967,9 @@ public class ExcelManager {
     }
     
     /**
-     * Η μέθοδος αυτή αφαιρεί τα μαθήματα που δεν έχουν κάποιον εξεταστή (δεν υπάρχει δηλαδή σχέση μαθήματος - εξεταστών στο φύλλο 'COURSES_PROFESSORS'. Τα θεωρούμε ως μαθήματα που δεν εξετάζονται).
+     * Η μέθοδος αυτή αφαιρεί τα μαθήματα που δεν έχουν κάποιον εξεταστή
+     * (δεν υπάρχει δηλαδή σχέση μαθήματος - εξεταστών στο φύλλο 'COURSES_PROFESSORS'.
+     * Τα μαθήματα αυτά θεωρούμε πως δεν εξετάζονται).
      */
     public void removeCoursesWithNoExaminers(){
         List<Course> copy = new ArrayList<>(courses);
@@ -966,7 +984,19 @@ public class ExcelManager {
         }
     }
 
+    
+    /**
+     * Η κλάση χρησιμοποιείται για την απεικόνιση μηνυμάτων σφάλματος στον χρήστη.
+     */
     private class CustomErrorException extends Exception{
+        
+        /**
+         * Η συνάρτηση εμφανίζει ένα μήνυμα λάθους με συγκεκριμένο format για 
+         * οποιδήποτε string ως παράμετρο.
+         * @param myJFrame Το αντικείμενο JFrame που χρησιμοποιείται από το βασικό
+         * πρόγραμμα. (JFrame).
+         * @param msg Το μήνυμα που επιθυμούμε να εμφανιστεί (String).
+         */
         public CustomErrorException(JFrame myJFrame, String msg) {
             String htmlMsg = "<html><body style='width: %1spx'>%1s";
             htmlMsg = String.format(htmlMsg, 600, msg); // Set the width as needed for your message

@@ -14,11 +14,14 @@ import java.util.Date;
  */
 public class DateComparator implements Comparator<String> {
     /**
-     * Η κλάση DateComparator συγκρίνει δύο συμβολοσειρές ημερομηνιών με βάση τα αντίστοιχα αντικείμενα Date τους.
-     * @param dateString1 Η πρώτη συμβολοσειρά ημερομηνίας προς σύγκριση (String)
-     * @param dateString2 Η δεύτερη συμβολοσειρά ημερομηνίας προς σύγκριση (String)
+     * Η κλάση DateComparator συγκρίνει δύο συμβολοσειρές ημερομηνιών με βάση τα
+     * αντίστοιχα αντικείμενα Date τους.
+     * @param dateString1 Η πρώτη συμβολοσειρά ημερομηνίας προς σύγκριση (String).
+     * @param dateString2 Η δεύτερη συμβολοσειρά ημερομηνίας προς σύγκριση (String).
      * @return ένας ακέραιος που δηλώνει τη σχέση των δύο ημερομηνιών: 
-     * α) αρνητικός αν η πρώτη είναι πριν β) θετικός αν είναι μετά γ) μηδέν αν είναι ίσες (integer)
+     *      α) αρνητικός αν η πρώτη είναι πριν 
+     *      β) θετικός αν είναι μετά 
+     *      γ) μηδέν αν είναι ίσες (integer)
      */
     @Override
     public int compare(String dateString1, String dateString2) {

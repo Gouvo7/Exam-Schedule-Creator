@@ -133,29 +133,23 @@ public class MainForm extends javax.swing.JFrame {
     private void loadUIBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadUIBtnActionPerformed
         
         ExcelManager a = new ExcelManager(this, def);
-        try
-        {
-            if(a.readGenericExcel()){
-                if (a.readAvailabilityTemplates()){
-                    ScheduleManager b = new ScheduleManager(a);
-                    if (def.examScheduleFileExists()){
-                        b.readExamSchedule();
-                        b.startProcess(false);
-                    } else {
-                        if (JOptionPane.showConfirmDialog(this, "Δεν βρέθηκε στο μονοπάτι: '" + def.getFolderPath() + " ' το" +
+        if(a.readGenericExcel()){
+            if (a.readAvailabilityTemplates()){
+                ScheduleManager b = new ScheduleManager(a);
+                if (def.examScheduleFileExists()){
+                    b.readExamSchedule();
+                    b.startProcess(false);
+                } else {
+                    if (JOptionPane.showConfirmDialog(this, "Δεν βρέθηκε στο μονοπάτι: '" + def.getFolderPath() + " ' το" +
                         " αρχείο: '" + def.getExamScheduleFile() + "'. Θέλεις να ξεκινήσεις ένα πρόγραμμα εκ νέου;", "Σφάλμα εφαρμογής", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
-                            b.startProcess(true);
-                        }
+                        b.startProcess(true);
                     }
-                }else {
-                    System.out.println("Πρόβλημα κατά την ανάγνωση των δεδομένων από τα συμπληρωμένα templates.");
                 }
-            }else{
-                System.out.println("dyskola");
+            }else {
+                //JOptionPane.showMessageDialog(this, "Πρόβλημα κατά την ανάγνωση των δεδομένων από τα συμπληρωμένα templates.", "Μήνυμα Εφαρμογής", JOptionPane.ERROR_MESSAGE);
             }
-        
-        } catch (SheetExc ex) {
-            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        }else {
+            //JOptionPane.showMessageDialog(this, "Πρόβλημα κατά την ανάγνωση του βασικού αρχείου Excel.", "Μήνυμα Εφαρμογής", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_loadUIBtnActionPerformed
     
