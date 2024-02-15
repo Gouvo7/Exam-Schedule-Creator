@@ -106,6 +106,150 @@ public class ScheduleManager extends JFrame {
         coursesClassroomsPanel = new JPanel();
         coursesClassroomsPanel.setLayout(new BoxLayout(coursesClassroomsPanel,BoxLayout.Y_AXIS));
         jScrollPaneClassrooms.setViewportView(coursesClassroomsPanel);
+        model = new DefaultTableModel(excelManager1.getDates().size() + 1, excelManager1.getTimeslots().size() + 1){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+            public boolean isCellSelected(int row, int column) {
+                return false;
+            }
+        };
+        model.setValueAt("ΗΜΕΡΟΜΗΝΙΑ / ΗΜΕΡΑ", 0, 0);
+        initTable();
+    }
+    
+    public void initTable(){
+        table.setRowHeight(60);
+        table.setCellSelectionEnabled(false);
+        table.setTableHeader(new JTableHeader());
+        table.getTableHeader().setReorderingAllowed(false);
+        table.setShowGrid(true);
+        table.setGridColor(Color.BLACK);
+        table = new JTable(model) {
+            @Override
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+                Component comp = super.prepareRenderer(renderer, row, column);
+                Color headerCells = Color.decode("#A9A9A9");
+                Color firstCell = Color.decode("#3333FF");
+                Color otherCells = Color.decode("#FFFFFF");
+                // Apply the custom background color logic
+                if (column == 0 && row == 0) {
+                    // First cell in the first column and first row
+                    comp.setBackground(firstCell);
+                } else if (column == 0) {
+                    // Any cell in the first column (excluding the first cell)
+                    comp.setBackground(headerCells);
+                } else if (row == 0 && column > 0) {
+                    // Any cell in the first row (excluding the first cell)
+                    comp.setBackground(headerCells);
+                } else {
+                    // All other cells
+                    comp.setBackground(otherCells);
+                }
+                return comp;
+            }
+        };
+        table.setDropTarget(new DropTarget() {
+            @Override
+            public synchronized void drop(DropTargetDropEvent evt) {
+                try {
+                    evt.acceptDrop(DnDConstants.ACTION_COPY);
+                    Transferable transferable = evt.getTransferable();
+                    String buttonText = (String) transferable.getTransferData(DataFlavor.stringFlavor);
+                    Point dropLocation = evt.getLocation();
+                    int row = table.rowAtPoint(dropLocation);
+                    int col = table.columnAtPoint(dropLocation);
+                    
+                    if (row > 0 & col > 0){
+                        Course tmpCourse = new Course(findCourse(buttonText));
+                        String rowValue = (String) table.getValueAt(row, 0);
+                        String colValue = (String) table.getValueAt(0, col);
+
+                        // Μετατροπή της ημερομηνίας από την μορφή 'ηη/μμ/εεεε Ημέρα' to simply 'ηη/μμ/εεεε'
+                        rowValue = getDateWithGreekFormat(rowValue);
+                        //if (rowValue == null){
+                            //System.exit(-12);
+                        //}
+                        boolean check1 = checkExaminersConflict(tmpCourse, rowValue, colValue);
+                        if (check1){
+                            model.setValueAt(buttonText, row, col);
+                            Component[] components = coursesPanel.getComponents();
+                            for (Component component : components) {
+                                if (component instanceof JButton) {
+                                    JButton button = (JButton) component;
+                                    if (buttonText.equals(button.getText())) {
+                                        coursesPanel.remove(button);
+                                        break;
+                                    }
+                                }
+                            }
+                            coursesPanel.revalidate();
+                            coursesPanel.repaint();
+                            evt.dropComplete(true);
+                            System.out.println("fiiix");
+                            
+                            addCourseToClassroomsPanel(tmpCourse, rowValue, colValue);
+                            System.out.println("fix2");
+                            coursesClassroomsPanel.revalidate();
+                            coursesClassroomsPanel.repaint();
+                            
+                        }else{
+                        }
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    evt.rejectDrop();
+                }
+            }
+        });
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int selectedRow = table.getSelectedRow();
+                    int selectedColumn = table.getSelectedColumn();
+                    String date = table.getValueAt(selectedRow, 0).toString();
+                    date = getDateWithGreekFormat(date);
+                    String timeslot = table.getValueAt(0, selectedColumn).toString();
+                    Object cellValue = model.getValueAt(selectedRow, selectedColumn);
+                    ScheduledCourse courseToDelete = null;
+                    if (cellValue != null && cellValue instanceof String && selectedRow > 0 && selectedColumn != 0) {
+                        String buttonText = (String) cellValue;
+                        for (ScheduledCourse sc : scheduledCourses){
+                            if (sc.getCourse().getCourseName().equals(buttonText)){
+                                for (Professor prf : sc.getCourse().getExaminers()){
+                                    prf.changeSpecificAvailability(date, timeslot,1);
+                                }
+                                courseToDelete = sc;
+                            }
+                        }
+                        if (courseToDelete != null){
+                            unscheduled.getCourses().add(courseToDelete.getCourse());
+                            scheduledCourses.remove(courseToDelete);
+                            removeCourseFromClassroomsPanel(courseToDelete.getCourse());
+                        }
+                        // Add the button back to coursesPanel
+                        JButton button = new JButton(buttonText);
+                        button.setPreferredSize(new Dimension(270, 40));
+                        button.setBackground(Color.lightGray);
+                        button.setTransferHandler(new ButtonTransferHandler(buttonText));
+                        button.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mousePressed(MouseEvent evt) {
+                                JComponent comp = (JComponent) evt.getSource();
+                                TransferHandler handler = comp.getTransferHandler();
+                                handler.exportAsDrag(comp, evt, TransferHandler.COPY);
+                            }
+                        });
+                        coursesPanel.add(button);
+                        coursesPanel.revalidate();
+                        coursesPanel.repaint();
+                        model.setValueAt(null, selectedRow, selectedColumn);
+                    }
+                }
+            }
+        });
     }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -514,48 +658,6 @@ public class ScheduleManager extends JFrame {
         int excelRows = dates.size();
         int excelCols = timeslots.size();
         
-        model = new DefaultTableModel(excelRows + 1, excelCols + 1){
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-            public boolean isCellSelected(int row, int column) {
-                return false;
-            }
-        };
-        
-        table = new JTable(model) {
-            @Override
-            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
-                Component comp = super.prepareRenderer(renderer, row, column);
-                Color headerCells = Color.decode("#A9A9A9");
-                Color firstCell = Color.decode("#3333FF");
-                Color otherCells = Color.decode("#FFFFFF");
-                // Apply the custom background color logic
-                if (column == 0 && row == 0) {
-                    // First cell in the first column and first row
-                    comp.setBackground(firstCell);
-                } else if (column == 0) {
-                    // Any cell in the first column (excluding the first cell)
-                    comp.setBackground(headerCells);
-                } else if (row == 0 && column > 0) {
-                    // Any cell in the first row (excluding the first cell)
-                    comp.setBackground(headerCells);
-                } else {
-                    // All other cells
-                    comp.setBackground(otherCells);
-                }
-                return comp;
-            }
-        };
-        table.setRowHeight(60);
-        table.setCellSelectionEnabled(false);
-        table.setTableHeader(new JTableHeader());
-        table.getTableHeader().setReorderingAllowed(false);
-        table.setShowGrid(true);
-        table.setGridColor(Color.BLACK);
-        this.table = table;
-        model.setValueAt("ΗΜΕΡΟΜΗΝΙΑ / ΗΜΕΡΑ", 0, 0);
         for (int j = 0; j < excelCols; j++){
             model.setValueAt(timeslots.get(j), 0, j + 1);
             DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -573,108 +675,6 @@ public class ScheduleManager extends JFrame {
                             .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
             model.setValueAt(dates.get(i) + " " + greekDayNameWithoutAccents, i + 1, 0);
         }
-        
-        table.setDropTarget(new DropTarget() {
-            @Override
-            public synchronized void drop(DropTargetDropEvent evt) {
-                try {
-                    evt.acceptDrop(DnDConstants.ACTION_COPY);
-                    Transferable transferable = evt.getTransferable();
-                    String buttonText = (String) transferable.getTransferData(DataFlavor.stringFlavor);
-                    Point dropLocation = evt.getLocation();
-                    int row = table.rowAtPoint(dropLocation);
-                    int col = table.columnAtPoint(dropLocation);
-                    
-                    if (row > 0 & col > 0){
-                        Course tmpCourse = new Course(findCourse(buttonText));
-                        String rowValue = (String) table.getValueAt(row, 0);
-                        String colValue = (String) table.getValueAt(0, col);
-
-                        // Μετατροπή της ημερομηνίας από την μορφή 'ηη/μμ/εεεε Ημέρα' to simply 'ηη/μμ/εεεε'
-                        rowValue = getDateWithGreekFormat(rowValue);
-                        //if (rowValue == null){
-                            //System.exit(-12);
-                        //}
-                        boolean check1 = checkExaminersConflict(tmpCourse, rowValue, colValue);
-                        if (check1){
-                            model.setValueAt(buttonText, row, col);
-                            Component[] components = coursesPanel.getComponents();
-                            for (Component component : components) {
-                                if (component instanceof JButton) {
-                                    JButton button = (JButton) component;
-                                    if (buttonText.equals(button.getText())) {
-                                        coursesPanel.remove(button);
-                                        break;
-                                    }
-                                }
-                            }
-                            coursesPanel.revalidate();
-                            coursesPanel.repaint();
-                            evt.dropComplete(true);
-                            System.out.println("fiiix");
-                            
-                            addCourseToClassroomsPanel(tmpCourse, rowValue, colValue);
-                            System.out.println("fix2");
-                            coursesClassroomsPanel.revalidate();
-                            coursesClassroomsPanel.repaint();
-                            
-                        }else{
-                        }
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    evt.rejectDrop();
-                }
-            }
-        });
-        
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    int selectedRow = table.getSelectedRow();
-                    int selectedColumn = table.getSelectedColumn();
-                    String date = table.getValueAt(selectedRow, 0).toString();
-                    date = getDateWithGreekFormat(date);
-                    String timeslot = table.getValueAt(0, selectedColumn).toString();
-                    Object cellValue = model.getValueAt(selectedRow, selectedColumn);
-                    ScheduledCourse courseToDelete = null;
-                    if (cellValue != null && cellValue instanceof String && selectedRow > 0 && selectedColumn != 0) {
-                        String buttonText = (String) cellValue;
-                        for (ScheduledCourse sc : scheduledCourses){
-                            if (sc.getCourse().getCourseName().equals(buttonText)){
-                                for (Professor prf : sc.getCourse().getExaminers()){
-                                    prf.changeSpecificAvailability(date, timeslot,1);
-                                }
-                                courseToDelete = sc;
-                            }
-                        }
-                        if (courseToDelete != null){
-                            unscheduled.getCourses().add(courseToDelete.getCourse());
-                            scheduledCourses.remove(courseToDelete);
-                            removeCourseFromClassroomsPanel(courseToDelete.getCourse());
-                        }
-                        // Add the button back to coursesPanel
-                        JButton button = new JButton(buttonText);
-                        button.setPreferredSize(new Dimension(270, 40));
-                        button.setBackground(Color.lightGray);
-                        button.setTransferHandler(new ButtonTransferHandler(buttonText));
-                        button.addMouseListener(new MouseAdapter() {
-                            @Override
-                            public void mousePressed(MouseEvent evt) {
-                                JComponent comp = (JComponent) evt.getSource();
-                                TransferHandler handler = comp.getTransferHandler();
-                                handler.exportAsDrag(comp, evt, TransferHandler.COPY);
-                            }
-                        });
-                        coursesPanel.add(button);
-                        coursesPanel.revalidate();
-                        coursesPanel.repaint();
-                        model.setValueAt(null, selectedRow, selectedColumn);
-                    }
-                }
-            }
-        });
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         return scrollPane;
