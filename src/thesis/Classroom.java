@@ -75,6 +75,31 @@ public class Classroom{
     }
     
     /**
+     * Η μέθοδος επιστρέφει την διαθεσιμότητα μίας αίθουσας για συγκεκριμένη
+     * ημερομηνία και χρονική περίοδο
+     * @param date Η ημερομηνία της διαθεσιμότητας προς έλεγχο
+     * @param timeslot Η χρονική περίοδος της διαθεσιμότητας προς έλεγχο
+     * @return 0 όταν η αίθουσα δεν είναι διαθέσιμη 
+     *         1 όταν η αίθουσα είναι διαθέσιμη
+     */
+    public int isAvailable(String date, String timeslot){
+        date.trim();
+        timeslot.trim();
+        for (Availability a : availability){
+            if (a.getDate().equals(date) && a.getTimeSlot().equals(timeslot)){
+                if(a.getIsAvailable() == 0){
+                    return 0;
+                }else if (a.getIsAvailable() == 1){
+                    return 1;
+                }else if (a.getIsAvailable() == 2){
+                    return 2;
+                }
+            }
+        }
+        return -1;
+    }
+    
+    /**
      * Εκτυπώνει την πλήρη διαθεσιμότητα της αίθουσας στην κονσόλα.
      * Η έξοδος περιλαμβάνει την ημερομηνία, το χρονικό διάστημα και τη διαθεσιμότητα
      * για κάθε διάστημα. Εκτυπώνεται το όνομα και ο κωδικός της αίθουσας

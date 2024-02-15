@@ -10,8 +10,6 @@ import java.io.Serializable;
  * και αιθουσών. Το isAvailable λαμβάνει τιμές:
  * 0 - Όχι.
  * 1 - Ναι.
- * 2 - Όχι (Δεσμευμένος - λαμβάνει την τιμη 2 μόνο όταν αλλάξει η διαθεσιμότητα 
- * από Ναι σε Όχι (0 σε 1).
  */
 public class Availability implements Serializable{
 

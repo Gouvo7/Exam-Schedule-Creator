@@ -1,6 +1,5 @@
 package thesis;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,8 +21,8 @@ public class Course{
     private boolean isExamined;
     private List<Professor> examiners;
     private List<Classroom> classrooms;
-    
-    
+    private int approxStudents;
+
     /**
      * Κατασκευαστής για τη δημιουργία ενός νέου αντικειμένου Course.
      *
@@ -41,6 +40,7 @@ public class Course{
         isExamined = isExamined;
         examiners = new ArrayList<>();
         classrooms = new ArrayList<>();
+        approxStudents = 0;
     }
     
     /**
@@ -115,7 +115,23 @@ public class Course{
     public String getCourseSeason(){
         return this.courseSeason;
     }
+    
+    public List<Classroom> getClassrooms() {
+        return classrooms;
+    }
 
+    public void setClassrooms(List<Classroom> classrooms) {
+        this.classrooms = classrooms;
+    }
+
+    public int getApproxStudents() {
+        return approxStudents;
+    }
+
+    public void setApproxStudents(int approxStudents) {
+        this.approxStudents = approxStudents;
+    }
+    
     /**
      * Εκτύπωση μαθήματος και εξεταστών.
      */

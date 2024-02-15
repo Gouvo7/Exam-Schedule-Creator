@@ -29,11 +29,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -70,20 +74,25 @@ public class ScheduleManager extends JFrame {
     private DefaultTableModel model;
     private Logs logs;
     private String finalExcelSheet;
-    private Scheduled scheduled;
+    private List<ScheduledCourse> scheduledCourses;
     private Unscheduled unscheduled;
     private List<ExamCoursesFromFinalSchedule> crsList;
-
-    public ScheduleManager() {
-    }
+    private String regex;
+    private Pattern pattern;
+    private JPanel coursesClassroomsPanel;
     
     public ScheduleManager(ExcelManager excelManager) {
         initComponents();
-        this.excelManager1 = excelManager;
+        excelManager1 = excelManager;
+        initOtherComponents();
+    }
+
+    public void initOtherComponents(){
+        
         courses = new ArrayList<>(excelManager1.getCourses());
         professors = new ArrayList<>(excelManager1.getProfs());
         classrooms = new ArrayList<>(excelManager1.getClassrooms());
-        scheduled = new Scheduled();
+        scheduledCourses = new ArrayList<>();
         unscheduled = new Unscheduled(excelManager1.getCourses());
         crsList = new ArrayList<>();
         logs = new Logs();
@@ -92,9 +101,12 @@ public class ScheduleManager extends JFrame {
         fileName = def.getFolderPath() + "\\" + def.getExamScheduleFile();
         modelPanel.setLayout(new BorderLayout());
         coursesPanel.setLayout(new GridLayout(0,3));
+        regex = "\\b\\d{2}/\\d{2}/\\d{4}\\b";
+        pattern = Pattern.compile(regex);
+        coursesClassroomsPanel = new JPanel();
+        coursesClassroomsPanel.setLayout(new BoxLayout(coursesClassroomsPanel,BoxLayout.Y_AXIS));
+        jScrollPaneClassrooms.setViewportView(coursesClassroomsPanel);
     }
-
-    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -103,11 +115,11 @@ public class ScheduleManager extends JFrame {
         modelPanel = new javax.swing.JPanel();
         coursesScrollPane = new javax.swing.JScrollPane();
         coursesPanel = new javax.swing.JPanel();
-        courseClassroomPanel = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        lblScheduleDesigner = new javax.swing.JLabel();
+        lblCourses = new javax.swing.JLabel();
+        lblCoursesClassrooms = new javax.swing.JLabel();
+        btnExportXlsx = new javax.swing.JButton();
+        jScrollPaneClassrooms = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Φόρμα Δημιουργίας Προγράμματος");
@@ -125,17 +137,17 @@ public class ScheduleManager extends JFrame {
         coursesPanel.setLayout(null);
         coursesScrollPane.setViewportView(coursesPanel);
 
-        jLabel1.setFont(new java.awt.Font("Franklin Gothic Book", 0, 18)); // NOI18N
-        jLabel1.setText("Σχεδιαστής Προγράμματος Εξεταστικής");
+        lblScheduleDesigner.setFont(new java.awt.Font("Franklin Gothic Book", 0, 18)); // NOI18N
+        lblScheduleDesigner.setText("Σχεδιαστής Προγράμματος Εξεταστικής");
 
-        jLabel2.setFont(new java.awt.Font("Franklin Gothic Book", 0, 18)); // NOI18N
-        jLabel2.setText("Μαθήματα");
+        lblCourses.setFont(new java.awt.Font("Franklin Gothic Book", 0, 18)); // NOI18N
+        lblCourses.setText("Μαθήματα");
 
-        jLabel3.setFont(new java.awt.Font("Franklin Gothic Book", 0, 18)); // NOI18N
-        jLabel3.setText("Μαθήματα - Αίθουσες");
+        lblCoursesClassrooms.setFont(new java.awt.Font("Franklin Gothic Book", 0, 18)); // NOI18N
+        lblCoursesClassrooms.setText("Μαθήματα - Αίθουσες");
 
-        jButton1.setText("Εξαγωγή");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnExportXlsx.setText("Εξαγωγή");
+        btnExportXlsx.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 createExcelFromTable(evt);
             }
@@ -148,47 +160,48 @@ public class ScheduleManager extends JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(modelScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(458, 458, 458)
+                        .addComponent(lblCourses)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnExportXlsx)
+                        .addGap(27, 27, 27))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(365, 365, 365)
-                        .addComponent(jLabel1))
+                        .addComponent(lblScheduleDesigner))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(24, 24, 24)
+                        .addComponent(modelScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(coursesScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(458, 458, 458)
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1)
-                        .addGap(27, 27, 27)))
+                        .addComponent(coursesScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(18, 18, 18)
-                        .addComponent(courseClassroomPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1050, Short.MAX_VALUE)
-                        .addContainerGap())
+                        .addComponent(jScrollPaneClassrooms, javax.swing.GroupLayout.PREFERRED_SIZE, 317, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(464, 464, 464))))
+                        .addComponent(lblCoursesClassrooms)
+                        .addGap(94, 94, 94)))
+                .addContainerGap(31, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(lblScheduleDesigner)
+                    .addComponent(lblCoursesClassrooms, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(modelScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(jButton1))
+                            .addComponent(lblCourses)
+                            .addComponent(btnExportXlsx))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(coursesScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(courseClassroomPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 1146, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(coursesScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 306, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPaneClassrooms))
+                .addContainerGap())
         );
 
         pack();
@@ -203,10 +216,49 @@ public class ScheduleManager extends JFrame {
                     fillCoursesFromExamScheduleData();
                 }
             });
+            initScheduledCourses();
         }
         this.setVisible(true);
         this.setLocationRelativeTo(null);
         this.setSize(1500, 1050);
+    }
+    
+    private void initScheduledCourses() {
+        for (ScheduledCourse sc : scheduledCourses) {
+            // Retrieve the necessary information for each scheduledCourses course
+            CourseClassroomsPanel ccp = new CourseClassroomsPanel(sc.getCourse() , sc.getClassrooms(), sc.getDate(), sc.getTimeslot());
+            coursesClassroomsPanel.add(ccp);
+        }
+    }
+
+    private void addCourseToClassroomsPanel(Course crs, String date, String timeslot){
+        CourseClassroomsPanel ccp = new CourseClassroomsPanel(crs , classrooms, date, timeslot);
+        coursesClassroomsPanel.add(ccp);
+        coursesClassroomsPanel.revalidate();
+        coursesClassroomsPanel.repaint();
+    }
+    
+    private void removeCourseFromClassroomsPanel(Course crs) {
+    for (Component comp : coursesClassroomsPanel.getComponents()) {
+        if (comp instanceof CourseClassroomsPanel) {
+            CourseClassroomsPanel ccp = (CourseClassroomsPanel) comp;
+            if (ccp.getCourse().equals(crs)) {
+                System.out.println("ΕΒΓΑΛΑ" + ccp.getCourse().getCourseName());
+                coursesClassroomsPanel.remove(ccp);
+                coursesClassroomsPanel.revalidate();
+                coursesClassroomsPanel.repaint();
+                break; // Assuming each course only has one panel associated with it
+            }
+        }
+    }
+}
+    
+    private List<Classroom> getClassroomsAvailableOn(String date, String timeslot) {
+        // This method should return a list of classrooms that are available on the specified date and timeslot
+        // Implement the logic based on how the availability data is stored and retrieved
+        List<Classroom> availableClassrooms = new ArrayList<>();
+        // ... logic to populate availableClassrooms ...
+        return availableClassrooms;
     }
     
     public void fillCoursesFromExamScheduleData(){
@@ -227,6 +279,12 @@ public class ScheduleManager extends JFrame {
         }
     }
     
+    /**
+     * Μέθοδος που αποθηκεύει το τελικό πρόγραμμα της εξεταστικής που απεικονίζεται
+     * στο παράθυρο JForm.
+     * 
+     * @param evt Το event που προκάλεσε την κλήση της μεθόδου
+     */
     private void createExcelFromTable(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createExcelFromTable
         int rowIndex = 0;
         int colIndex = 0;
@@ -236,12 +294,11 @@ public class ScheduleManager extends JFrame {
         List<String> dates = new ArrayList<>(excelManager1.getDates());
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             XSSFSheet sheet = workbook.createSheet("ΠΡΟΓΡΑΜΜΑ ΕΞΕΤΑΣΤΙΚΗΣ");
-            
-            //fillHeaders(workbook, sheet, dateFormatter, timeslots, dates);
-            int tableRows = table.getRowCount();
-            int tableColumns = table.getColumnCount();
-            for (rowIndex = 1; rowIndex < tableRows; rowIndex++){
-                for (colIndex = 1; colIndex < tableColumns; colIndex++){
+            fillHeaders(workbook, sheet, timeslots, dates);
+            int tableRows = table.getRowCount() - 1 ;
+            int tableColumns = table.getColumnCount() - 1 ;
+            for (rowIndex = 1; rowIndex <= tableRows; rowIndex++){
+                for (colIndex = 1; colIndex <= tableColumns; colIndex++){
                     try{
                         String cellValue = (String) table.getValueAt(rowIndex, colIndex);
                         Course a = getCourse(cellValue);
@@ -256,24 +313,25 @@ public class ScheduleManager extends JFrame {
                     }
                 }
             }
-            autoSizeColumns(sheet, tableColumns);
-            applyCellStyles(workbook, sheet, tableRows, tableColumns);
+            autoSizeColumns(sheet, tableColumns + 1);
+            applyCellStyles(workbook, sheet);
             
             JOptionPane.showMessageDialog(this, "Η δημιουργία του αρχείου προγράμματος εξεταστικής ολοκληρώθηκε επιτυχώς!", "Μήνυμα Λάθους", JOptionPane.INFORMATION_MESSAGE);
             // Αποθήκευση αρχείου προς συμπλήρωση για τους καθηγητές
             try (FileOutputStream outputStream = new FileOutputStream(path.toString())) {
                 workbook.write(outputStream);
             }
-            
-            //logger.appendLogger("Η δημιουργία του template για τους καθηγητές ολοκληρώθηκε επιτυχώς.");
-            //logger.appendLogger("Η δημιουργία του template για τους καθηγητές ολοκληρώθηκε επιτυχώς.");
         }catch (Exception e){
-            //logger.appendLogger("Η δημιουργία του template για τους καθηγητές απέτυχε.");
             System.out.println("Η δημιουργία του template για τους καθηγητές απέτυχε." + rowIndex + " " + colIndex);
         }
     }//GEN-LAST:event_createExcelFromTable
 
-    public Course getCourse(String cellValue){
+    /**
+     * Συνάρτηση που εντοπίζει εάν υπάρχει ένα string στην λίστα με τα μαθήματα
+     * @param cellValue Τ
+     * @return 
+     */
+    private Course getCourse(String cellValue){
         for (Course tmp : this.courses){
             if (tmp.getCourseName().equals(cellValue)){
                 return tmp;
@@ -285,6 +343,7 @@ public class ScheduleManager extends JFrame {
     /**
      * Η συνάρτηση χρησιμοποιείται για να προτρέψει τον χρήστη στο να επιλέξει την τοποθεσία
      * αλλά και το όνομα αποθήκευσης του τελικού αρχείου προγράμματος σε .xlsx μορφή.
+     * 
      * @return Το πλήρες μονοπάτι του αρχείου.
      */
     public String askUserToSaveFile(){
@@ -326,13 +385,25 @@ public class ScheduleManager extends JFrame {
             String header2 = sheet.GetCellString(0, 1);
             
             if (!header1.equals("ΗΜ/ΝΙΑ") || !header2.equals("ΗΜΕΡΑ")){
-                //throw new NotEqualHeadersException();
+                file.close();
+                String msg = "Πρόβλημα με τα δεδομένα του αρχείου '" + 
+                    fileName + "' στην γραμμή " + (rowIndex + 1) + 
+                    ". Εντοπίστηκαν διαφορετικά headers στην 1η γραμμή στις πρώτες"
+                        + " 2 στήλες. Παρακαλώ πολύ ελέγξτε ότι τα δεδομένα για"
+                        + " το 1ο και το 2ο κελί είναι 'ΗΜ/ΝΙΑ' και 'ΗΜΕΡΑ' αντίστοιχα.";
+                throw new CustomErrorException(this, msg);
+                
             }
             String timeslot = "";
             for(int x = 2; x < lastCol; x++){
                 timeslot = sheet.GetCellString(rowIndex, x);
                 if (!timeslots.contains(timeslot)){
-                    //throw new TimeslotNotFoundException();
+                    file.close();
+                    String msg = "Πρόβλημα με τα δεδομένα του αρχείου '" + 
+                        fileName + "' στην γραμμή " + (rowIndex + 1) + 
+                        ". Το χρονικό διάστημα '" + timeslot + "' δεν υπάρχει καταχωρημένο"
+                            + " στο βασικό αρχείο πληροφοριών (" + def.getGenericFile() + ").";
+                    throw new CustomErrorException(this, msg);
                 }
             }
             String date;
@@ -343,12 +414,14 @@ public class ScheduleManager extends JFrame {
                 date = sheet.GetCellString(rowIndex, 1);
                 dateName = getGreekDayName(date);
                 if (dateName == null || !dates.contains(date)){
-                    //throw new DateNotFoundException();
-                    logs.appendLogger(logs.getIndexString() + "Πρόβλημα με την ημερομηνία '" + date  + "' γραμμή " + rowIndex + ".");
+                    file.close();
+                    String msg = "Πρόβλημα με τα δεδομένα του αρχείου '" + 
+                        fileName + "' στην γραμμή " + (rowIndex + 1) + 
+                        ". Η ημερομηνία'" + date + "' δεν υπάρχει καταχωρημένη"
+                            + " στο βασικό αρχείο πληροφοριών (" + def.getGenericFile() + ").";
+                    throw new CustomErrorException(this, msg);
                 }
             }
-            logs.appendLogger("Κατά την διαδικασία ανάγνωσης του αρχείου '" + fileName + "', εντοπίστικαν" +
-                            " τα παρακάτω σφάλματα:");
             for(rowIndex = 1; rowIndex < lastRow; rowIndex++){
                 for(colIndex = 2; colIndex < lastCol; colIndex++){
                     courseCell = getSafeCellString(sheet, rowIndex, colIndex);
@@ -357,9 +430,12 @@ public class ScheduleManager extends JFrame {
                     }
                     else{
                         if (findCourse(courseCell)== null){ 
-                            //throw new CourseNotFoundException();
-                            logs.appendLogger(logs.getIndexString() + "Πρόβλημα με το μάθημα '" + courseCell + "' στην γραμμή/στήλη" + rowIndex + ":" + colIndex + "."
-                                    + " Το μάθημα δεν βρέθηκε στην λίστα των μαθημάτων.");
+                            file.close();
+                            String msg = "Πρόβλημα με τα δεδομένα του αρχείου '" + 
+                                fileName + "' στην γραμμή " + (rowIndex + 1) + 
+                                ". Το μάθημα '" + courseCell + "' δεν υπάρχει καταχωρημένο"
+                                    + " στο βασικό αρχείο πληροφοριών (" + def.getGenericFile() + ").";
+                            throw new CustomErrorException(this, msg);
                         }else{
                             String courseTimeslot = sheet.GetCellString(0, colIndex );
                             String courseDate = sheet.GetCellString(rowIndex, 1);
@@ -535,6 +611,13 @@ public class ScheduleManager extends JFrame {
                             coursesPanel.revalidate();
                             coursesPanel.repaint();
                             evt.dropComplete(true);
+                            System.out.println("fiiix");
+                            
+                            addCourseToClassroomsPanel(tmpCourse, rowValue, colValue);
+                            System.out.println("fix2");
+                            coursesClassroomsPanel.revalidate();
+                            coursesClassroomsPanel.repaint();
+                            
                         }else{
                         }
                     }
@@ -555,20 +638,21 @@ public class ScheduleManager extends JFrame {
                     date = getDateWithGreekFormat(date);
                     String timeslot = table.getValueAt(0, selectedColumn).toString();
                     Object cellValue = model.getValueAt(selectedRow, selectedColumn);
-                    Course courseToDelete = null;
+                    ScheduledCourse courseToDelete = null;
                     if (cellValue != null && cellValue instanceof String && selectedRow > 0 && selectedColumn != 0) {
                         String buttonText = (String) cellValue;
-                        for (Course crs : scheduled.getCourses()){
-                            if (crs.getCourseName().equals(buttonText)){
-                                for (Professor prf : crs.getExaminers()){
+                        for (ScheduledCourse sc : scheduledCourses){
+                            if (sc.getCourse().getCourseName().equals(buttonText)){
+                                for (Professor prf : sc.getCourse().getExaminers()){
                                     prf.changeSpecificAvailability(date, timeslot,1);
                                 }
-                                courseToDelete = crs;
+                                courseToDelete = sc;
                             }
                         }
                         if (courseToDelete != null){
-                            unscheduled.getCourses().add(courseToDelete);
-                            scheduled.getCourses().remove(courseToDelete);
+                            unscheduled.getCourses().add(courseToDelete.getCourse());
+                            scheduledCourses.remove(courseToDelete);
+                            removeCourseFromClassroomsPanel(courseToDelete.getCourse());
                         }
                         // Add the button back to coursesPanel
                         JButton button = new JButton(buttonText);
@@ -596,31 +680,6 @@ public class ScheduleManager extends JFrame {
         return scrollPane;
     }
 
-    public static void main(String args[]) {
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ScheduleManager.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ScheduleManager.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ScheduleManager.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ScheduleManager.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ScheduleManager().setVisible(true);
-            }
-        });
-    }
-    
      public boolean checkExaminersConflict(Course course, String date, String timeslot){
         List<Professor> newCourseExaminers = null;
         String errorMsg = "";
@@ -642,7 +701,8 @@ public class ScheduleManager extends JFrame {
                     for (Professor prf2 : newCourseExaminers){
                         prf2.changeSpecificAvailability(date, timeslot, 2);
                     }
-                    scheduled.addCourse(crs, date, timeslot);
+                    ScheduledCourse sc = new ScheduledCourse(crs, date, timeslot, classrooms);
+                    scheduledCourses.add(sc);
                     unscheduled.getCourses().remove(crs);
                     return true;
                 }
@@ -720,7 +780,7 @@ public class ScheduleManager extends JFrame {
      * @param courseName Το όνομα του μαθήματος προς αναζήτηση
      * @return Αντικείμενο Course ή null ανάλογα με το εάν εντοπίστηκε το μάθημα από το string ή όχι
      */
-    public Course findCourse(String courseName){
+    private Course findCourse(String courseName){
         for (Course course : this.courses){
             if (course.getCourseName().equals(courseName)){
                 return course;
@@ -729,7 +789,15 @@ public class ScheduleManager extends JFrame {
         return null;
     }
     
-    private void fillHeaders(XSSFWorkbook workbook, XSSFSheet sheet, DateTimeFormatter dateFormatter, List<String> timeslots, List<String> dates){
+    /**
+     * Η συνάρτηση γεμίζει το τελικό πρόγραμμα εξεταστικής με τα headers
+     * από τις ημερομηνίες και τα timeslots.
+     * @param workbook Το αρχείο προς επεξεργασία (XSSFWorkbook).
+     * @param sheet Το φύλλο προς επεξεργασία (XSSFSheet).
+     * @param timeslots Η λίστα με τα χρονικά διαστήματα (List<String>).
+     * @param dates Η λίστα με τις ημερομηνίες εξέτασης (List<String>).
+     */
+    private void fillHeaders(XSSFWorkbook workbook, XSSFSheet sheet, List<String> timeslots, List<String> dates){
         CellStyles cs = new CellStyles();
         // Προσθήκη των χρονικών διαστημάτων (timeslots) ως headers στις στήλες
         Row timeslotRow = sheet.createRow(0);
@@ -756,7 +824,13 @@ public class ScheduleManager extends JFrame {
         }
     }
     
-    private void applyCellStyles(XSSFWorkbook workbook, XSSFSheet sheet, int rows, int columns){
+    /**
+     * Η συνάρτηση εφαρμόζει template στυλ κελιών σε συγκεκριμένες θέσεις
+     * για να αποτυπώσει το τελικό excel προγράμματος εξετάσεων.
+     * @param workbook Το αρχείο προς επεξεργασία (XSSFWorkbook).
+     * @param sheet Το φύλλο προς επεξεργασία (XSSFSheet).
+     */
+    private void applyCellStyles(XSSFWorkbook workbook, XSSFSheet sheet){
         int curRow, curCol = 0;
         CellStyles cs = new CellStyles();
         for (Row row : sheet) {
@@ -779,6 +853,12 @@ public class ScheduleManager extends JFrame {
         }
     }
     
+    /**
+     * Η συνάρτηση δέχεται ένα string ως παράμετρο και επιστρέφει το string χωρίς
+     * τόνους στους ελληνικούς χαρακτήρες.
+     * @param s Το string που θα υποστεί επεξεργασία (String).
+     * @return  Το τροποποιημένο string (String).
+     */
     private static String removeAccents(String s) {
         return s.replaceAll("ά", "α")
             .replaceAll("έ", "ε")
@@ -796,21 +876,45 @@ public class ScheduleManager extends JFrame {
             .replaceAll("Ώ", "Ω");
     }
     
+    /**
+     * Συνάρτηση που αλλάζει αυτόματα το μέγεθος των στηλών του φύλλου excel.
+     * @param sheet Το sheet του οποίου οι στήλες θα αλλάξουν μέγεθος (XSSFSheet).
+     * @param columns Ο αριθμός των στηλών προς αλλαγή (integer).
+     */
     private void autoSizeColumns(XSSFSheet sheet, int columns){
         for (int i = 0; i <= columns; i++){
             sheet.autoSizeColumn(i);
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel courseClassroomPanel;
+    private javax.swing.JButton btnExportXlsx;
     private javax.swing.JPanel coursesPanel;
     private javax.swing.JScrollPane coursesScrollPane;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
+    private javax.swing.JScrollPane jScrollPaneClassrooms;
+    private javax.swing.JLabel lblCourses;
+    private javax.swing.JLabel lblCoursesClassrooms;
+    private javax.swing.JLabel lblScheduleDesigner;
     private javax.swing.JPanel modelPanel;
     private javax.swing.JScrollPane modelScrollPane;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * Η κλάση χρησιμοποιείται για την απεικόνιση μηνυμάτων σφάλματος στον χρήστη.
+     */
+    private class CustomErrorException extends Exception{
+        
+        /**
+         * Η συνάρτηση εμφανίζει ένα μήνυμα λάθους με συγκεκριμένο format για 
+         * οποιδήποτε string ως παράμετρο.
+         * @param myJFrame Το αντικείμενο JFrame που χρησιμοποιείται από το βασικό
+         * πρόγραμμα. (JFrame).
+         * @param msg Το μήνυμα που επιθυμούμε να εμφανιστεί (String).
+         */
+        public CustomErrorException(JFrame myJFrame, String msg) {
+            String htmlMsg = "<html><body style='width: %1spx'>%1s";
+            htmlMsg = String.format(htmlMsg, 600, msg); // Set the width as needed for your message
+            JOptionPane.showMessageDialog(myJFrame, htmlMsg, "Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    }
 }

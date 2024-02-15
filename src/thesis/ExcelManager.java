@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.apache.poi.ss.usermodel.Cell;
@@ -51,7 +53,10 @@ public class ExcelManager {
     private List<Classroom> classrooms;
     private List<String> timeslots;
     private List<String> dates;
-    
+    private String regex;
+    private Pattern pattern;
+
+        
     /**
      * Κατασκευαστής του ExcelManager αντικειμένου στον οποίο οι περισσότερες
      * ιδιότητες του ExcelManager αρχικοποιούνται με βάση τις σταθερές από το
@@ -79,6 +84,8 @@ public class ExcelManager {
         excel4 = true;
         excel5 = true;
         excel6 = true;
+        regex = "\\b\\d{2}/\\d{2}/\\d{4}\\b";
+        pattern = Pattern.compile(regex);
     }
     
     public List<Professor> getProfs() {
@@ -243,6 +250,7 @@ public class ExcelManager {
                     boolean exists = false;
                     for (Course tmpCourse : courses){
                         if (tmpCourse.getCourseName().equals(course)){
+                            tmpCourse.setApproxStudents(intValue);
                             exists = true;
                             if (checkIfValid(course)){
                                 for (Professor prof : profs){
@@ -777,22 +785,48 @@ public class ExcelManager {
         symbols.setWeekdays(weekdays);
         try (FileInputStream file = new FileInputStream(new File(filename))) {
             sheet = new XlsxSheet(filename);
-            SimpleDateFormat inputFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", symbols);
-            SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy", new Locale("el", "GR"));
             for (Professor professor : professors){
+                List<String> uniqueDates = new ArrayList<String>();
                 sheetName = professor.getProfSurname() + " " + professor.getProfFirstname();
                 sheet.SelectSheet(sheetName);
                 int lastRow = sheet.GetLastRow();
                 List<Availability> availabilityList = new ArrayList<>();
                 for (rowIndex = 1; rowIndex <= lastRow; rowIndex++) {
                     String cellDate = sheet.GetCellString(rowIndex, 0);
-                    System.out.println("kostas" + cellDate);
-                    Date date = inputFormat.parse(cellDate);
-                    cellDate = outputFormat.format(date);
+                    Matcher matcher = pattern.matcher(cellDate);
+                    if (matcher.find()) {
+                        cellDate = matcher.group();
+                        if(!dates.contains(cellDate)){
+                            file.close();
+                            String msg = "Πρόβλημα με τα δεδομένα του αρχείου '" + 
+                                filename + "' στην γραμμή " + (rowIndex + 1) + 
+                                ". Βρέθηκε ημερομηνία που δεν υπάρχει στο αρχείο"
+                                    + " με τις ημερομηνίες της εξεταστικής.";
+                            throw new CustomErrorException(myJFrame, msg);
+                        }
+                        if(uniqueDates.contains(cellDate)){
+                            file.close();
+                            String msg = "Πρόβλημα με τα δεδομένα του αρχείου '" + 
+                                filename + "' στην γραμμή " + (rowIndex + 1) + 
+                                ". Βρέθηκε διπλοεγγραφή ημερομηνίας, παρακαλώ πολύ"
+                                    + " ελέγξτε τα δεδομένα σας.";
+                            throw new CustomErrorException(myJFrame, msg);
+                        }
+                        uniqueDates.add(cellDate);
+                    } else {
+                        file.close();
+                        String msg = "Πρόβλημα με τα δεδομένα του αρχείου '" + 
+                                filename + "' στην γραμμή " + (rowIndex + 1) + 
+                                ". Βρέθηκε μη έγκυρη ημερομηνία, παρακαλούμε ελέγξτε"
+                                + " τα δεδομένα εκ νέου και επιβεβαιώστε ότι"
+                                + " η ημερομηνία είναι γραμμένη με την μορφή"
+                                + " 'Ημέρα ηη/μμ/εεεε'.";
+                        throw new CustomErrorException(myJFrame, msg);
+                    }
+
                     for (colIndex = 1; colIndex <= lastColumn; colIndex++){
                         String timeslot = sheet.GetCellString(0,colIndex);
                         curCell = sheet.GetCellString(rowIndex, colIndex);
-                        System.out.println(cellDate + " - " + timeslot + ": '" + curCell + "'");
                         if (curCell.equals("+")){
                             Availability tmp = new Availability(cellDate, timeslot, 1);
                             availabilityList.add(tmp);
@@ -849,8 +883,28 @@ public class ExcelManager {
                 List<Availability> availabilityList = new ArrayList<>();
                 for (rowIndex = 1; rowIndex <= lastRow; rowIndex++) {
                     String cellDate = sheet.GetCellString(rowIndex, 0);
-                    Date date = inputFormat.parse(cellDate);
-                    cellDate = outputFormat.format(date);
+                    Matcher matcher = pattern.matcher(cellDate);
+                    if (matcher.find()) {
+                        cellDate = matcher.group();
+                        if(!dates.contains(cellDate)){
+                            file.close();
+                            String msg = "Πρόβλημα με τα δεδομένα του αρχείου '" + 
+                                filename + "' στην γραμμή " + (rowIndex + 1) + 
+                                ". Βρέθηκε ημερομηνία που δεν υπάρχει στο αρχείο"
+                                    + " με τις ημερομηνίες της εξεταστικής.";
+                        throw new CustomErrorException(myJFrame, msg);
+                        }
+                    } else {
+                        file.close();
+                        String msg = "Πρόβλημα με τα δεδομένα του αρχείου '" + 
+                                filename + "' στην γραμμή " + (rowIndex + 1) + 
+                                ". Βρέθηκε μη έγκυρη ημερομηνία, παρακαλούμε ελέγξτε"
+                                + " τα δεδομένα εκ νέου και επιβεβαιώστε ότι"
+                                + " η ημερομηνία είναι γραμμένη με την μορφή"
+                                + " 'Ημέρα ηη/μμ/εεεε'.";
+                        throw new CustomErrorException(myJFrame, msg);
+                    }
+
                     for (colIndex = 1; colIndex <= lastColumn; colIndex++){
                         String timeslot = sheet.GetCellString(0,colIndex);
                         curCell = sheet.GetCellString(rowIndex, colIndex).trim();
@@ -861,8 +915,13 @@ public class ExcelManager {
                             Availability tmp = new Availability(cellDate, timeslot, 0);
                             availabilityList.add(tmp);
                         }else{
-                            System.out.println(sheetName + " " + cellDate);
-                            throw new Exception();
+                            file.close();
+                            String msg = "Πρόβλημα με τα δεδομένα του αρχείου '" + 
+                                    filename + "' στην γραμμή " + (rowIndex + 1) + 
+                                    ". Βρέθηκε μη έγκυρη πληροφορία, παρακαλώ ελέγξτε ότι"
+                                    + " οι τιμές στην στήλη είναι ανάμεσα στα σύμβολα"
+                                    + " '+' και '-'.";
+                            throw new CustomErrorException(myJFrame, msg);
                         }
                     }
                 }
