@@ -1,11 +1,6 @@
 package thesis;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import org.gmele.general.sheets.exception.SheetExc;
 
 /**
  * Η κλάση MainForm είναι η κύρια κλάση του προγράμματος.
@@ -20,10 +15,8 @@ public class MainForm extends javax.swing.JFrame {
     Definitions def;
     
     public MainForm(){
-        
         loadSettings();
         folderPath = def.getFolderPath();
-        
         initComponents();
         jTextField1.setText(folderPath);
         this.setLocationRelativeTo(null);
@@ -125,19 +118,24 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_changeDirectoryBtnActionPerformed
 
     private void produceTemplateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_produceTemplateBtnActionPerformed
-        ExcelManager a = new ExcelManager(this, def);
-        a.readGenericExcel();
-        a.createExcels();
+        ExcelManager excelManager = new ExcelManager(this, def);
+        excelManager.readGenericExcel();
+        excelManager.createExcels();
     }//GEN-LAST:event_produceTemplateBtnActionPerformed
 
     private void loadUIBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadUIBtnActionPerformed
         
-        ExcelManager a = new ExcelManager(this, def);
-        if(a.readGenericExcel()){
-            if (a.readAvailabilityTemplates()){
-                ScheduleManager b = new ScheduleManager(a);
+        ExcelManager excelManager = new ExcelManager(this, def);
+        if(excelManager.readGenericExcel()){
+            if (excelManager.readAvailabilityTemplates()){
+                ScheduleManager b = new ScheduleManager(excelManager);
                 if (def.examScheduleFileExists()){
-                    b.readExamSchedule();
+                    if(!b.readExamSchedule()){
+                        if (JOptionPane.showConfirmDialog(this, "Σφάλμα κατά την ανάγνωση των δεδομένων από το αρχείο του προγράμματος εξεταστικής." +
+                            " Θέλετε να ξεκινήσετε ένα νέο κενό παράθυρο;", "Σφάλμα εφαρμογής", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
+                            b.startProcess(true);
+                        }
+                    }
                     b.startProcess(false);
                 } else {
                     if (JOptionPane.showConfirmDialog(this, "Δεν βρέθηκε στο μονοπάτι: '" + def.getFolderPath() + " ' το" +

@@ -13,9 +13,9 @@ public class ScheduledCourse {
     
     private Course course;
     private String date, timeslot;
-    List<Classroom> classrooms;
-    List<Classroom> selectedClassrooms;
-    int currSeats;
+    private List<Classroom> classrooms;
+    private List<Classroom> selectedClassrooms;
+    private int neededSeats;
     
     // if we set a course to be scheduled, whenever we check a classroom,
     // we need to also update the change of the classroom's availability
@@ -29,18 +29,19 @@ public class ScheduledCourse {
             classrooms = new ArrayList<>(clsrms);
         }
         this.selectedClassrooms = new ArrayList<>();
-        currSeats = 0;
+        //neededSeats = crs.getCourse().getApproxStudents();
+        
     }
 
     public void setCurrSeats(int currSeats) {
-        this.currSeats = currSeats;
+        this.neededSeats = currSeats;
     }
 
-    public Course getCourse() {
+    public Course getScheduledCourse() {
         return course;
     }
 
-    public void setCourse(Course course) {
+    public void setScheduledCourse(Course course) {
         this.course = course;
     }
 
@@ -76,7 +77,15 @@ public class ScheduledCourse {
         this.selectedClassrooms = selectedClassrooms;
     }
 
-    public int getCurrSeats() {
-        return currSeats;
+    public int getNeededSeats() {
+        return neededSeats;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
     }
 }

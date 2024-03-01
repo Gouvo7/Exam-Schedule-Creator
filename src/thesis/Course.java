@@ -32,12 +32,12 @@ public class Course{
      * @param season Περίοδος εξέστασης (String 'ΕΑΡΙΝΟ'/'ΧΕΙΜΕΡΙΝΟ').
      * @param isExamined Εάν εξετάζεται το μάθημα ή όχι(boolean, true για '+', false για '-').
      */
-    public Course(String name, String nameShort, String semester, String season, boolean isExamined){
+    public Course(String name, String nameShort, String semester, String season, boolean examined){
         courseName = name;
         courseShort = nameShort;
         courseSem = semester;
         courseSeason = season;
-        isExamined = isExamined;
+        isExamined = examined;
         examiners = new ArrayList<>();
         classrooms = new ArrayList<>();
         approxStudents = 0;
@@ -58,10 +58,7 @@ public class Course{
         isExamined = course.getIsExamined();
         examiners = new ArrayList<>(course.getExaminers());
         classrooms = new ArrayList<>();
-    }
-
-    public Course getCourse(){
-        return this;
+        approxStudents = course.getApproxStudents();
     }
     
     public String getCourseName() {

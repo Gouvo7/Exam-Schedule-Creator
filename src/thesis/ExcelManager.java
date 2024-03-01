@@ -393,6 +393,7 @@ public class ExcelManager {
     
     /**
      * Εντοπισμός όλων των αιθουσών που έχουν καταχωρηθεί στο βασικό αρχείο.
+     * 
      * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
      * @return Μία λίστα με αντικείμενα τύπου Classroom.
      */
@@ -461,7 +462,9 @@ public class ExcelManager {
     }
     
     /**
-     * Εντοπισμός όλων των ημερομηνιών της εξεταστικής που έχουν καταχωρηθεί στο βασικό αρχείο.
+     * Εντοπισμός όλων των ημερομηνιών της εξεταστικής που έχουν καταχωρηθεί στο
+     * βασικό αρχείο.
+     * 
      * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
      * @return Ένα HashMap με ζευγάρια ημέρας - ημερομηνίας.
      */
@@ -567,6 +570,7 @@ public class ExcelManager {
     
     /**
      * Εντοπισμός όλων των καθηγητών που έχουν καταχωρηθεί στο βασικό αρχείο.
+     * 
      * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
      * @return Μία λίστα με αντικείμενα τύπου Professor.
      */
@@ -769,12 +773,13 @@ public class ExcelManager {
     
     /**
      * Συμπληρώνει για όλη την λίστα των καθηγητών, την διαθεσιμότητά τους από το συμπληρωμένο φύλλο που παράχθηκε από το πρόγραμμα σε προηγούμενο βήμα. 
+     * 
      * @param professors Η λίστα με τους καθηγητές που θα προστεθεί η διαθεσιμότητά τους.
      * @param lastColumn Το μέγεθος της λίστας timeslots ή το πλήθος των διαφορετικών
      * χρονικών πλαισίων.
      * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
      */    
-    public boolean addProfessorsAvailability(List<Professor> professors,int lastColumn) throws SheetExc{
+    private boolean addProfessorsAvailability(List<Professor> professors,int lastColumn) throws SheetExc{
         int rowIndex = 0;
         int colIndex = 0;
         String sheetName="";
@@ -858,13 +863,15 @@ public class ExcelManager {
     }
     
     /**
-     * Συμπληρώνει για όλη την λίστα των αιθουσών, την διαθεσιμότητά τους από το συμπληρωμένο φύλλο που παράχθηκε από το πρόγραμμα σε προηγούμενο βήμα. 
+     * Συμπληρώνει για όλη την λίστα των αιθουσών, την διαθεσιμότητά τους από το
+     * συμπληρωμένο φύλλο που παράχθηκε από το πρόγραμμα σε προηγούμενο βήμα. 
+     * 
      * @param classrooms Η λίστα με τις αίθουσες που θα προστεθεί η διαθεσιμότητά τους.
      * @param lastColumn Το μέγεθος της λίστας timeslots ή το πλήθος των διαφορετικών
      * χρονικών πλαισίων.
      * @param filename Το όνομα του αρχείου από το οποίο θα αντλήσουμε την πληροφορία.
      */
-    public boolean addClassroomsAvailability(List<Classroom> classrooms, int lastColumn){
+    private boolean addClassroomsAvailability(List<Classroom> classrooms, int lastColumn){
         int rowIndex = 0;
         int colIndex = 0;
         String filename = def.getFolderPath() + "\\" + def.getClassroomsAvailabilityFile();
@@ -969,7 +976,6 @@ public class ExcelManager {
      * λίστα από τους διαβασμένους καθηγητές.
      * 
      * @param cell Το περιεχόμενο του κελιού (String).
-     * 
      * @return true εφόσον το string ταιριάζει με επώνυμο καθηγητή και false 
      * εάν όχι (boolean).
      */
@@ -1005,7 +1011,7 @@ public class ExcelManager {
      * @param cellA Πληροφορία από 1η στήλη (String).
      * @return εάν υπάρχει ήδη ή όχι (boolean).
      */
-    public boolean checkDuplicateCourse(Course course, String cellA){
+    private boolean checkDuplicateCourse(Course course, String cellA){
         if(course.getCourseName().equals(cellA)){
             return true;
         }
@@ -1018,7 +1024,7 @@ public class ExcelManager {
      * @param s Το string προς έλεγχο (String).
      * @return εάν είναι έγκυρο ή όχι (boolean).
      */
-    public boolean checkIfValid(String s){
+    private boolean checkIfValid(String s){
         if(s != null && !s.equals("") && !s.equals(" ")){
             return true;
         }
@@ -1030,7 +1036,7 @@ public class ExcelManager {
      * (δεν υπάρχει δηλαδή σχέση μαθήματος - εξεταστών στο φύλλο 'COURSES_PROFESSORS'.
      * Τα μαθήματα αυτά θεωρούμε πως δεν εξετάζονται).
      */
-    public void removeCoursesWithNoExaminers(){
+    private void removeCoursesWithNoExaminers(){
         List<Course> copy = new ArrayList<>(courses);
         for (Course course : copy){
             int i = 0;
@@ -1042,25 +1048,6 @@ public class ExcelManager {
             }
         }
     }
-
     
-    /**
-     * Η κλάση χρησιμοποιείται για την απεικόνιση μηνυμάτων σφάλματος στον χρήστη.
-     */
-    private class CustomErrorException extends Exception{
-        
-        /**
-         * Η συνάρτηση εμφανίζει ένα μήνυμα λάθους με συγκεκριμένο format για 
-         * οποιδήποτε string ως παράμετρο.
-         * @param myJFrame Το αντικείμενο JFrame που χρησιμοποιείται από το βασικό
-         * πρόγραμμα. (JFrame).
-         * @param msg Το μήνυμα που επιθυμούμε να εμφανιστεί (String).
-         */
-        public CustomErrorException(JFrame myJFrame, String msg) {
-            String htmlMsg = "<html><body style='width: %1spx'>%1s";
-            htmlMsg = String.format(htmlMsg, 600, msg); // Set the width as needed for your message
-            JOptionPane.showMessageDialog(myJFrame, htmlMsg, "Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-    }
+
 }
