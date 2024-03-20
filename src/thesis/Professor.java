@@ -17,7 +17,7 @@ import java.util.Objects;
  * @param availability Λίστα με αντικείμενα της κλάσης Availability
  */
 
-public class Professor implements Serializable{
+public class Professor{
     
     private String profSurname;
     private String profFirstname;
@@ -65,8 +65,6 @@ public class Professor implements Serializable{
      *         2 όταν ο καθηγητής είναι διαθέσιμος αλλά έχει δεσμευθεί από άλλο μάθημα για εκείνη την ημερομηνία
      */
     public int isAvailable(String date, String timeslot){
-        date.trim();
-        timeslot.trim();
         for (Availability a : availability){
             if (a.getDate().equals(date) && a.getTimeSlot().equals(timeslot)){
                 if(a.getIsAvailable() == 0){

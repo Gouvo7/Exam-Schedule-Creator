@@ -19,22 +19,32 @@ public class ScheduledCourse {
     
     // if we set a course to be scheduled, whenever we check a classroom,
     // we need to also update the change of the classroom's availability
-    // in the classrooms list but also in the 
-    
+    // in the classrooms list but also in the
     public ScheduledCourse(Course crs, String date, String timeslot, List<Classroom> clsrms){
-        course = crs;
+        this.course = crs;
         this.date = date;
         this.timeslot = timeslot;
         if(clsrms!= null){
-            classrooms = new ArrayList<>(clsrms);
+            this.classrooms = new ArrayList<>(clsrms);
         }
         this.selectedClassrooms = new ArrayList<>();
         //neededSeats = crs.getCourse().getApproxStudents();
         
     }
+    
+    public ScheduledCourse(Course crs){
+        course = crs;
+        date = null;
+        timeslot = null;
+        classrooms = null;
+        selectedClassrooms = new ArrayList<>();
+        //neededSeats = crs.getCourse().getApproxStudents();
+        
+    }
+
 
     public void setCurrSeats(int currSeats) {
-        this.neededSeats = currSeats;
+        neededSeats = currSeats;
     }
 
     public Course getScheduledCourse() {

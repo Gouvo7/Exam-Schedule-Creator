@@ -129,6 +129,16 @@ public class Course{
         this.approxStudents = approxStudents;
     }
     
+    public boolean checkIfProfessorsAreAvailable(String date, String timeslot){
+        boolean res = true;
+        for(Professor prf : examiners){
+            if (prf.isAvailable(date, timeslot) != 1){
+                res = false;
+            }
+        }
+        return res;
+    }
+    
     /**
      * Εκτύπωση μαθήματος και εξεταστών.
      */

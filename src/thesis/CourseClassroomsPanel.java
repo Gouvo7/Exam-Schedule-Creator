@@ -25,9 +25,12 @@ public class CourseClassroomsPanel extends javax.swing.JPanel {
     public CourseClassroomsPanel(ScheduledCourse sc, List<Classroom> cls, String dt, String ts) {
         initComponents();
         this.scheduledCourse = sc;
-        int classroomsRows = ((scheduledCourse.getClassrooms().size())/2) + 1;
+        int classroomsCount = scheduledCourse.getClassrooms().size();
+        int classroomsRows = 0;
+        if(classroomsCount >= 0){
+            classroomsRows = ((scheduledCourse.getClassrooms().size())/2) + 1;
+        }
         this.setLayout(new BorderLayout());
-        //this.setLayout(new GridBagLayout());
         dimensionsFrame = new Dimension(280, 200);
         dimensionsCheckboxesPanels = new Dimension(200, 30 * classroomsRows);
         jPanel1.setLayout(new GridLayout(classroomsRows ,2, 20, 0));
@@ -77,8 +80,8 @@ public class CourseClassroomsPanel extends javax.swing.JPanel {
     
     private void createComponents() {
         String courseName = scheduledCourse.getScheduledCourse().getCourseName() + " '" + scheduledCourse.getScheduledCourse().getCourseSem() + "' (" + scheduledCourse.getScheduledCourse().getApproxStudents() + ")";
-        String htmlMsg = "<html><body style='width: %1spx'>%2s</body></html>";
-        String res1 = String.format(htmlMsg, 400, courseName);
+        String htmlMsg = "<html><div style='width: 40px; word-wrap: break-word'</body></html>";
+        String res1 = String.format(htmlMsg, 100, courseName);
         
         String courseDetails = "Περιόδου: " + scheduledCourse.getScheduledCourse().getCourseSeason() + "     Εξάμηνο: " + scheduledCourse.getScheduledCourse().getCourseSem();
         lblCourseName.setText(courseDetails);

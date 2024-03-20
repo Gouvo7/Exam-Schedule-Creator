@@ -28,4 +28,25 @@ public class Unscheduled {
     public void setCourses(List<Course> courses) {
         this.courses = courses;
     }
+    
+    public void removeCourseFromUnscheduledList(Course crs){
+        for(Course tmp : courses){
+            if (tmp.getCourseName().equals(crs.getCourseName()) && tmp.getCourseSem().equals(crs.getCourseSem())){
+                courses.remove(tmp);
+                return;
+            }
+        }
+    }
+    
+    public void addCourseToUnscheduledList(Course crs){
+        if (!courses.contains(crs)){
+            courses.add(crs);
+        }
+    }
+    
+    public void printCourses(){
+        for(Course crs : courses){
+            System.out.println("Unscheduled - CourseName: " + crs.getCourseName());
+        }
+    }
 }

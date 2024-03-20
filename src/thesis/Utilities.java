@@ -7,6 +7,9 @@ package thesis;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -163,6 +166,27 @@ public class Utilities {
         }
     }
     
+    public String modifyDate(String inputDate, int daysToModify, char operation) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        try {
+            LocalDate date = LocalDate.parse(inputDate, formatter);
+
+            // Modify the date based on the operation
+            if (operation == '+') {
+                date = date.plusDays(daysToModify);
+            } else if (operation == '-') {
+                date = date.minusDays(daysToModify);
+            } else {
+                return null;
+            }
+            return date.format(formatter);
+
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+    
     /**
      * Η συνάρτηση γεμίζει το τελικό πρόγραμμα εξεταστικής με τα headers
      * από τις ημερομηνίες και τα timeslots.
@@ -208,4 +232,5 @@ public class Utilities {
         }
         return validCoursesList;
     }
+    
 }

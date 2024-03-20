@@ -130,7 +130,7 @@ public class MainForm extends javax.swing.JFrame {
             if (excelManager.readAvailabilityTemplates()){
                 ScheduleManager b = new ScheduleManager(excelManager);
                 if (def.examScheduleFileExists()){
-                    if(!b.readExamSchedule()){
+                    if(!b.readExamScheduleExcel()){
                         if (JOptionPane.showConfirmDialog(this, "Σφάλμα κατά την ανάγνωση των δεδομένων από το αρχείο του προγράμματος εξεταστικής." +
                             " Θέλετε να ξεκινήσετε ένα νέο κενό παράθυρο;", "Σφάλμα εφαρμογής", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
                             b.startProcess(true);
