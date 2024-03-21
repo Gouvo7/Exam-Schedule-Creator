@@ -124,7 +124,6 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_produceTemplateBtnActionPerformed
 
     private void loadUIBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadUIBtnActionPerformed
-        
         ExcelManager excelManager = new ExcelManager(this, def);
         if(excelManager.readGenericExcel()){
             if (excelManager.readAvailabilityTemplates()){

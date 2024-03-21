@@ -107,7 +107,6 @@ public class ScheduleManager extends JFrame {
         excelCols = timeslots.size();
         logs = new Logs();
         def = excelManager1.getDefinitions();
-        utils = new Utilities();
         professors = new ArrayList<>(excelManager1.getProfs());
         finalExcelSheet = def.getSheet7();
         regex = "\\b\\d{2}/\\d{2}/\\d{4}\\b";
@@ -139,11 +138,7 @@ public class ScheduleManager extends JFrame {
         modelPanel.add(populateTable());
         populateCourses();
         if (!isNew) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    fillCoursesWithReadExcelScheduleData();
-                }
-            });
+            fillCoursesWithReadExcelScheduleData();
             createScheduledCourseClassroomsPanels();
         } else {
         }
@@ -258,6 +253,7 @@ public class ScheduleManager extends JFrame {
                                 coursesPanel.repaint();
                                 ScheduledCourse sc = new ScheduledCourse(tmpCourse, rowValue, colValue, classrooms);
                                 addCourseToClassroomsPanel(sc, rowValue, colValue);
+                                //unscheduled.removeCourseFromUnscheduledList(tmpCourse);
                                 added = true;
                                 break;
                             }
@@ -265,21 +261,31 @@ public class ScheduleManager extends JFrame {
                     }
                     if (dropCellContents != null && added) {
                         Course cellCourse = findCourse(dropCellContents);
+                        ScheduledCourse courseToBeRemoved = null;
                         for (ScheduledCourse tmp : scheduledCourses) {
                             if (tmp.getCourse().getCourseName() == cellCourse.getCourseName()) {
                                 for (Professor prf : tmp.getCourse().getExaminers()) {
                                     prf.changeSpecificAvailability(rowValue, colValue,1);
                                 }
-                                unscheduled.addCourseToUnscheduledList(tmpCourse);
-                                scheduledCourses.remove(tmp);
+                                //System.out.println("------------------------------------------------------ Unscheduled Before: " + tmpCourse.getCourseName());
+                                //unscheduled.printCourses();
+                                //unscheduled.addCourseToUnscheduledList(tmpCourse);
+                                //System.out.println("------------------------------------------------------ Unscheduled After:");
+                                //unscheduled.printCourses();
+                                courseToBeRemoved = tmp;
                                 removeCourseFromClassroomsPanel(cellCourse);
                                 JButton courseButton = new JButton();
                                 courseButton = createCourseBtn(cellCourse);
                                 coursesPanel.add(courseButton);
                                 coursesPanel.revalidate();
                                 coursesPanel.repaint();
-                                evt.dropComplete(true);
+                                break;
                             }
+                            if(courseToBeRemoved != null){
+                                scheduledCourses.remove(courseToBeRemoved);
+                            }
+                            evt.dropComplete(true);
+                            
                         }
                         // Μετατροπή της ημερομηνίας από την μορφή 'ηη/μμ/εεεε Ημέρα' to simply
                         // 'ηη/μμ/εεεε'
@@ -295,8 +301,14 @@ public class ScheduleManager extends JFrame {
         } catch (java.awt.dnd.InvalidDnDOperationException ex) {
         } catch (IOException ex) {
             Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
-        }catch (Exception ex){
+        }catch (java.util.ConcurrentModificationException ex){
+            Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println(ex);
+            System.out.println(ex.getStackTrace());
+        }catch (Exception ex){
+            Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex);
+            System.out.println(ex.getStackTrace());
         }
     }
 
@@ -528,7 +540,8 @@ public class ScheduleManager extends JFrame {
     private void autoAddProfessorsToSchedulebtncreateExcelFromTable(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoAddProfessorsToSchedulebtncreateExcelFromTable
         JOptionPane.showMessageDialog(null, "Ενημέρωση: Η διαδικασία θα διαρκέσει μερικά δευτερόλεπτα.", "Μήνυμα εφαρμογής", JOptionPane.OK_OPTION );
         unscheduled.printCourses();
-        for(Course course : unscheduled.getCourses()){
+        Unscheduled copy = new Unscheduled(unscheduled);
+        for(Course course : copy.getCourses()){
             
             boolean placedCourse = false;
             List<Availability> professorsAvailability = new ArrayList<>();
@@ -557,6 +570,7 @@ public class ScheduleManager extends JFrame {
                                 addCourseToClassroomsPanel(sc, date, timeslot);
                                 coursesPanel.repaint();
                                 placedCourse = true;
+                                unscheduled.removeCourseFromUnscheduledList(course);
                             }
                         }
                     }

@@ -10,11 +10,17 @@ import java.util.List;
  * @author ice18390193
  */
 public class Unscheduled {
+
     private List<Course> courses;
     private String msg;
     
     Unscheduled(){
         courses = new ArrayList<>();
+    }
+    
+    Unscheduled(Unscheduled un){
+        courses = new ArrayList<>(un.getCourses());
+        msg = un.getMsg();
     }
     
     Unscheduled(List<Course> courses){
@@ -27,6 +33,14 @@ public class Unscheduled {
 
     public void setCourses(List<Course> courses) {
         this.courses = courses;
+    }
+    
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
     
     public void removeCourseFromUnscheduledList(Course crs){
