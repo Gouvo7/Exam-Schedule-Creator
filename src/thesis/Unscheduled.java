@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Η κλάση χρησιμοποιείται για την αποθήκευση των μαθημάτων που δεν έχουν τοποθετηθεί στον πίνακα excel
- * 
  * @author Nektarios Gkouvousis
  * @author ice18390193
+ * 
+ * Η κλάση χρησιμοποιείται για την αποθήκευση των μαθημάτων που δεν έχουν 
+ * ακόμη προγραμματιστεί για εξέταση (δεν έχουν τοποθετηθεί στον πίνακα)
+ * 
+ * 
  */
 public class Unscheduled {
 
@@ -44,11 +47,8 @@ public class Unscheduled {
     }
     
     public void removeCourseFromUnscheduledList(Course crs){
-        for(Course tmp : courses){
-            if (tmp.getCourseName().equals(crs.getCourseName()) && tmp.getCourseSem().equals(crs.getCourseSem())){
-                courses.remove(tmp);
-                return;
-            }
+        if(courses.contains(crs)){
+            courses.remove(crs);
         }
     }
     

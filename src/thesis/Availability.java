@@ -6,10 +6,9 @@ import java.io.Serializable;
  * @author Nektarios Gkouvousis
  * @author ice18390193
  * 
- * Η κλάση Availability ευθύνεται για την διαχείριση της διαθεσιμότητας καθηγητών
- * και αιθουσών. Το isAvailable λαμβάνει τιμές:
- * 0 - Όχι.
- * 1 - Ναι.
+ * Η κλάση Availability χειρίζεται την αποθήκευση και διαχείριση της διαθεσιμότητας
+ * για καθηγητές και αίθουσες. Χρησιμοποιεί έναν ακέραιο για να εκφράσει τη διαθεσιμότητα,
+ * όπου 0 σημαίνει μη διαθέσιμο και 1 διαθέσιμο.
  */
 public class Availability implements Serializable{
 

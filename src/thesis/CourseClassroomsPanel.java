@@ -3,8 +3,6 @@ package thesis;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.List;
 import javax.swing.BorderFactory;
@@ -38,19 +36,11 @@ public class CourseClassroomsPanel extends javax.swing.JPanel {
         createComponents();
     }
 
-    public ScheduledCourse getSc() {
+    public ScheduledCourse getScheduledCourse() {
         return scheduledCourse;
     }
 
-    public void setSc(ScheduledCourse sc) {
-        this.scheduledCourse = sc;
-    }
-
-    public ScheduledCourse getCourse() {
-        return scheduledCourse;
-    }
-
-    public void setCourse(ScheduledCourse sc) {
+    public void setScheduledCourse(ScheduledCourse sc) {
         this.scheduledCourse = sc;
     }
 
@@ -79,11 +69,13 @@ public class CourseClassroomsPanel extends javax.swing.JPanel {
     }
     
     private void createComponents() {
-        String courseName = scheduledCourse.getScheduledCourse().getCourseName() + " '" + scheduledCourse.getScheduledCourse().getCourseSem() + "' (" + scheduledCourse.getScheduledCourse().getApproxStudents() + ")";
+        String courseName = scheduledCourse.getScheduledCourse().getCourseName();
         String htmlMsg = "<html><div style='width: 40px; word-wrap: break-word'</body></html>";
         String res1 = String.format(htmlMsg, 100, courseName);
         
-        String courseDetails = "Περιόδου: " + scheduledCourse.getScheduledCourse().getCourseSeason() + "     Εξάμηνο: " + scheduledCourse.getScheduledCourse().getCourseSem();
+        String courseDetails = "<html>&nbsp;Περιόδου: " + scheduledCourse.getScheduledCourse().getCourseSeason() +
+                           "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Εξάμηνο: " + scheduledCourse.getScheduledCourse().getCourseSem() +
+                           "<br>&nbsp;Εκτιμώμενος αριθμός μαθητών: " + scheduledCourse.getScheduledCourse().getApproxStudents() + "</html>";
         lblCourseName.setText(courseDetails);
         lblCourseName.setForeground(Color.GRAY);
         for (Classroom classroom : scheduledCourse.getClassrooms()) {
@@ -140,7 +132,7 @@ public class CourseClassroomsPanel extends javax.swing.JPanel {
             .addGap(0, 160, Short.MAX_VALUE)
         );
 
-        totalSeatsLabel.setText("Συνολικές καταχωρημένες θέσεις:");
+        totalSeatsLabel.setText("Συνολικές καταχωρημένες θέσεις: 0 θέσεις");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -157,7 +149,7 @@ public class CourseClassroomsPanel extends javax.swing.JPanel {
                 .addGroup(layout.createSequentialGroup()
                     .addGap(16, 16, 16)
                     .addComponent(totalSeatsLabel)
-                    .addContainerGap(24, Short.MAX_VALUE)))
+                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

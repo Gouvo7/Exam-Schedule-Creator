@@ -12,18 +12,18 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  * @author Nektarios Gkouvousis
  * @author ice18390193
  * 
- * Η κλάση CellStyles ευθύνεται για την δημιουργία και την επιστροφή προκαθορισμένων στυλ κελιών.
- * Συγκεκριμένα, έχουν δημιουργηθεί οι απαραίτητες μέθοδοι για διαφορετικά είδη κελιών
- * που χρησιμοποιούνται για την δημιουργία των απαραίτητων excel αρχείων.
+ * Η κλάση CellStyles ευθύνεται για την δημιουργία και την επιστροφή προκαθορισμένων
+ * στυλ κελιών. Συγκεκριμένα, έχουν δημιουργηθεί οι απαραίτητες μέθοδοι για 
+ * διαφορετικά είδη κελιών που χρησιμοποιούνται για την δημιουργία των απαραίτητων
+ * excel αρχείων.
  */
 public class CellStyles {
     
     /**
-     * Όλες οι μέθοδοι λαμβάνουν ως είσοδο ένα αντικείμενο τύπου XSSFWorkbook και
-     * επιστρέφουν ένα αντικείμενο τύπου CellStyle.
+     * Η μέθοδος δημιουργεί και επιστρέφει ένα βασικό template format κελιού.
      * 
-     * @param workbook Αντικείμενο τύπου XSSFWorkbook που θα λάβει την τροποποίηση.
-     * @return style Το αντικείμενο τύπου CellStyle.
+     * @param workbook Αντικείμενο τύπου XSSFWorkbook στο οποίο θα εφαρμοστεί το style.
+     * @return style Το αντικείμενο τύπου CellStyle με προκαθορισμένο σχεδιασμό.
      */
     public CellStyle getTemplateStyle(XSSFWorkbook workbook) {
         CellStyle style = workbook.createCellStyle();
@@ -38,8 +38,11 @@ public class CellStyles {
     }
     
      /**
-      * @param workbook Αντικείμενο τύπου XSSFWorkbook που θα λάβει την τροποποίηση.
-      * @return style Το αντικείμενο τύπου CellStyle.
+      * Η μέθοδος δημιουργεί και επιστρέφει ένα βασικό template format κελιού για
+      * τις επικεφαλίδες των πρώτων 2 στηλών.
+      * 
+      * @param workbook Αντικείμενο τύπου XSSFWorkbook στο οποίο θα εφαρμοστεί το style.
+      * @return style Το αντικείμενο τύπου CellStyle με προκαθορισμένο σχεδιασμό.
       */
     public CellStyle getDateHeadersStyle(XSSFWorkbook workbook) {
         CellStyle style = workbook.createCellStyle();
@@ -58,8 +61,11 @@ public class CellStyles {
     }
     
     /**
-     * @param workbook Αντικείμενο τύπου XSSFWorkbook που θα λάβει την τροποποίηση.
-     * @return style Το αντικείμενο τύπου CellStyle.
+     * Η μέθοδος δημιουργεί και επιστρέφει ένα βασικό template format κελιού για
+     * τις επικεφαλίδες των ημερομηνιών.
+     * 
+     * @param workbook Αντικείμενο τύπου XSSFWorkbook στο οποίο θα εφαρμοστεί το style.
+     * @return style Το αντικείμενο τύπου CellStyle με προκαθορισμένο σχεδιασμό.
      */
     public CellStyle getDateValuesStyle(XSSFWorkbook workbook) {
         CellStyle style = workbook.createCellStyle();
@@ -80,8 +86,11 @@ public class CellStyles {
     }
     
     /**
-     * @param workbook Αντικείμενο τύπου XSSFWorkbook που θα λάβει την τροποποίηση.
-     * @return style Το αντικείμενο τύπου CellStyle.
+     * Η μέθοδος δημιουργεί και επιστρέφει ένα βασικό template format κελιού για
+     * τις επικεφαλίδες των χρονικών ορίων
+     * 
+     * @param workbook Αντικείμενο τύπου XSSFWorkbook στο οποίο θα εφαρμοστεί το style.
+     * @return style Το αντικείμενο τύπου CellStyle με προκαθορισμένο σχεδιασμό.
      */
     public CellStyle getTimeslotsHeadersStyle(XSSFWorkbook workbook) {
         CellStyle style = workbook.createCellStyle();
@@ -99,9 +108,12 @@ public class CellStyles {
         return style;
     }
     
-    /**
-     * @param workbook Αντικείμενο τύπου XSSFWorkbook που θα λάβει την τροποποίηση.
-     * @return style Το αντικείμενο τύπου CellStyle.
+    /** DEPRECATED - NOT BEING USED
+     * Η μέθοδος δημιουργεί και επιστρέφει ένα βασικό template format κελιού για
+     * τα κελιά των μαθημάτων
+     * 
+     * @param workbook Αντικείμενο τύπου XSSFWorkbook στο οποίο θα εφαρμοστεί το style.
+     * @return style Το αντικείμενο τύπου CellStyle με προκαθορισμένο σχεδιασμό.
      */
     public CellStyle getNoBorderStyle(XSSFWorkbook workbook) {
         CellStyle style = workbook.createCellStyle();
@@ -121,9 +133,11 @@ public class CellStyles {
     }
     
     /**
-      * @param workbook Αντικείμενο τύπου XSSFWorkbook που θα λάβει την τροποποίηση.
-      * @return style Το αντικείμενο τύπου CellStyle.
-      */
+     * Η μέθοδος δημιουργεί και επιστρέφει ένα βασικό template format κελιού για
+     * τα κελιά των μαθημάτων
+     * @param workbook Αντικείμενο τύπου XSSFWorkbook στο οποίο θα εφαρμοστεί το style.
+     * @return style Το αντικείμενο τύπου CellStyle με προκαθορισμένο σχεδιασμό.
+     */
     public CellStyle getFinalScheduleBasicStyle(XSSFWorkbook workbook) {
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();

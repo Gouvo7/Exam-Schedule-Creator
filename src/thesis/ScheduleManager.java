@@ -24,17 +24,20 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import static java.lang.Thread.sleep;
 import java.text.DateFormatSymbols;
 import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -69,6 +72,8 @@ import org.gmele.general.sheets.exception.SheetExc;
 public class ScheduleManager extends JFrame {
 
     private String[] weekdays = { "ΚΥΡΙΑΚΗ", "ΔΕΥΤΕΡΑ", "ΤΡΙΤΗ", "ΤΕΤΑΡΤΗ", "ΠΕΜΠΤΗ", "ΠΑΡΑΣΚΕΥΗ", "ΣΑΒΒΑΤΟ" };
+    private Map<Character, Integer> coursesSemesters = new HashMap<>();
+    char[] greekSemesters = {'Α', 'Β', 'Γ', 'Δ', 'Ε', 'Ζ', 'Η'};
     private JTable table;
     private ExcelManager excelManager1;
     Definitions def;
@@ -87,6 +92,7 @@ public class ScheduleManager extends JFrame {
     private String regex;
     private JPanel coursesClassroomsPanel;
     private Utilities utils;
+    private LoadingPanel lp;
 
     public ScheduleManager(ExcelManager excelManager) {
         initComponents();
@@ -95,6 +101,7 @@ public class ScheduleManager extends JFrame {
     }
 
     public void initOtherComponents() {
+        lp = new LoadingPanel();
         utils = new Utilities();
         courses = new ArrayList<>(excelManager1.getCourses());
         classrooms = new ArrayList<>(excelManager1.getClassrooms());
@@ -132,6 +139,23 @@ public class ScheduleManager extends JFrame {
             }
         };
         initTable();
+        for (int i = 0; i < greekSemesters.length; i++) {
+            coursesSemesters.put(greekSemesters[i], i + 1);
+        }
+    }
+    
+    private void showLoading(){
+        this.getContentPane().add(lp);
+        this.getContentPane().setComponentZOrder(lp, 0);
+        this.repaint();
+        this.revalidate();
+    }
+    
+    private void hideLoading(){
+        this.remove(lp);
+        this.revalidate();
+        this.repaint();
+        //this.getContentPane().setComponentZOrder(this, 0);
     }
 
     public void startProcess(boolean isNew) {
@@ -140,6 +164,7 @@ public class ScheduleManager extends JFrame {
         if (!isNew) {
             fillCoursesWithReadExcelScheduleData();
             createScheduledCourseClassroomsPanels();
+            sortAndReorderPanels(coursesClassroomsPanel);
         } else {
         }
         this.setVisible(true);
@@ -253,7 +278,8 @@ public class ScheduleManager extends JFrame {
                                 coursesPanel.repaint();
                                 ScheduledCourse sc = new ScheduledCourse(tmpCourse, rowValue, colValue, classrooms);
                                 addCourseToClassroomsPanel(sc, rowValue, colValue);
-                                //unscheduled.removeCourseFromUnscheduledList(tmpCourse);
+                                scheduledCourses.add(sc);
+                                unscheduled.removeCourseFromUnscheduledList(tmpCourse);
                                 added = true;
                                 break;
                             }
@@ -313,27 +339,47 @@ public class ScheduleManager extends JFrame {
     }
 
     public void removeCourseFromTable(int selectedRow, int selectedColumn) {
-        String date = table.getValueAt(selectedRow, 0).toString();
-        date = utils.getDateWithGreekFormat(weekdays, date);
-        String timeslot = table.getValueAt(0, selectedColumn).toString();
-        Object cellValue = model.getValueAt(selectedRow, selectedColumn);
-        ScheduledCourse courseToDelete = null;
-        if (utils.checkDate(dates, date) && utils.checkTimeslot(timeslots, timeslot)) {
-            if (cellValue != null && cellValue instanceof String && selectedRow > 0 && selectedColumn != 0) {
-                String buttonText = (String) cellValue;
-                for (ScheduledCourse sc : scheduledCourses) {
-                    if (sc.getScheduledCourse().getCourseName().equals(buttonText)
-                            || sc.getScheduledCourse().getCourseShort().equals(buttonText)) {
-                        for (Professor prf : sc.getScheduledCourse().getExaminers()) {
-                            prf.changeSpecificAvailability(date, timeslot, 1);
+        try{
+            String date = table.getValueAt(selectedRow, 0).toString();
+            date = utils.getDateWithGreekFormat(weekdays, date);
+            String timeslot = table.getValueAt(0, selectedColumn).toString();
+            Object cellValue = model.getValueAt(selectedRow, selectedColumn);
+            ScheduledCourse courseToDelete = null;
+            if (utils.checkDate(dates, date) && utils.checkTimeslot(timeslots, timeslot)) {
+                if (cellValue != null && cellValue instanceof String && selectedRow > 0 && selectedColumn != 0) {
+                    String buttonText = (String) cellValue;
+                    
+                    for (ScheduledCourse sc : scheduledCourses) {
+                        if (sc.getScheduledCourse().getCourseName().equals(buttonText)
+                                || sc.getScheduledCourse().getCourseShort().equals(buttonText)) {
+                            for (Professor prf : sc.getScheduledCourse().getExaminers()) {
+                                prf.changeSpecificAvailability(date, timeslot, 1);
+                            }
+                            courseToDelete = sc;
                         }
-                        courseToDelete = sc;
                     }
+                    if (courseToDelete != null) {
+                        unscheduled.addCourseToUnscheduledList(courseToDelete.getScheduledCourse());
+                        scheduledCourses.remove(courseToDelete);
+                        removeCourseFromClassroomsPanel(courseToDelete.getScheduledCourse());
+                    } else {
+                        try {
+                            String msg = "Πρόβλημα κατά την αφαίρεση του μαθήματος από το κελί. Παρακαλώ πολύ ελέγξτε τα δεδομένα σας και προσπαθήστε ξανά.";
+                            throw new CustomErrorException(ScheduleManager.this, msg);
+                        } catch (CustomErrorException ex) {
+                            Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    // Προσθήκη του κουμπιού πίσω στο coursesPanel
+                    JButton courseButton = new JButton();
+                    courseButton = createCourseBtn(courseToDelete.getCourse());
+                    coursesPanel.add(courseButton);
+                    coursesPanel.revalidate();
+                    coursesPanel.repaint();
+                    model.setValueAt(null, selectedRow, selectedColumn);
                 }
-                if (courseToDelete != null) {
-                    unscheduled.addCourseToUnscheduledList(courseToDelete.getScheduledCourse());
-                    scheduledCourses.remove(courseToDelete);
-                    removeCourseFromClassroomsPanel(courseToDelete.getScheduledCourse());
+            } else {
+                if (selectedRow == 0 || selectedColumn == 0) {
                 } else {
                     try {
                         String msg = "Πρόβλημα κατά την αφαίρεση του μαθήματος από το κελί. Παρακαλώ πολύ ελέγξτε τα δεδομένα σας και προσπαθήστε ξανά.";
@@ -342,24 +388,10 @@ public class ScheduleManager extends JFrame {
                         Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                // Προσθήκη του κουμπιού πίσω στο coursesPanel
-                JButton courseButton = new JButton();
-                courseButton = createCourseBtn(courseToDelete.getCourse());
-                coursesPanel.add(courseButton);
-                coursesPanel.revalidate();
-                coursesPanel.repaint();
-                model.setValueAt(null, selectedRow, selectedColumn);
             }
-        } else {
-            if (selectedRow == 0 || selectedColumn == 0) {
-            } else {
-                try {
-                    String msg = "Πρόβλημα κατά την αφαίρεση του μαθήματος από το κελί. Παρακαλώ πολύ ελέγξτε τα δεδομένα σας και προσπαθήστε ξανά.";
-                    throw new CustomErrorException(ScheduleManager.this, msg);
-                } catch (CustomErrorException ex) {
-                    Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+
+        }catch (Exception ex){
+            System.out.println(ex);
         }
     }
 
@@ -404,11 +436,10 @@ public class ScheduleManager extends JFrame {
         coursesScrollPane = new javax.swing.JScrollPane();
         coursesPanel = new javax.swing.JPanel();
         autoAddProfessorsToSchedulebtn = new javax.swing.JButton();
-        btnExportXlsx1 = new javax.swing.JButton();
+        btnClear = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Φόρμα Δημιουργίας Προγράμματος");
-        setPreferredSize(new java.awt.Dimension(1200, 900));
         setResizable(false);
 
         modelScrollPane.setPreferredSize(new java.awt.Dimension(800, 450));
@@ -467,10 +498,10 @@ public class ScheduleManager extends JFrame {
             }
         });
 
-        btnExportXlsx1.setText("Καθαρισμός");
-        btnExportXlsx1.addActionListener(new java.awt.event.ActionListener() {
+        btnClear.setText("Καθαρισμός");
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnExportXlsx1createExcelFromTable(evt);
+                btnClearCreateExcelFromTable(evt);
             }
         });
 
@@ -497,7 +528,7 @@ public class ScheduleManager extends JFrame {
                                 .addGap(18, 18, 18)
                                 .addComponent(autoAddProfessorsToSchedulebtn, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnExportXlsx1)
+                                .addComponent(btnClear)
                                 .addGap(18, 18, 18)
                                 .addComponent(btnExportXlsx)))
                         .addGap(8, 8, 8)))
@@ -527,7 +558,7 @@ public class ScheduleManager extends JFrame {
                             .addComponent(lblCourses)
                             .addComponent(btnExportXlsx)
                             .addComponent(autoAddProfessorsToSchedulebtn)
-                            .addComponent(btnExportXlsx1))
+                            .addComponent(btnClear))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPaneClassrooms, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -538,53 +569,111 @@ public class ScheduleManager extends JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void autoAddProfessorsToSchedulebtncreateExcelFromTable(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoAddProfessorsToSchedulebtncreateExcelFromTable
-        JOptionPane.showMessageDialog(null, "Ενημέρωση: Η διαδικασία θα διαρκέσει μερικά δευτερόλεπτα.", "Μήνυμα εφαρμογής", JOptionPane.OK_OPTION );
-        unscheduled.printCourses();
-        Unscheduled copy = new Unscheduled(unscheduled);
-        for(Course course : copy.getCourses()){
-            
-            boolean placedCourse = false;
-            List<Availability> professorsAvailability = new ArrayList<>();
-            List<String> nonAvailableDates = new ArrayList<>(getInvalidExaminationDates(course.getCourseName(), course.getCourseSem()));
-            professorsAvailability = initAvailabilityForValidDatesWithNoCourse(course, nonAvailableDates);
-            for(Availability a : professorsAvailability){
-                String date = a.getDate();
-                String timeslot = a.getTimeSlot();
-                if(course.checkIfProfessorsAreAvailable(date, timeslot)){
-                    int row = getRowFromDate(date);
-                    int col = getColFromTimeslot(timeslot);
-                    if(row == 0 && col == 0){
-                        break;
-                    }
-                    System.out.println(course.getCourseName() + " : " + row + " " + col);
-                    model.setValueAt(course.getCourseName(), row, col);
-                    Component[] components = coursesPanel.getComponents();
-                    for (Component component : components) {
-                        if (component instanceof JButton) {
-                            JButton button = (JButton) component;
-                            if (course.getCourseName().equals(button.getText())){
-                                coursesPanel.remove(button);
-                                coursesPanel.revalidate();
-                                coursesPanel.repaint();
-                                ScheduledCourse sc = new ScheduledCourse(course, date, timeslot, classrooms);
-                                addCourseToClassroomsPanel(sc, date, timeslot);
-                                coursesPanel.repaint();
-                                placedCourse = true;
-                                unscheduled.removeCourseFromUnscheduledList(course);
+        try{
+            JOptionPane.showMessageDialog(null, "Ενημέρωση: Η διαδικασία θα διαρκέσει μερικά δευτερόλεπτα.", "Μήνυμα εφαρμογής", JOptionPane.OK_OPTION );
+            showLoading();
+            Unscheduled copy = new Unscheduled(unscheduled);
+            for(Course course : copy.getCourses()){
+
+                boolean placedCourse = false;
+                List<Availability> professorsAvailability = new ArrayList<>();
+                List<String> nonAvailableDates = new ArrayList<>(getInvalidExaminationDates(course.getCourseName(), course.getCourseSem()));
+                professorsAvailability = initAvailabilityForValidDatesWithNoCourse(course, nonAvailableDates);
+                for(Availability a : professorsAvailability){
+                    String date = a.getDate();
+                    String timeslot = a.getTimeSlot();
+                    if(course.checkIfProfessorsAreAvailable(date, timeslot)){
+                        int row = getRowFromDate(date);
+                        int col = getColFromTimeslot(timeslot);
+                        if(row == 0 && col == 0){
+                            break;
+                        }
+                        System.out.println(course.getCourseName() + " : " + row + " " + col);
+                        model.setValueAt(course.getCourseName(), row, col);
+                        Component[] components = coursesPanel.getComponents();
+                        for (Component component : components) {
+                            if (component instanceof JButton) {
+                                JButton button = (JButton) component;
+                                if (course.getCourseName().equals(button.getText())){
+                                    coursesPanel.remove(button);
+                                    coursesPanel.revalidate();
+                                    coursesPanel.repaint();
+                                    ScheduledCourse sc = new ScheduledCourse(course, date, timeslot, classrooms);
+                                    scheduledCourses.add(sc);
+                                    addCourseToClassroomsPanel(sc, date, timeslot);
+                                    coursesPanel.repaint();
+                                    placedCourse = true;
+                                    unscheduled.removeCourseFromUnscheduledList(course);
+                                }
                             }
                         }
                     }
-                }
-                if(placedCourse == true){
-                    break;
+                    if(placedCourse == true){
+                        break;
+                    }
                 }
             }
+            hideLoading();
+        }catch (Exception ex){
+            System.out.println(ex);
         }
     }//GEN-LAST:event_autoAddProfessorsToSchedulebtncreateExcelFromTable
 
-    private void btnExportXlsx1createExcelFromTable(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportXlsx1createExcelFromTable
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnExportXlsx1createExcelFromTable
+    private void btnClearCreateExcelFromTable(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearCreateExcelFromTable
+        /*
+        ScheduleManager b = new ScheduleManager(excelManager1);
+        System.out.println(evt);
+        b.startProcess(false);
+        this.dispose();
+        */
+        
+        if (JOptionPane.showConfirmDialog(this, "Είστε σίγουρος ότι επιθυμείτε καθαρισμό όλων των δεδομένων;", "Σφάλμα εφαρμογής", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+        {
+            try{
+                ExcelManager newExcelManager = new ExcelManager(this, def);
+                if(newExcelManager.readGenericExcel()){
+                    if (newExcelManager.readAvailabilityTemplates()){
+                        ScheduleManager b = new ScheduleManager(newExcelManager);
+                        b.startProcess(false);
+                        this.dispose();
+                    }
+                }
+                clearTable();
+                courses = new ArrayList<>(excelManager1.getCourses());
+                classrooms = new ArrayList<>(excelManager1.getClassrooms());
+                professors = new ArrayList<>(excelManager1.getProfs());
+                unscheduled = new Unscheduled(excelManager1.getCourses());
+                for(Course crs : courses){
+                    System.out.println(crs.getCourseName());
+                }
+                
+                for(Course crs : courses){
+                    JButton courseButton = new JButton();
+                    courseButton = createCourseBtn(crs);
+                    coursesPanel.add(courseButton);
+                }
+                for(Component comp : coursesClassroomsPanel.getComponents()){
+                    coursesClassroomsPanel.remove(comp);
+                }
+                coursesClassroomsPanel.repaint();
+                coursesClassroomsPanel.revalidate();
+                coursesPanel.repaint();
+                coursesPanel.revalidate();
+                scheduledCourses = new ArrayList<>();
+                
+            }catch (Exception ex){
+                System.out.println(ex);
+            }
+        }
+    }//GEN-LAST:event_btnClearCreateExcelFromTable
+    
+    private void clearTable(){
+        for(int i = 1; i < table.getRowCount(); i++){
+            for(int j = 1; j < table.getColumnCount(); j++){
+                table.setValueAt("", i, j);
+            }
+        }
+    }
     
     public List<String> getInvalidExaminationDates(String courseName, String courseSemester){
         List<String> list = new ArrayList<>();
@@ -730,8 +819,47 @@ public class ScheduleManager extends JFrame {
         coursesClassroomsPanel.add(ccp);
         coursesClassroomsPanel.revalidate();
         coursesClassroomsPanel.repaint();
+        sortAndReorderPanels(coursesClassroomsPanel);
+    }
+    
+    public void sortAndReorderPanels(JPanel container) {
+        // Step 1: Remove panels and add them to a list
+        List<CourseClassroomsPanel> panels = new ArrayList<>();
+        for (Component comp : container.getComponents()) {
+            if (comp instanceof CourseClassroomsPanel) {
+                panels.add((CourseClassroomsPanel) comp);
+            }
+        }
+
+        // Remove all components from the container
+        container.removeAll();
+
+        // Step 2: Sort the list based on the Greek semester
+        panels.sort(new Comparator<CourseClassroomsPanel>() {
+            @Override
+            public int compare(CourseClassroomsPanel o1, CourseClassroomsPanel o2) {
+                String sem1 = o1.getScheduledCourse().getCourse().getCourseSem();
+                String sem2 = o2.getScheduledCourse().getCourse().getCourseSem();
+                return Integer.compare(getGreekCharOrder(sem1.charAt(0)), getGreekCharOrder(sem2.charAt(0)));
+            }
+        });
+
+        // Step 3: Re-add the panels to the container in sorted order
+        for (CourseClassroomsPanel panel : panels) {
+            container.add(panel);
+        }
+
+        // Refresh the container UI
+        container.revalidate();
+        container.repaint();
     }
 
+    private int getGreekCharOrder(char greekChar) {
+        String greekAlphabet = "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ";
+        // Για να μην γυρίσουμε ποτέ το -1 για χαρακτήρες που δεν βρέθηκαν
+        return greekAlphabet.indexOf(greekChar) + 1; 
+    }
+    
     /**
      * Μέθοδος που χρησιμοποιείται για την αφαίρεση ενός μαθήματος
      * από το πάνελ των μαθημάτων - αιθουσών.
@@ -741,8 +869,8 @@ public class ScheduleManager extends JFrame {
     private void removeCourseFromClassroomsPanel(Course crs) {
         for (Component comp : coursesClassroomsPanel.getComponents()) {
             if (comp instanceof CourseClassroomsPanel) {
-                ((CourseClassroomsPanel) comp).getCourse().getCourse().getCourseName();
-                String tmp = ((CourseClassroomsPanel) comp).getCourse().getCourse().getCourseName();
+                ((CourseClassroomsPanel) comp).getScheduledCourse().getCourse().getCourseName();
+                String tmp = ((CourseClassroomsPanel) comp).getScheduledCourse().getCourse().getCourseName();
                 if (tmp.equals(crs.getCourseName()) || tmp.equals(crs.getCourseShort())) {
                     coursesClassroomsPanel.remove(comp);
                     coursesClassroomsPanel.revalidate();
@@ -1088,8 +1216,8 @@ public class ScheduleManager extends JFrame {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton autoAddProfessorsToSchedulebtn;
+    private javax.swing.JButton btnClear;
     private javax.swing.JButton btnExportXlsx;
-    private javax.swing.JButton btnExportXlsx1;
     private javax.swing.JPanel coursesPanel;
     private javax.swing.JScrollPane coursesScrollPane;
     private javax.swing.JLayeredPane jLayeredPane1;

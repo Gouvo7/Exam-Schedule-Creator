@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package thesis;
 
 import java.text.DateFormatSymbols;
@@ -21,9 +17,12 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.gmele.general.sheets.XlsxSheet;
 
 /**
- *
- * @author gouvo
+ * @author Nektarios Gkouvousis
+ * @author ice18390193
+ * 
+ * Η κλάση Utilities 
  */
+
 public class Utilities {
     
     public Utilities(){

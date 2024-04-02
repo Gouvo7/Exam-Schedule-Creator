@@ -18,7 +18,6 @@ public class Main {
         try {
             //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
             UIManager.setLookAndFeel( new FlatLightLaf() );
-
             MainForm a = new MainForm();
         //} catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
           } catch (UnsupportedLookAndFeelException e) {

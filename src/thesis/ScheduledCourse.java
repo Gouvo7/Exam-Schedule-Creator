@@ -29,7 +29,6 @@ public class ScheduledCourse {
         }
         this.selectedClassrooms = new ArrayList<>();
         //neededSeats = crs.getCourse().getApproxStudents();
-        
     }
     
     public ScheduledCourse(Course crs){
@@ -41,7 +40,6 @@ public class ScheduledCourse {
         //neededSeats = crs.getCourse().getApproxStudents();
         
     }
-
 
     public void setCurrSeats(int currSeats) {
         neededSeats = currSeats;
