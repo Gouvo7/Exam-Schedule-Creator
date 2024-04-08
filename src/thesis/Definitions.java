@@ -36,6 +36,7 @@ public class Definitions extends JFrame{
     private static String sheet5 = "COURSES";
     private static String sheet6 = "COURSES_PROFESSORS";
     private static String sheet7 = "ΠΡΟΓΡΑΜΜΑ ΕΞΕΤΑΣΤΙΚΗΣ";
+    private static String sheet8 = "ΠΡΟΓΡΑΜΜΑ ΑΙΘΟΥΣΩΝ";
                                     
     
     public void Definitions(){
@@ -166,6 +167,14 @@ public class Definitions extends JFrame{
     
     public static void setSheet7(String sheet7) {
         Definitions.sheet7 = sheet7;
+    }
+    
+    public String getSheet8() {
+        return sheet8;
+    }
+    
+    public static void setSheet8(String sheet8) {
+        Definitions.sheet8 = sheet8;
     }
     
     /**

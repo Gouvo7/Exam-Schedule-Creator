@@ -24,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import static java.lang.Thread.sleep;
 import java.text.DateFormatSymbols;
 import java.text.Normalizer;
 import java.time.LocalDate;
@@ -48,7 +47,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
@@ -63,7 +61,7 @@ import org.gmele.general.sheets.exception.SheetExc;
 
 /**
  * Η κλάση ScheduleManager κληρονομείται από την κλάση JFrame και είναι υπεύθυνη
- * για την διαχείριση του παραθύρου της δημιουργίας του προγράμματος εξεταστικής
+ * για την διαχείριση του παραθύρου της δημιουργίας του προγράμματος εξεταστικής.
  * 
  * @author Nektarios Gkouvousis
  * @author ice18390193
@@ -76,6 +74,7 @@ public class ScheduleManager extends JFrame {
     char[] greekSemesters = {'Α', 'Β', 'Γ', 'Δ', 'Ε', 'Ζ', 'Η'};
     private JTable table;
     private ExcelManager excelManager1;
+    private Map<Course, CourseClassroomsPanel> courseToPanelMap;
     Definitions def;
     private List<Professor> professors;
     private List<Course> courses;
@@ -85,10 +84,10 @@ public class ScheduleManager extends JFrame {
     private DefaultTableModel model;
     private int excelRows, excelCols;
     private Logs logs;
-    private String finalExcelSheet;
     private List<ScheduledCourse> scheduledCourses;
     private Unscheduled unscheduled;
     private List<ExamCoursesFromFinalSchedule> crsList;
+    private String finalExcelSheet;
     private String regex;
     private JPanel coursesClassroomsPanel;
     private Utilities utils;
@@ -108,6 +107,7 @@ public class ScheduleManager extends JFrame {
         dates = new ArrayList<>(excelManager1.getDates());
         timeslots = new ArrayList<>(excelManager1.getTimeslots());
         scheduledCourses = new ArrayList<>();
+        courseToPanelMap = new HashMap<>();
         unscheduled = new Unscheduled(excelManager1.getCourses());
         crsList = new ArrayList<>();
         excelRows = dates.size();
@@ -143,20 +143,6 @@ public class ScheduleManager extends JFrame {
             coursesSemesters.put(greekSemesters[i], i + 1);
         }
     }
-    
-    private void showLoading(){
-        this.getContentPane().add(lp);
-        this.getContentPane().setComponentZOrder(lp, 0);
-        this.repaint();
-        this.revalidate();
-    }
-    
-    private void hideLoading(){
-        this.remove(lp);
-        this.revalidate();
-        this.repaint();
-        //this.getContentPane().setComponentZOrder(this, 0);
-    }
 
     public void startProcess(boolean isNew) {
         modelPanel.add(populateTable());
@@ -171,7 +157,110 @@ public class ScheduleManager extends JFrame {
         this.setSize(1450, 900);
         this.setLocationRelativeTo(null);
     }
+    
+    public void initTable() {
+        prepareTableRenderer();
+        this.table.setDropTarget(new DropTarget() {
+            @Override
+            public synchronized void drop(DropTargetDropEvent evt) {
+                Point dropLocation = evt.getLocation();
+                int row = table.rowAtPoint(dropLocation);
+                int col = table.columnAtPoint(dropLocation);
+                handleDroppedCourse(row, col, evt);
+            }
+        });
+        this.table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int selectedRow = table.getSelectedRow();
+                    int selectedColumn = table.getSelectedColumn();
+                    removeCourseFromTable(selectedRow, selectedColumn);
+                }
+            }
+        });
+        this.table.setCellSelectionEnabled(false);
+        this.table.setTableHeader(new JTableHeader());
+        this.table.getTableHeader().setReorderingAllowed(false);
+        //this.table.setShowGrid(true);
+        //this.table.setGridColor(Color.BLACK);
+    }
+    
+    /**
+     * Η μέθοδος χρησιμοποιείται για την συμπλήρωση των headers των ημερομηνιών και
+     * των χρονικών διαστημάτων.
+     * 
+     * @return Ένα παράθυρο με εμπεριέχει τον πίνακα που δημιουργήσαμε (JScrollPane).
+     */
+    public JScrollPane populateTable() {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        for (int j = 0; j < excelCols; j++) {
+            model.setValueAt(timeslots.get(j), 0, j + 1);
+        }
+        for (int i = 0; i < excelRows; i++) {
+            LocalDate date = LocalDate.parse(dates.get(i), dateFormatter);
+            String greekDayName = date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("el-GR"))
+                    .toUpperCase();
+            String greekDayNameWithoutAccents = Normalizer.normalize(greekDayName, Normalizer.Form.NFD)
+                    .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+            model.setValueAt(dates.get(i) + " " + greekDayNameWithoutAccents, i + 1, 0);
+        }
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        return scrollPane;
+    }
+    
+    /**
+     * Η μέθοδος χρησιμοποιείται για την δημιουργία των αντικειμένων των μαθημάτων
+     * στο panel στο κάτω μέρος του κεντρικού παραθύρου.
+     */
+    public void populateCourses() {
+        List<Course> notSettled = new ArrayList<>(unscheduled.getCourses());
+        for (Course course : notSettled) {
+            // Create a custom component (e.g., JPanel or JButton) for each course
+            JButton courseButton = new JButton();
+            courseButton = createCourseBtn(course);
+            coursesPanel.add(courseButton);
+        }
+    }
 
+    /**
+     * Η μέθοδος χρησιμοποιείται για την δημιουργία ενός JButton που αντιστοιχεί
+     * σε ένα μάθημα.
+     * 
+     * @param crs Αντικείμενο μαθήματος (Course).
+     * @return Ένα κουμπί για το μάθημα (JButton).
+     */
+    private JButton createCourseBtn(Course crs) {
+        JButton courseButton = new JButton(crs.getCourseName());
+        courseButton.setPreferredSize(new Dimension(270, 40)); // Set preferred size as needed
+        courseButton.setTransferHandler(new ButtonTransferHandler(crs.getCourseName()));
+        courseButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                JComponent comp = (JComponent) evt.getSource();
+                TransferHandler handler = comp.getTransferHandler();
+                handler.exportAsDrag(comp, evt, TransferHandler.COPY);
+            }
+        });
+        if (crs.getCourseSeason().equals("ΧΕΙΜΕΡΙΝΟ")) {
+            // courseButton.setBackground(Color.red);
+            courseButton.setBackground(new Color(102, 178, 255)); // RGB values for light blue
+
+        } else {
+            // courseButton.setBackground(Color.blue);
+            courseButton.setBackground(new Color(255, 178, 102)); // RGB values for light blue
+        }
+        courseButton.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        return courseButton;
+    }
+    
+    /**
+     * Η μέθοδος χρησιμοποιείται για την εύρεση του αντικειμένου μαθήματος (Course)
+     * με βάση το όνομα ή την συντομογραφία του μαθήματος.
+     * 
+     * @param courseName Το όνομα του μαθήματος (String).
+     * @return Το αντικείμενο του μαθήματος (εφόσον βρεθεί) ή null (Course).
+     */
     public Course findCourses(String courseName) {
         for (Course course : this.courses) {
             if (course.getCourseName().equals(courseName) || course.getCourseShort().equals(courseName)) {
@@ -181,6 +270,10 @@ public class ScheduleManager extends JFrame {
         return null;
     }
 
+    /**
+     * Η μέθοδος χρησιμοποιείται για την δημιουργία και την αρχική παραμετροποίηση
+     * του πίνακα table.
+     */
     public void prepareTableRenderer() {
         model.setValueAt("ΗΜΕΡΟΜΗΝΙΑ / ΗΜΕΡΑ", 0, 0);
         this.table = new JTable(model){
@@ -221,34 +314,6 @@ public class ScheduleManager extends JFrame {
         table.revalidate();
     }
 
-    public void initTable() {
-        prepareTableRenderer();
-        this.table.setDropTarget(new DropTarget() {
-            @Override
-            public synchronized void drop(DropTargetDropEvent evt) {
-                Point dropLocation = evt.getLocation();
-                int row = table.rowAtPoint(dropLocation);
-                int col = table.columnAtPoint(dropLocation);
-                handleDroppedCourse(row, col, evt);
-            }
-        });
-        this.table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    int selectedRow = table.getSelectedRow();
-                    int selectedColumn = table.getSelectedColumn();
-                    removeCourseFromTable(selectedRow, selectedColumn);
-                }
-            }
-        });
-        this.table.setCellSelectionEnabled(false);
-        this.table.setTableHeader(new JTableHeader());
-        this.table.getTableHeader().setReorderingAllowed(false);
-        //this.table.setShowGrid(true);
-        //this.table.setGridColor(Color.BLACK);
-    }
-
     public void handleDroppedCourse(int row, int col, DropTargetDropEvent evt) {
         try {
             // To dropCellContents παίρνει το string από το πεδίο που αφήσαμε το μάθημα
@@ -262,7 +327,6 @@ public class ScheduleManager extends JFrame {
                 Course tmpCourse = findCourse(buttonText);
                 String rowValue = (String) table.getValueAt(row, 0);
                 String colValue = (String) table.getValueAt(0, col);
-                System.out.println("Searching for Course: '" + dropCellContents + "'");
                 rowValue = utils.getDateWithGreekFormat(weekdays, rowValue);
                 boolean check1 = checkExaminersConflict(tmpCourse, rowValue, colValue);
                 if (check1) {
@@ -330,11 +394,9 @@ public class ScheduleManager extends JFrame {
         }catch (java.util.ConcurrentModificationException ex){
             Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println(ex);
-            System.out.println(ex.getStackTrace());
         }catch (Exception ex){
             Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println(ex);
-            System.out.println(ex.getStackTrace());
         }
     }
 
@@ -399,8 +461,8 @@ public class ScheduleManager extends JFrame {
      * Η μέθοδος είναι υπεύθυνη για τον εντοπισμό του μαθήματος από ένα string
      * 
      * @param courseName Το όνομα του μαθήματος προς αναζήτηση
-     * @return Αντικείμενο Course ή null ανάλογα με το εάν εντοπίστηκε το μάθημα από
-     *         το string ή όχι
+     * @return Αντικείμενο Course ή null ανάλογα με το εάν εντοπίστηκε το μάθημα
+     * από το string ή όχι (Course)
      */
     public Course findCourse(String courseName) {
         for (Course crs : courses) {
@@ -588,7 +650,6 @@ public class ScheduleManager extends JFrame {
                         if(row == 0 && col == 0){
                             break;
                         }
-                        System.out.println(course.getCourseName() + " : " + row + " " + col);
                         model.setValueAt(course.getCourseName(), row, col);
                         Component[] components = coursesPanel.getComponents();
                         for (Component component : components) {
@@ -644,10 +705,6 @@ public class ScheduleManager extends JFrame {
                 professors = new ArrayList<>(excelManager1.getProfs());
                 unscheduled = new Unscheduled(excelManager1.getCourses());
                 for(Course crs : courses){
-                    System.out.println(crs.getCourseName());
-                }
-                
-                for(Course crs : courses){
                     JButton courseButton = new JButton();
                     courseButton = createCourseBtn(crs);
                     coursesPanel.add(courseButton);
@@ -666,7 +723,20 @@ public class ScheduleManager extends JFrame {
             }
         }
     }//GEN-LAST:event_btnClearCreateExcelFromTable
-    
+
+    public CourseClassroomsPanel findScheduledCourse(Course course) {
+        Component[] components = coursesClassroomsPanel.getComponents();
+        for (Component component : components) {
+            if (component instanceof CourseClassroomsPanel) {
+                CourseClassroomsPanel ccp = (CourseClassroomsPanel) component;
+                if (ccp.getScheduledCourse().getCourse().getCourseName().equals(course.getCourseName())) {
+                    return ccp;
+                }
+            }
+        }
+        return null;
+    }
+        
     private void clearTable(){
         for(int i = 1; i < table.getRowCount(); i++){
             for(int j = 1; j < table.getColumnCount(); j++){
@@ -914,22 +984,39 @@ public class ScheduleManager extends JFrame {
         int colIndex = 0;
         String path = def.getFolderPath() + "\\" + def.getExamScheduleFile();
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
-            XSSFSheet sheet = workbook.createSheet("ΠΡΟΓΡΑΜΜΑ ΕΞΕΤΑΣΤΙΚΗΣ");
-            utils.fillHeaders(workbook, sheet, timeslots, dates);
+            XSSFSheet sheet1 = workbook.createSheet("ΠΡΟΓΡΑΜΜΑ ΕΞΕΤΑΣΤΙΚΗΣ");
+            XSSFSheet sheet2 = workbook.createSheet("ΠΡΟΓΡΑΜΜΑ ΑΙΘΟΥΣΩΝ");
+            utils.fillHeaders(workbook, sheet1, timeslots, dates);
+            utils.fillHeaders(workbook, sheet2, timeslots, dates);
             int tableRows = table.getRowCount() - 1;
             int tableColumns = table.getColumnCount() - 1;
-            System.out.println(timeslots.size() + " " + dates.size() + " " + tableRows + " " + tableColumns);
             for (rowIndex = 1; rowIndex <= tableRows; rowIndex++) {
                 for (colIndex = 1; colIndex <= tableColumns; colIndex++) {
                     try {
                         String cellValue = (String) table.getValueAt(rowIndex, colIndex);
-                        Course a = utils.getCourse(courses, cellValue);
-                        if (a != null) {
-                            Cell excelCell1 = (Cell) sheet.getRow(rowIndex).createCell(colIndex + 1);
-                            excelCell1.setCellValue(a.getCourseName());
+                        Course course = utils.getCourse(courses, cellValue);
+                        if (course != null) {
+                            Cell excelCell1 = (Cell) sheet1.getRow(rowIndex).createCell(colIndex + 1);
+                            excelCell1.setCellValue(course.getCourseName());
                             excelCell1.getCellStyle().setWrapText(true);
-                            // Cell excelCell2 = (Cell) sheet.getRow(i).createCell(j + 2);
-                            // excelCell2.setCellValue(a.getCourseSem());
+                            CourseClassroomsPanel tmp;
+                            tmp = utils.findPanelForCourse(course, coursesClassroomsPanel);
+                            if(tmp != null){
+                                Cell excelCell2 = (Cell) sheet2.getRow(rowIndex).createCell(colIndex + 1);
+                                excelCell2.getCellStyle().setWrapText(true);
+                                String cellValue2 = course.getCourseName() + "\n(";
+                                boolean firstValueEntered = false;
+                                for(Classroom clr : tmp.getSelectedClassrooms()){
+                                    if(firstValueEntered == false){
+                                        cellValue2 = cellValue2 + clr.getClassroomName();
+                                        firstValueEntered = true;
+                                    }else{
+                                        cellValue2 = cellValue2 + ", " + clr.getClassroomName();
+                                    }
+                                }
+                                cellValue2 = cellValue2 + ")";
+                                excelCell2.setCellValue(cellValue2);
+                            }
                         } else {
                         }
                     } catch (Exception e) {
@@ -938,8 +1025,12 @@ public class ScheduleManager extends JFrame {
                     }
                 }
             }
-            utils.autoSizeColumns(sheet, tableColumns + 1);
-            utils.applyCellStyles(workbook, sheet);
+            
+            
+            utils.autoSizeColumns(sheet1, tableColumns + 1);
+            utils.applyCellStyles(workbook, sheet1);
+            utils.autoSizeColumns(sheet2, tableColumns + 1);
+            utils.applyCellStyles(workbook, sheet2);
 
             JOptionPane.showMessageDialog(this,
                     "Η δημιουργία του αρχείου προγράμματος εξεταστικής ολοκληρώθηκε επιτυχώς!", "Μήνυμα Λάθους",
@@ -1087,67 +1178,113 @@ public class ScheduleManager extends JFrame {
         }
         return false;
     }
+    
+    public boolean readClassroomsScheduleExcel() {
+        int rowIndex = 0;
+        int colIndex = 0;
+        String courseCell = "";
+        String fileName = def.getFolderPath() + "\\" + def.getExamScheduleFile();
+        String sheetName = def.getSheet7();
+        DateFormatSymbols symbols = new DateFormatSymbols(new Locale("el", "GR"));
+        symbols.setWeekdays(weekdays);
+        // + 2 για τις 2 πρώτες στήλες
+        int lastCol = timeslots.size() + 2;
+        try (FileInputStream file = new FileInputStream(new File(fileName))) {
+            XlsxSheet sheet = new XlsxSheet(fileName);
+            sheet.SelectSheet(sheetName);
+            int lastRow = sheet.GetLastRow();
 
-    /**
-     * Η μέθοδος χρησιμοποιείται για την δημιουργία των αντικειμένων των μαθημάτων
-     * στο panel στο κάτω μέρος
-     * του κεντρικού παραθύρου
-     */
-    public void populateCourses() {
-        List<Course> notSettled = new ArrayList<>(unscheduled.getCourses());
-        for (Course course : notSettled) {
-            // Create a custom component (e.g., JPanel or JButton) for each course
-            JButton courseButton = new JButton();
-            courseButton = createCourseBtn(course);
-            coursesPanel.add(courseButton);
-        }
-    }
+            String header1 = sheet.GetCellString(0, 0);
+            String header2 = sheet.GetCellString(0, 1);
 
-    private JButton createCourseBtn(Course crs) {
-        JButton courseButton = new JButton(crs.getCourseName());
-        courseButton.setPreferredSize(new Dimension(270, 40)); // Set preferred size as needed
-        courseButton.setTransferHandler(new ButtonTransferHandler(crs.getCourseName()));
-        courseButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                JComponent comp = (JComponent) evt.getSource();
-                TransferHandler handler = comp.getTransferHandler();
-                handler.exportAsDrag(comp, evt, TransferHandler.COPY);
+            if (!header1.equals("ΗΜ/ΝΙΑ") || !header2.equals("ΗΜΕΡΑ")) {
+                file.close();
+                String msg = "Πρόβλημα με τα δεδομένα του αρχείου '" +
+                        fileName + "' στην γραμμή " + (rowIndex + 1) +
+                        ". Εντοπίστηκαν διαφορετικά headers στην 1η γραμμή στις πρώτες"
+                        + " 2 στήλες. Παρακαλώ πολύ ελέγξτε ότι τα δεδομένα για"
+                        + " το 1ο και το 2ο κελί είναι 'ΗΜ/ΝΙΑ' και 'ΗΜΕΡΑ' αντίστοιχα.";
+                throw new CustomErrorException(this, msg);
+
             }
-        });
-        if (crs.getCourseSeason().equals("ΧΕΙΜΕΡΙΝΟ")) {
-            // courseButton.setBackground(Color.red);
-            courseButton.setBackground(new Color(102, 178, 255)); // RGB values for light blue
+            String timeslot = "";
+            for (int x = 2; x < lastCol; x++) {
+                timeslot = sheet.GetCellString(rowIndex, x);
+                if (!timeslots.contains(timeslot)) {
+                    file.close();
+                    String msg = "Πρόβλημα με τα δεδομένα του αρχείου '" +
+                            fileName + "' στην γραμμή " + (rowIndex + 1) +
+                            ". Το χρονικό διάστημα '" + timeslot + "' δεν υπάρχει καταχωρημένο"
+                            + " στο βασικό αρχείο πληροφοριών (" + def.getGenericFile() + ").";
+                    throw new CustomErrorException(this, msg);
+                }
+            }
+            String date;
+            String dateName;
+            for (rowIndex = 1; rowIndex < lastRow; rowIndex++) {
+                date = "";
+                dateName = "";
+                date = sheet.GetCellString(rowIndex, 1);
+                dateName = utils.getGreekDayName(date);
+                if (dateName == null || !dates.contains(date)) {
+                    file.close();
+                    String msg = "Πρόβλημα με τα δεδομένα του αρχείου '" +
+                            fileName + "' στην γραμμή " + (rowIndex + 1) +
+                            ". Η ημερομηνία'" + date + "' δεν υπάρχει καταχωρημένη"
+                            + " στο βασικό αρχείο πληροφοριών (" + def.getGenericFile() + ").";
+                    throw new CustomErrorException(this, msg);
+                }
+            }
+            for (rowIndex = 1; rowIndex < lastRow; rowIndex++) {
+                for (colIndex = 2; colIndex < lastCol; colIndex++) {
+                    courseCell = utils.getSafeCellString(sheet, rowIndex, colIndex);
+                    if (courseCell.equals("") || courseCell.equals(" ")) {
+                    } else {
+                        if (findCourse(courseCell) == null) {
+                            file.close();
+                            String msg = "Πρόβλημα με τα δεδομένα του αρχείου '" +
+                                    fileName + "' στην γραμμή " + (rowIndex + 1) +
+                                    ". Το μάθημα '" + courseCell + "' δεν υπάρχει καταχωρημένο"
+                                    + " στο βασικό αρχείο πληροφοριών (" + def.getGenericFile() + ").";
+                            throw new CustomErrorException(this, msg);
+                        } else {
+                            String courseTimeslot = sheet.GetCellString(0, colIndex);
+                            String courseDate = sheet.GetCellString(rowIndex, 1);
+                            Course crs = new Course(findCourse(courseCell));
+                            boolean check = checkExaminersConflict(crs, courseDate, courseTimeslot);
+                            if (check) {
+                                if(!existsInExamCourses(crs)){
+                                    ExamCoursesFromFinalSchedule courseDet = new ExamCoursesFromFinalSchedule(crs, rowIndex, colIndex);
+                                    this.crsList.add(courseDet);
+                                }
+                            } else {
+                                logs.appendLogger(logs.getIndexString() + "Πρόβλημα με το μάθημα '" + courseCell + "' και \n"
+                                                + "την διαθεσιμότητα των καθηγητών. Το μάθημα θα αγνοηθεί.");
+                            }
+                        }
+                    }
+                }
+            }
+            file.close();
+            return true;
 
-        } else {
-            // courseButton.setBackground(Color.blue);
-            courseButton.setBackground(new Color(255, 178, 102)); // RGB values for light blue
+        } catch (FileNotFoundException ex) {
+            JOptionPane.showMessageDialog(this, "Το αρχείο '" + fileName + "' δεν βρέθηκε.",
+                    "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Σφάλμα κατά το άνοιγμα"
+                    + " του αρχείου '" + fileName + "'.", "Μήνυμα Λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (SheetExc ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Στο αρχείο '" + def.getExamScheduleFile() + "' στην γραμμή και στήλη " + (rowIndex + 1) + ":"
+                            + colIndex
+                            + "' με περιεχόμενο κελιού '" + courseCell
+                            + "'  δεν μπόρεσε να αντιστοιχηθεί με κάποιο μάθημα." + ex,
+                    "Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            System.out.println(ex);
         }
-        courseButton.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-        return courseButton;
-    }
-
-    /**
-     * Η μέθοδος χρησιμοποιείται για την καταχώρηση των headers των ημερομηνιών και
-     * των
-     * χρονικών διαστημάτων.
-     */
-    public JScrollPane populateTable() {
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        for (int j = 0; j < excelCols; j++) {
-            model.setValueAt(timeslots.get(j), 0, j + 1);
-        }
-
-        for (int i = 0; i < excelRows; i++) {
-            LocalDate date = LocalDate.parse(dates.get(i), dateFormatter);
-            String greekDayName = date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("el-GR"))
-                    .toUpperCase();
-            String greekDayNameWithoutAccents = Normalizer.normalize(greekDayName, Normalizer.Form.NFD)
-                    .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-            model.setValueAt(dates.get(i) + " " + greekDayNameWithoutAccents, i + 1, 0);
-        }
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        return scrollPane;
+        return false;
     }
 
     public boolean checkExaminersConflict(Course course, String date, String timeslot) {
@@ -1212,6 +1349,19 @@ public class ScheduleManager extends JFrame {
             }
         }
         return true;
+    }
+    
+    private void showLoading(){
+        this.getContentPane().add(lp);
+        this.getContentPane().setComponentZOrder(lp, 0);
+        this.repaint();
+        this.revalidate();
+    }
+    
+    private void hideLoading(){
+        this.remove(lp);
+        this.revalidate();
+        this.repaint();
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

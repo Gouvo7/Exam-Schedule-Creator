@@ -133,13 +133,18 @@ public class MainForm extends javax.swing.JFrame {
                         if (JOptionPane.showConfirmDialog(this, "Σφάλμα κατά την ανάγνωση των δεδομένων από το αρχείο του προγράμματος εξεταστικής." +
                             " Θέλετε να ξεκινήσετε ένα νέο κενό παράθυρο;", "Σφάλμα εφαρμογής", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
                             b.startProcess(true);
+                        }else{
+                            return;
                         }
                     }
                     b.startProcess(false);
                 } else {
                     if (JOptionPane.showConfirmDialog(this, "Δεν βρέθηκε στο μονοπάτι: '" + def.getFolderPath() + " ' το" +
                         " αρχείο: '" + def.getExamScheduleFile() + "'. Θέλεις να ξεκινήσεις ένα πρόγραμμα εκ νέου;", "Σφάλμα εφαρμογής", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
+                        
                         b.startProcess(true);
+                    }else{
+                        return;
                     }
                 }
             }else {

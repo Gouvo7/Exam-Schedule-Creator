@@ -22,7 +22,6 @@ public class CustomErrorException extends Exception{
             JOptionPane.showMessageDialog(myJFrame, htmlMsg, "Μήνυμα λάθους", JOptionPane.ERROR_MESSAGE);
             return;
         }catch(Exception e){
-            
         }
     }
 }

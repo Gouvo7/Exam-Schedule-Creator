@@ -1,5 +1,6 @@
 package thesis;
 
+import java.awt.Component;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import javax.swing.JPanel;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -115,6 +117,15 @@ public class Utilities {
             if (tmp.getCourseName().equals(cellValue) || 
                     tmp.getCourseShort().equals(cellValue)){
                 return tmp;
+            }
+        }
+        return null;
+    }
+    
+    public ScheduledCourse getScheduledCourse(List<ScheduledCourse> scheduledCourses, Course course){
+        for(ScheduledCourse crs : scheduledCourses){
+            if(crs.getCourse().getCourseName().equals(course.getCourseName())){
+                return crs;
             }
         }
         return null;
@@ -232,4 +243,15 @@ public class Utilities {
         return validCoursesList;
     }
     
+    public CourseClassroomsPanel findPanelForCourse(Course course, JPanel coursesClassroomsPanelContainer) {
+        for (Component comp : coursesClassroomsPanelContainer.getComponents()) {
+            if (comp instanceof CourseClassroomsPanel) {
+                CourseClassroomsPanel panel = (CourseClassroomsPanel) comp;
+                if (panel.getScheduledCourse().getCourse().equals(course)) {
+                    return panel;
+                }
+            }
+        }
+        return null;
+    }
 }
