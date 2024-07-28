@@ -1,9 +1,9 @@
-package thesis;
+package models;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import thesis.Availability;
 
 /** 
  * Η κλάση Professors υλοποιεί την κλάση Serializable και είναι υπεύθυνη για την αποθήκευση στοιχείων των καθηγητών
@@ -11,24 +11,27 @@ import java.util.Objects;
  * @author Nektarios Gkouvousis
  * @author ice18390193
  * 
- * @param profSurname Επώνυμο καθηγητή
- * @param profFirstname Όνομα καθηγητή
- * @param profField Ειδικότητα καθηγητή
- * @param availability Λίστα με αντικείμενα της κλάσης Availability
  */
 
 public class Professor{
-    
+   
     private String profSurname;
     private String profFirstname;
     private String profField;
     private List<Availability> availability;
     
-    Professor(String a, String b, String c){
-        profSurname = a;
-        profFirstname = b;
-        profField = c;
-        availability = new ArrayList<>();
+    /**
+     * Η κλάση Professor απεικονίζει κάθε καθηγητή. Αρχικοποιείται με το ονοματεπώνυμό του
+     * και την ειδικότητά του.
+     * @param surname Το επώνυμο του καθηγητή (String).
+     * @param firstName Το όνομα του καθηγητή (String).
+     * @param field Η ειδικότητα του καθηγητή (String).
+     */
+    public Professor(String surname, String firstName, String field){
+        profSurname = surname;
+        profFirstname = firstName;
+        profField = field;
+        availability = new ArrayList<Availability>();
     }
     
     public void setProfSurname(String x){

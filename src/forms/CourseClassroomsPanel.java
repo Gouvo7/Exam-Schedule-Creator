@@ -1,48 +1,57 @@
-package thesis;
+package forms;
 
+import models.Classroom;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import thesis.Logs;
+import thesis.ScheduledCourse;
 
-/**
- *
- * @author gouvo
+/** 
+ * @author Nektarios Gkouvousis
+ * @author ice18390193
+ * 
+ * Η κλάση CourseClassroomsPanel είναι ένα panel για κάθε μάθημα στο δεξί μέροες του.
+ * παραθύρου του ScheduleManager. Τα παράθυρα αυτά ευθύνονται για την επιλογή των
+ * αιθουσών που θα καταληφθούν για την εξέταση ενός μαθήματος.
  */
 public class CourseClassroomsPanel extends javax.swing.JPanel {
 
     private ScheduledCourse scheduledCourse;
     private List<Classroom> selectedClassrooms;
-    private CustomJPanel jpanel;
+    private CustomJPanel bottomPanel;
     private int totalSeats = 0;
+    private Logs log;
+    private List<Classroom> classrooms;
     private Dimension dimensionsCheckboxesPanels;
     private Dimension dimensionsFrame;
-    private JLabel jPanelLabel;
-    private ImageIcon jPanelIcon;
-
     
-    public CourseClassroomsPanel(CourseClassroomsPanel ccp) {
-        scheduledCourse = ccp.scheduledCourse;
-        selectedClassrooms = ccp.getSelectedClassrooms();
-    }
-    
-    public CourseClassroomsPanel(ScheduledCourse sc, List<Classroom> cls, String dt, String ts) {
+    /**
+     * Ο constructor της κλάσης ο οποίος απαιτεί τις ακόλουθες παραμέτρους για την
+     * αρχικοποίησή του. Στον constructor επίσης αρχικοποιούνται μεταβλητές, και
+     * θέτουμε παραμέτρους για το panel.
+     * @param sc Το προγραμματισμένο μάθημα (ScheduledCourse).
+     * @param cls Η λίστα με όλες τις αίθουσες (List<Classroom).
+     */
+    public CourseClassroomsPanel(ScheduledCourse sc, List<Classroom> cls) {
         initComponents();
+        
         scheduledCourse = sc;
         selectedClassrooms = new ArrayList<>();
+        classrooms = List.copyOf(cls);
         int classroomsCount = scheduledCourse.getClassrooms().size();
+        
+        // Υπολογισμός των γραμμών των αιθουσών που θα καταλάβει η λίστα αιθουσών.
         int classroomsRows = 0;
         if(classroomsCount >= 0){
             classroomsRows = ((scheduledCourse.getClassrooms().size())/2) + 1;
@@ -50,15 +59,11 @@ public class CourseClassroomsPanel extends javax.swing.JPanel {
         this.setLayout(new BorderLayout());
         dimensionsFrame = new Dimension(340, 200);
         dimensionsCheckboxesPanels = new Dimension(200, 30 * classroomsRows);
-        jPanel1.setLayout(new GridLayout(classroomsRows ,2, 20, 0));
-        jPanel1.setSize(dimensionsCheckboxesPanels);
-        
-        jpanel = new CustomJPanel();
-        
-        totalSeatsLabel = new JLabel("Συνολικές καταχωρημένες θέσεις: "+ totalSeats + " θέσεις");
-        jPanelIcon = new ImageIcon(getClass().getResource("/Assets/caution.png"));
-        jpanel.setLayout(new BorderLayout());
-        jpanel.setName("bottom_panel");
+        classroomsPanel.setLayout(new GridLayout(classroomsRows ,2, 20, 0));
+        classroomsPanel.setSize(dimensionsCheckboxesPanels);
+        totalSeatsLabel = new JLabel("Επιλεγμένες θέσεις: "+ totalSeats + " θέσεις");
+        bottomPanel = new CustomJPanel(scheduledCourse.getCourse().getApproxStudents());
+        bottomPanel.setName("bottom_panel");
         createNewComponents();
     }
 
@@ -93,7 +98,7 @@ public class CourseClassroomsPanel extends javax.swing.JPanel {
     public void setTotalSeats(int totalSeats) {
         this.totalSeats = totalSeats;
     }
-
+    
     public String getScheduledCourseName(){
         return this.scheduledCourse.getScheduledCourse().getCourseName();
     }
@@ -102,14 +107,16 @@ public class CourseClassroomsPanel extends javax.swing.JPanel {
         return this.scheduledCourse.getScheduledCourse().getCourseShort();
     }
     
+    /**
+     * Μέθοδος που καλείται για την δημιουργία του panel του προγραμματισμένου
+     * μαθήματος.
+     */
     private void createNewComponents() {
         String courseName = scheduledCourse.getScheduledCourse().getCourseName();
-        String htmlMsg = "<html><div style='width: 40px; word-wrap: break-word'</body></html>";
-        String res1 = String.format(htmlMsg, 100, courseName);
-        
-        String courseDetails = "<html>&nbsp;Περιόδου: " + scheduledCourse.getScheduledCourse().getCourseSeason() +
+        String courseDetails = "<html>Ημερομηνία: " + scheduledCourse.getDate() + "&nbsp;&nbsp;Ώρα: " + scheduledCourse.getTimeslot() + 
+                            "<br>&nbsp;Περιόδου: " + scheduledCourse.getScheduledCourse().getCourseSeason() +
                            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Εξάμηνο: " + scheduledCourse.getScheduledCourse().getCourseSem() +
-                           "<br>&nbsp;Εκτιμώμενος αριθμός μαθητών: " + scheduledCourse.getScheduledCourse().getApproxStudents() + "</html>";
+                           "<br>&nbsp;Επιλεγμένες θέσεις: " + scheduledCourse.getScheduledCourse().getApproxStudents() + "</html>";
         lblCourseName.setText(courseDetails);
         lblCourseName.setForeground(Color.GRAY);
         for (Classroom classroom : scheduledCourse.getClassrooms()) {
@@ -120,49 +127,115 @@ public class CourseClassroomsPanel extends javax.swing.JPanel {
             }else{
                classroomCheckbox.setEnabled(false);
             }
-            classroomCheckbox.putClientProperty("classroom", classroom);
+            classroomCheckbox.putClientProperty("classroom", classroom.getClassroomName());
+            classroomCheckbox.putClientProperty("seats", classroom.getClassroomSeats());
             classroomCheckbox.addActionListener(e -> {
                 if (classroomCheckbox.isSelected()) {
                     selectedClassrooms.add(classroom);
                     totalSeats += classroom.getClassroomSeats();
+                    bottomPanel.addSeats(classroom.getClassroomSeats());
                 } else {
                     selectedClassrooms.remove(classroom);
                     totalSeats -= classroom.getClassroomSeats();
+                    bottomPanel.removeSeats(classroom.getClassroomSeats());
                 }
-                updateTotalSeatsDisplay();
-                updateIcon();
             });
-            jPanel1.add(classroomCheckbox);
+            classroomsPanel.add(classroomCheckbox);
         }
-//        ImageIcon originalIcon = new ImageIcon(getClass().getResource("/Assets/accept.png"));
-//        Image scaledImage = originalIcon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
-//        ImageIcon scaledIcon = new ImageIcon(scaledImage);
-//        JLabel imageLabel = new JLabel(scaledIcon);
-//        JLabel imageLabel1 = new JLabel("Συνολικές καταχωρημένες θέσεις: 0 θέσεις");
-//        jpanel.add(imageLabel, BorderLayout.CENTER);
-//        jpanel.add(imageLabel1, BorderLayout.WEST);
-        //jpanel.
         this.add(lblCourseName, BorderLayout.NORTH);
-        this.add(jPanel1, BorderLayout.CENTER);
-        //this.add(jpanel, BorderLayout.SOUTH);
-        this.add(totalSeatsLabel, BorderLayout.SOUTH);
+        this.add(classroomsPanel, BorderLayout.CENTER);
+        this.add(bottomPanel, BorderLayout.SOUTH);
         this.setSize(dimensionsFrame);
         this.setPreferredSize(dimensionsFrame);
         this.setMaximumSize(dimensionsFrame);
-        
         this.setBorder(BorderFactory.createTitledBorder(courseName));
         this.revalidate();
         this.repaint();
     }
-
-    private void updateTotalSeatsDisplay() {
-        totalSeatsLabel.setText("Συνολικές καταχωρημένες θέσεις: "+ totalSeats + " θέσεις");
+    
+    /**
+    * Επιλέγει τις αίθουσες από τη λίστα των αιθουσών και ενημερώνει την κατάσταση επιλογής των
+    * αντίστοιχων checkboxes στο γραφικό περιβάλλον. Επίσης, προσθέτει τον αριθμό θέσεων της
+    * κάθε επιλεγμένης αίθουσας στον συνολικό αριθμό θέσεων.
+    *
+    * @param classroomsList Η λίστα των ονομάτων των αιθουσών που πρέπει να επιλεχθούν.
+    */
+    public void selectClassrooms(List<String> classroomsList){
+        for(Component comp : classroomsPanel.getComponents()){
+            if (comp instanceof JCheckBox){
+                JCheckBox checkbox = (JCheckBox) comp;
+                String tmp1 = (String) checkbox.getClientProperty("classroom");
+                if(classroomsList.contains(tmp1)){
+                    Classroom classroom = getClassroomFromName(tmp1);
+                    String date = this.getScheduledCourse().getDate();
+                    String timeslot = this.getScheduledCourse().getTimeslot();
+                    if(classroom.isAvailable(date, timeslot) == 1){
+                        checkbox.setSelected(true);
+                        int seats = (int) checkbox.getClientProperty("seats");
+                        bottomPanel.addSeats(seats);
+                        totalSeats += seats;
+                    }
+                }
+            }
+        }
     }
     
-    private void updateIcon(){
-        if(totalSeats < scheduledCourse.getNeededSeats()){
-            
+    /**
+     *  Μέθοδος που επιστρέφει την αίθουσα αποτυπωμένη με μορφή String στην λίστα
+     * με τις αίθουσες. 
+     * 
+     * @param classroomName Το όνομα της αίθουσας (String).
+     * @return Εάν το όνομα ταιριάζει, τότε επιστρέφει το αντικείμενο της αίθουσας,
+     * αλλιώς, επιστρέφει null (Classroom).
+     */
+    public Classroom getClassroomFromName(String classroomName){
+        for(Classroom cls : classrooms){
+            if(cls.getClassroomName().equals(classroomName)){
+                return cls;
+            }
         }
+        return null;
+    }
+    
+    /**
+     * Μέθοδος για αυτόματη επιλογή διαθέσιμων αιθουσών
+     */
+    public void autoSelectNeededClassrooms() {
+        int studentsToTakeExam = scheduledCourse.getCourse().getApproxStudents();
+        if(bottomPanel.getCurrSeats() >= studentsToTakeExam){
+            return;
+        }
+        for (Component comp : classroomsPanel.getComponents()) {
+            if (comp instanceof JCheckBox) {
+                JCheckBox checkbox = (JCheckBox) comp;
+                if (!checkbox.isSelected() && checkbox.isEnabled()) {
+                    checkbox.setSelected(true); // Automatically select the checkbox
+                    String classroomName = (String) checkbox.getClientProperty("classroom");
+                    Classroom classroom = findClassroom(classroomName);
+                    totalSeats += classroom.getClassroomSeats();
+                    bottomPanel.addSeats(classroom.getClassroomSeats());
+                    selectedClassrooms.add(classroom);
+                    if (studentsToTakeExam <= totalSeats) {
+                        break; // Stop once enough seats are selected.
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Μέθοδος για έυρεση του αντικειμένου αίθουσας που αντιστοιχηθεί με το 
+     * εισαγόμενο λεκτικό
+     * @param classroomName Το όνομα της αίθουσα (String).
+     * @return Το αντικείμενο Classroom σε περίπτωση που βρεθεί ή null.
+     */
+    public Classroom findClassroom(String classroomName){
+        for(Classroom classroom : classrooms){
+            if(classroom.getClassroomName().equals(classroomName)){
+                return classroom;
+            }
+        }
+        return null;
     }
     
     @SuppressWarnings("unchecked")
@@ -170,23 +243,23 @@ public class CourseClassroomsPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         lblCourseName = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
+        classroomsPanel = new javax.swing.JPanel();
         totalSeatsLabel = new javax.swing.JLabel();
 
         lblCourseName.setText("0");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout classroomsPanelLayout = new javax.swing.GroupLayout(classroomsPanel);
+        classroomsPanel.setLayout(classroomsPanelLayout);
+        classroomsPanelLayout.setHorizontalGroup(
+            classroomsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        classroomsPanelLayout.setVerticalGroup(
+            classroomsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 160, Short.MAX_VALUE)
         );
 
-        totalSeatsLabel.setText("Συνολικές καταχωρημένες θέσεις: 0 θέσεις");
+        totalSeatsLabel.setText("Επιλεγμένες  θέσεις: 0 θέσεις");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -197,7 +270,7 @@ public class CourseClassroomsPanel extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(lblCourseName, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(classroomsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
@@ -211,7 +284,7 @@ public class CourseClassroomsPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(lblCourseName, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(classroomsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(47, Short.MAX_VALUE))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -223,20 +296,109 @@ public class CourseClassroomsPanel extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel classroomsPanel;
     private javax.swing.JLabel lblCourseName;
     private javax.swing.JLabel totalSeatsLabel;
     // End of variables declaration//GEN-END:variables
 }
 
+/**
+ * 
+ * @author Nektarios Gkouvousis
+ * @author ice18390193
+ * 
+ * Κλάση που χρησιμοποιείται για την δημιουργία των JPanels επιλογής αιθουσών.
+ */
 class CustomJPanel extends JPanel{
-    String lblTotalSeats = "Συνολικός αριθμός εκτιμώμενων μαθητών: ";
-    int intTotalSeats = 0;
-    CustomJPanel(String tmp1, String tmp2){
-        
-    }
-    CustomJPanel(){
-        
+    String lblTotalSeats = "Επιλεγμένες θέσεις: ";
+    int currSeats = 0;
+    int neededSeats = 0;
+    JLabel lblSeats;
+    ImageIcon warningIcon;
+    ImageIcon validIcon;
+    JLabel lblIcon;
 
+    CustomJPanel(int x){
+        lblSeats = new JLabel();
+        neededSeats = x;
+        lblSeats.setText(getSeatsString());
+        initIcons();
+        initPanel();
+    }
+    
+    public int getCurrSeats(){
+        return currSeats;
+    }
+    
+    public String getSeatsString(){
+        return lblTotalSeats + currSeats;
+    }
+    
+    /**
+     * Μέθοδος για την προσθήκη θέσεων στο λεκτικό που απεικονίζει τον αριθμό 
+     * δεσμευμένων θέσσεων κατά έναν χ αριθμό.
+     * @param x Ο αριθμός των αιθουσών που θα αυξηθεί.
+     */
+    public void addSeats(int x){
+        currSeats = currSeats + x;
+        lblSeats.setText(getSeatsString());
+        updateTextAndIcon();
+    }
+    
+    /**
+     * Μέθοδος για την αφαίρεση θέσεων στο λεκτικό που απεικονίζει τον αριθμό 
+     * δεσμευμένων θέσσεων κατά έναν χ αριθμό.
+     * @param x Ο αριθμός των αιθουσών που θα μειωθεί.
+     */
+    public void removeSeats(int x){
+        currSeats = currSeats - x;
+        lblSeats.setText(getSeatsString());
+        updateTextAndIcon();
+    }
+    
+    /**
+     * Μέθοδος για την δημιουργία των εικονιδίων
+     */
+    public void initIcons(){
+        ImageIcon originalIcon1 = new ImageIcon(getClass().getResource("/Assets/caution.png"));
+        Image scaledImage1 = originalIcon1.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
+        warningIcon = new ImageIcon(scaledImage1);
+        
+        ImageIcon originalIcon2 = new ImageIcon(getClass().getResource("/Assets/accept.png"));
+        Image scaledImage2 = originalIcon2.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
+        validIcon = new ImageIcon(scaledImage2);
+        if(currSeats == 0){
+            lblIcon = new JLabel(warningIcon);
+        }else{
+            lblIcon = new JLabel(validIcon);
+        }
+    }
+    
+    public void initPanel(){
+        this.setLayout(new BorderLayout());
+        this.add(lblSeats, BorderLayout.WEST);
+        this.add(lblIcon, BorderLayout.EAST);
+        this.repaint();
+        this.revalidate();
+    }
+    
+    public void changeIcon(ImageIcon imageIcon){
+        lblIcon.setIcon(imageIcon);
+        this.revalidate();
+        this.repaint();
+    }
+    
+    public void updateTextAndIcon(){
+        if(neededSeats <= currSeats && currSeats > 0){
+            if(this.lblIcon.getIcon() == validIcon){
+                return;
+            }
+            changeIcon(validIcon);
+        }else{
+            if(this.lblIcon.getIcon() == warningIcon){
+                return;
+            }
+            changeIcon(warningIcon);
+        }
     }
 }

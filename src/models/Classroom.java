@@ -1,7 +1,9 @@
-package thesis;
+package models;
 
 import java.util.ArrayList;
 import java.util.List;
+import thesis.Availability;
+import thesis.Availability;
 
 /** 
  * @author Nektarios Gkouvousis
@@ -26,7 +28,7 @@ public class Classroom{
      * @param seats Ο αριθμός των θέσεων στην αίθουσα (integer > 0).
      * @param type Τύπος αίθουσας (char '+' για εργαστηριακή, αλλιώς '-' για κανονική).
      */
-    Classroom(String code, String name, int seats, String type){
+    public Classroom(String code, String name, int seats, String type){
         classroomCode = code;
         classroomName = name;
         classroomSeats = seats;
@@ -35,7 +37,17 @@ public class Classroom{
         }else{
             isLabClassroom = false;
         }
-        availability = new ArrayList<>();
+        availability = new ArrayList<Availability>();
+    }
+    
+    public Classroom(Classroom cls){
+        if(cls != null){
+            classroomCode = cls.getClassroomCode();
+            classroomName = cls.getClassroomName();
+            classroomSeats = cls.getClassroomSeats();
+            isLabClassroom = cls.getClassroomType();
+            List<Availability> availability = new ArrayList<Availability>(cls.getAvailabilityList());
+        }
     }
     
     public String getClassroomCode(){
@@ -72,6 +84,10 @@ public class Classroom{
     
     public void setAvailability(List<Availability> availability) {
         this.availability = availability;
+    }
+    
+    public List<Availability> getAvailabilityList(){
+        return this.availability;
     }
     
     /**

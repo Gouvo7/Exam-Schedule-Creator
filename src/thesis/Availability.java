@@ -1,7 +1,5 @@
 package thesis;
 
-import java.io.Serializable;
-
 /**
  * @author Nektarios Gkouvousis
  * @author ice18390193
@@ -10,13 +8,13 @@ import java.io.Serializable;
  * για καθηγητές και αίθουσες. Χρησιμοποιεί έναν ακέραιο για να εκφράσει τη διαθεσιμότητα,
  * όπου 0 σημαίνει μη διαθέσιμο και 1 διαθέσιμο.
  */
-public class Availability implements Serializable{
+public class Availability{
 
     private String date;
     private String timeSlot;
     private int isAvailable;
 
-    Availability(String x, String y, int z) {
+    public Availability(String x, String y, int z) {
         date = x;
         timeSlot = y;
         isAvailable = z;

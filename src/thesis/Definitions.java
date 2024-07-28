@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -24,21 +26,25 @@ public class Definitions extends JFrame{
     
     private static String folderPath = "";
     private static String settingsFile = "config.txt";
-    private static String genericFile = "1) General.xlsx";
-    private static String professorsAvailabilityFile = "TEST2.xlsx";
-    private static String classroomsAvailabilityFile = "TEST3.xlsx";
+    private static String genericFile = "Scheduler_input.xlsx";
+    private static String producedProfessorsAvailabilityFile = "generated_professors_availability.xlsx";
+    private static String producedClassroomsAvailabilityFile = "generated_classrooms_availability.xlsx";
+    private static String professorsAvailabilityFile = "filled_professors_availability.xlsx";
+    private static String classroomsAvailabilityFile = "filled_classrooms_availability.xlsx";
     private static String examScheduleFile = "ΠΡΟΓΡΑΜΜΑ.xlsx";
     
-    private static String sheet1 = "PROFESSORS"; 
-    private static String sheet2 = "TIMESLOTS";
-    private static String sheet3 = "DATES";
-    private static String sheet4 = "CLASSROOMS";
-    private static String sheet5 = "COURSES";
-    private static String sheet6 = "COURSES_PROFESSORS";
+    private static String sheet1 = "ΚΑΘΗΓΗΤΕΣ"; 
+    private static String sheet2 = "ΧΡΟΝΙΚΑ_ΔΙΑΣΤΗΜΑΤΑ";
+    private static String sheet3 = "ΗΜΕΡΟΜΗΝΙΕΣ";
+    private static String sheet4 = "ΑΙΘΟΥΣΕΣ";
+    private static String sheet5 = "ΜΑΘΗΜΑΤΑ";
+    private static String sheet6 = "ΜΑΘΗΜΑΤΑ_ΚΑΘΗΓΗΤΕΣ";
     private static String sheet7 = "ΠΡΟΓΡΑΜΜΑ ΕΞΕΤΑΣΤΙΚΗΣ";
     private static String sheet8 = "ΠΡΟΓΡΑΜΜΑ ΑΙΘΟΥΣΩΝ";
-                                    
     
+    private String[] weekdays = { "ΔΕΥΤΕΡΑ", "ΤΡΙΤΗ", "ΤΕΤΑΡΤΗ", "ΠΕΜΠΤΗ", "ΠΑΡΑΣΚΕΥΗ", "ΣΑΒΒΑΤΟ", "ΚΥΡΙΑΚΗ" };
+    private List<String> greekSemesters = Arrays.asList("Α", "Β", "Γ", "Δ", "Ε", "Ζ", "Η","ΣΤ", "ΕΧ1", "ΕΧ2", "ΕΧ3", "ΕΧΓ", "ΕΕ1", "ΕΕ2", "ΕΕ3", "ΕΕΓ", "ΕΧΑ");
+
     public void Definitions(){
     }
     
@@ -50,12 +56,12 @@ public class Definitions extends JFrame{
      */
     public void startProcess(){
         if (!configFileExists()){
-            if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(this, "Καλωσήρθατε στο βοήθημα για την παραγωγή του προγράμματος εξετάσεων!"
-                    + " Παρακαλώ επιλέξτε τον φάκελο στον οποίο θα γίνεται η επεξεργασία των αρχείων εισόδου/εξόδου.", "Μήνυμα Εφαρμογής", JOptionPane.OK_OPTION))
+            if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(this, "Καλωσήρθατε στην εφαρμογή!"
+                    + " Παρακαλώ ορίστε τον φάκελο αρχείων εισόδου/εξόδου για την εκκίνηση του σχεδιαστή προγράμματος εξετάσεων.", "Μήνυμα Εφαρμογής", JOptionPane.OK_OPTION))
             {
-                System.exit(0);
-            }else{
                 promptUserForFolder();
+            }else{
+                System.exit(0);
             }
         }else{
             loadWorkingDirectory();
@@ -73,7 +79,6 @@ public class Definitions extends JFrame{
     public String getSettingsFile(){
         return settingsFile;
     }
-    
     
     public void setFolderPath(String tmp){
         folderPath = tmp;
@@ -97,6 +102,13 @@ public class Definitions extends JFrame{
     
     public String getConfigFile(){
         return settingsFile;
+    }
+    
+    public String getProducedProfessorsAvailabilityFile(){
+        return producedProfessorsAvailabilityFile;
+    }
+    public String getProducedClassroomsAvailabilityFile(){
+        return producedClassroomsAvailabilityFile;
     }
     
     public String getProfessorsAvailabilityFile(){
@@ -177,6 +189,22 @@ public class Definitions extends JFrame{
         Definitions.sheet8 = sheet8;
     }
     
+    public String[] getWeekdays() {
+        return weekdays;
+    }
+
+    public void setWeekdays(String[] weekdays) {
+        this.weekdays = weekdays;
+    }
+
+    public List<String> getGreekSemesters() {
+        return greekSemesters;
+    }
+
+    public void setGreekSemesters(List<String> greekSemesters) {
+        this.greekSemesters = greekSemesters;
+    }
+    
     /**
      * Ελέγχει εάν το αρχείο ρυθμίσεων υπάρχει.
      *
@@ -196,9 +224,9 @@ public class Definitions extends JFrame{
     }
     
     /**
-     * Επιστρέφει τον τρέχοντα κατάλογο της εφαρμογής.
+     * Επιστρέφει τον τρέχον κατάλογο της εφαρμογής.
      *
-     * @return Ο τρέχοντας κατάλογος.
+     * @return Ο τρέχον κατάλογος.
      */
     public String CurrentDirectory(){
         return System.getProperty("user.dir");
@@ -238,7 +266,7 @@ public class Definitions extends JFrame{
     }
 
     /**
-     * Φορτώνει τον τρέχοντα κατάλογο από το αρχείο ρυθμίσεων διαβάζοντας το αρχείο
+     * Φορτώνει τον τρέχον κατάλογο από το αρχείο ρυθμίσεων διαβάζοντας το αρχείο
      * ρυθμίσεων.
      */
     public void loadWorkingDirectory() {

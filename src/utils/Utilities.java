@@ -1,5 +1,7 @@
-package thesis;
+package utils;
 
+import forms.CourseClassroomsPanel;
+import models.Course;
 import java.awt.Component;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
@@ -12,11 +14,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.JPanel;
+import models.Professor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.gmele.general.sheets.XlsxSheet;
+import thesis.ScheduledCourse;
 
 /**
  * @author Nektarios Gkouvousis
@@ -122,6 +126,16 @@ public class Utilities {
         return null;
     }
     
+    public List<String> getCourseExaminersSurnames(Course course){
+        List<String> examinersSurnames = new ArrayList<>();
+        if(course.getExaminers().size() != 0){
+            for (Professor prof : course.getExaminers()){
+                examinersSurnames.add(prof.getProfSurname());
+            }
+        }
+        return examinersSurnames;
+    }
+    
     public ScheduledCourse getScheduledCourse(List<ScheduledCourse> scheduledCourses, Course course){
         for(ScheduledCourse crs : scheduledCourses){
             if(crs.getCourse().getCourseName().equals(course.getCourseName())){
@@ -170,7 +184,6 @@ public class Utilities {
 
             return greekDayName;
         } catch (ParseException e) {
-            // Handle parsing exception
             e.printStackTrace();
             return null;
         }
@@ -178,7 +191,6 @@ public class Utilities {
     
     public String modifyDate(String inputDate, int daysToModify, char operation) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
         try {
             LocalDate date = LocalDate.parse(inputDate, formatter);
 
@@ -211,8 +223,8 @@ public class Utilities {
         Row timeslotRow = sheet.createRow(0);
         Cell cell1 = timeslotRow.createCell(0);
         Cell cell2 = timeslotRow.createCell(1);
-        cell1.setCellValue("ΗΜ/ΝΙΑ");
-        cell2.setCellValue("ΗΜΕΡΑ");
+        cell1.setCellValue("ΗΜΕΡΑ");
+        cell2.setCellValue("ΗΜ/ΝΙΑ");
         for (int i = 0; i < timeslots.size(); i++) {
             Cell cell = timeslotRow.createCell(i + 2);
             cell.setCellValue(timeslots.get(i));
@@ -232,11 +244,30 @@ public class Utilities {
         }
     }
     
-    //method to filter out not needed courses.
-    public List<Course> getValidCourses(List<Course> courses){
+    public List<Course> filterOutNotExaminedCourses(List<Course> courses){
         List<Course> validCoursesList = new ArrayList<>();
         for(Course crs : courses){
-            if (crs.getApproxStudents() > 0 && crs.getIsExamined() == true){
+            if (crs.getIsExamined() == true){
+                validCoursesList.add(crs);
+            }
+        }
+        return validCoursesList;
+    }
+    
+    public List<Course> filterOutCoursesWithNoExaminers(List<Course> courses){
+        List<Course> validCoursesList = new ArrayList<>();
+        for(Course crs : courses){
+            if(!crs.getExaminers().isEmpty()){
+                validCoursesList.add(crs);
+            }
+        }
+        return validCoursesList;
+    }
+    
+    public List<Course> filterOutCoursesWithNoStudents(List<Course> courses){
+        List<Course> validCoursesList = new ArrayList<>();
+        for(Course crs : courses){
+            if(crs.getApproxStudents() > 0){
                 validCoursesList.add(crs);
             }
         }

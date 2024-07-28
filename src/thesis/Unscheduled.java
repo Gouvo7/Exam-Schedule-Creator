@@ -1,5 +1,6 @@
 package thesis;
 
+import models.Course;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,16 +18,16 @@ public class Unscheduled {
     private List<Course> courses;
     private String msg;
     
-    Unscheduled(){
+    public Unscheduled(){
         courses = new ArrayList<>();
     }
     
-    Unscheduled(Unscheduled un){
+    public Unscheduled(Unscheduled un){
         courses = new ArrayList<>(un.getCourses());
         msg = un.getMsg();
     }
     
-    Unscheduled(List<Course> courses){
+    public Unscheduled(List<Course> courses){
         this.courses = courses;
     }
     

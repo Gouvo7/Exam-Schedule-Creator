@@ -1,6 +1,9 @@
 package thesis;
 
 import com.formdev.flatlaf.FlatLightLaf;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -16,13 +19,12 @@ public class Main {
     
     public static void main (String[] args){
         try {
-            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            UIManager.setLookAndFeel( new FlatLightLaf() );
+            UIManager.setLookAndFeel(new FlatLightLaf());
             MainForm a = new MainForm();
-        //} catch (UnsupportedLookAndFeelException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-          } catch (UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
-            System.exit(-1);
+        } catch (IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

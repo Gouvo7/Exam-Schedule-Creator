@@ -1,5 +1,7 @@
 package thesis;
 
+import models.Course;
+import models.Classroom;
 import java.util.ArrayList;
 import java.util.List;
 

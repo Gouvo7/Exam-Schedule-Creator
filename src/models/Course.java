@@ -1,5 +1,6 @@
-package thesis;
+package models;
 
+import models.Classroom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,13 +25,14 @@ public class Course{
     private int approxStudents;
 
     /**
-     * Κατασκευαστής για τη δημιουργία ενός νέου αντικειμένου Course.
+     * Η κλάση Course αντιπροσωπεύει τα μαθήματα του προγράμματος σπουδών.
+     * Αρχικοποιείται με τις πληροφορίες από το γραμμογραφημένο Excel.
      *
      * @param name Το όνομα του μαθήματος (String).
      * @param nameShort Η συντομογραφία του μαθήματος (String).
      * @param semester Το εξάμηνο διεξαγωγής του μαθήματος (String).
-     * @param season Περίοδος εξέστασης (String 'ΕΑΡΙΝΟ'/'ΧΕΙΜΕΡΙΝΟ').
-     * @param isExamined Εάν εξετάζεται το μάθημα ή όχι(boolean, true για '+', false για '-').
+     * @param season Περίοδος εξέστασης (String, 'ΕΑΡΙΝΟ'/'ΧΕΙΜΕΡΙΝΟ').
+     * @param examined Εάν εξετάζεται το μάθημα ή όχι(Boolean, true για '+', false για '-').
      */
     public Course(String name, String nameShort, String semester, String season, boolean examined){
         courseName = name;
@@ -129,6 +131,15 @@ public class Course{
         this.approxStudents = approxStudents;
     }
     
+    /**
+     * Μέθοδος που ελέγχει εάν όλοι οι καθηγητές του μαθήματος είναι διαθέσιμοι
+     * για μία ημερομηνία και ένα timeslot.
+     * @param date Η ημερομηνία που θέλουμε να ελέγξουμε (String).
+     * @param timeslot Το timeslot που θέλουμε να ελέγξουμε (String).
+     * 
+     * @return true εάν όλοι οι καθηγητές του μαθήματος είναι διαθέσιμοι και false
+     * εάν δεν είναι (Boolean).
+     */
     public boolean checkIfProfessorsAreAvailable(String date, String timeslot){
         boolean res = true;
         for(Professor prf : examiners){
@@ -138,16 +149,4 @@ public class Course{
         }
         return res;
     }
-    
-    /**
-     * Εκτύπωση μαθήματος και εξεταστών.
-     */
-    /*
-    public void printStatistics(){
-        int i = 0;
-        System.out.println("Course is:" + this.getCourseName() + examiners.size());
-        for (Professor prof : examiners){
-            System.out.println("Professor " + i + ": " + prof.getProfFirstname());
-        }
-    }*/
 }

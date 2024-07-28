@@ -1,5 +1,7 @@
 package thesis;
 
+import models.Course;
+
 /**
  * @author Nektarios Gkouvousis
  * @author ice18390193

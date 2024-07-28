@@ -1,4 +1,4 @@
-package thesis;
+package utils;
 
 import javax.swing.TransferHandler;
 import java.awt.datatransfer.Transferable;
